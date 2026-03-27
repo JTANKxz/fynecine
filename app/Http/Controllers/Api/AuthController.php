@@ -21,12 +21,14 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name'                  => ['required', 'string', 'max:255'],
+            'username'              => ['required', 'string', 'max:255', 'unique:users'],
             'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'              => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
             'name'     => $validated['name'],
+            'username' => $validated['username'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
@@ -47,13 +49,15 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email'    => ['required', 'email'],
+            'login'    => ['required', 'string'],
             'password' => ['required'],
         ]);
 
-        if (! Auth::attempt($request->only('email', 'password'))) {
+        $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (! Auth::attempt([$loginField => $request->login, 'password' => $request->password])) {
             throw ValidationException::withMessages([
-                'email' => ['Credenciais inválidas.'],
+                'login' => ['Credenciais inválidas.'],
             ]);
         }
 

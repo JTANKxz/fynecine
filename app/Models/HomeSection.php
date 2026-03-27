@@ -61,6 +61,9 @@ class HomeSection extends Model
             case 'network':
                 return $this->resolveNetwork($limit);
 
+            case 'recently_added':
+                return $this->resolveRecentlyAdded($limit);
+
             default:
                 return collect();
         }
@@ -161,5 +164,20 @@ class HomeSection extends Model
         }
 
         return $results->take($limit)->values();
+    }
+
+    private function resolveRecentlyAdded($limit)
+    {
+        $results = collect();
+
+        if (in_array($this->content_type, ['movie', 'both'])) {
+            $results = $results->merge(Movie::latest()->limit($limit)->get());
+        }
+
+        if (in_array($this->content_type, ['series', 'both'])) {
+            $results = $results->merge(Serie::latest()->limit($limit)->get());
+        }
+
+        return $results->sortByDesc('created_at')->take($limit)->values();
     }
 }

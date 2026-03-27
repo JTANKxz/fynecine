@@ -32,6 +32,7 @@
                     <option value="genre" {{ old('type') == 'genre' ? 'selected' : '' }}>Por Gênero</option>
                     <option value="trending" {{ old('type') == 'trending' ? 'selected' : '' }}>Trending (Mais Assistidos)</option>
                     <option value="network" {{ old('type') == 'network' ? 'selected' : '' }}>Por Network</option>
+                    <option value="recently_added" {{ old('type') == 'recently_added' ? 'selected' : '' }}>Recém Adicionados</option>
                 </select>
             </div>
         </div>

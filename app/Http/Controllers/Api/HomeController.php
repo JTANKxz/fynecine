@@ -62,7 +62,9 @@ class HomeController extends Controller
             ->map(function ($section) {
                 return [
                     'title' => $section->title,
-                    'type' => $section->content_type, // 'movie', 'series', 'both'
+                    'type' => $section->type, // 'custom', 'genre', 'trending', 'network', 'recently_added'
+                    'content_type' => $section->content_type, // 'movie', 'series', 'both'
+                    'slug' => ($section->type === 'genre' && $section->genre) ? $section->genre->slug : null,
                     'items' => $section->resolveItems()
                 ];
             });

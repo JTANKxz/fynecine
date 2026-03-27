@@ -28,7 +28,15 @@ class SettingController extends Controller
             'update_features' => ['nullable', 'string'],
             
             'autoembed_movie_url' => ['nullable', 'string'],
+            'autoembed_movie_name' => ['nullable', 'string', 'max:50'],
+            'autoembed_movie_quality' => ['nullable', 'string', 'max:50'],
+            'autoembed_movie_type' => ['nullable', 'string', 'max:50'],
+            'autoembed_movie_player_sub' => ['nullable', 'string', 'max:50'],
             'autoembed_serie_url' => ['nullable', 'string'],
+            'autoembed_serie_name' => ['nullable', 'string', 'max:50'],
+            'autoembed_serie_quality' => ['nullable', 'string', 'max:50'],
+            'autoembed_serie_type' => ['nullable', 'string', 'max:50'],
+            'autoembed_serie_player_sub' => ['nullable', 'string', 'max:50'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -53,7 +61,16 @@ class SettingController extends Controller
         $config->update_features = $request->update_features;
         
         $config->autoembed_movie_url = $request->autoembed_movie_url;
+        $config->autoembed_movie_name = $request->autoembed_movie_name ?? 'Auto Player';
+        $config->autoembed_movie_quality = $request->autoembed_movie_quality ?? 'HD';
+        $config->autoembed_movie_type = $request->autoembed_movie_type ?? 'embed';
+        $config->autoembed_movie_player_sub = $request->autoembed_movie_player_sub ?? 'Dub/Leg';
+
         $config->autoembed_serie_url = $request->autoembed_serie_url;
+        $config->autoembed_serie_name = $request->autoembed_serie_name ?? 'Auto Player';
+        $config->autoembed_serie_quality = $request->autoembed_serie_quality ?? 'HD';
+        $config->autoembed_serie_type = $request->autoembed_serie_type ?? 'embed';
+        $config->autoembed_serie_player_sub = $request->autoembed_serie_player_sub ?? 'Dub/Leg';
 
         $config->save();
 

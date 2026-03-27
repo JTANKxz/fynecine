@@ -95,7 +95,17 @@
                                 <span class="text-xs font-bold uppercase tracking-widest">Filmes</span>
                             </label>
                             <input type="text" name="autoembed_movie_url" value="{{ old('autoembed_movie_url', $config->autoembed_movie_url) }}" 
-                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none" placeholder="URL do player">
+                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-3" placeholder="URL do player">
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <input type="text" name="autoembed_movie_name" value="{{ old('autoembed_movie_name', $config->autoembed_movie_name) }}" placeholder="Nome (Ex: Auto Player)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_movie_quality" value="{{ old('autoembed_movie_quality', $config->autoembed_movie_quality) }}" placeholder="Qualidade (Ex: HD)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" name="autoembed_movie_type" value="{{ old('autoembed_movie_type', $config->autoembed_movie_type) }}" placeholder="Tipo (Ex: embed)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_movie_player_sub" value="{{ old('autoembed_movie_player_sub', $config->autoembed_movie_player_sub) }}" placeholder="Idioma (Ex: Dub/Leg)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                            </div>
                         </div>
 
                         <div class="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700/50">
@@ -104,7 +114,17 @@
                                 <span class="text-xs font-bold uppercase tracking-widest text-blue-500">Séries / Episódios</span>
                             </label>
                             <input type="text" name="autoembed_serie_url" value="{{ old('autoembed_serie_url', $config->autoembed_serie_url) }}" 
-                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none" placeholder="URL do player">
+                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-3" placeholder="URL do player">
+                                   
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <input type="text" name="autoembed_serie_name" value="{{ old('autoembed_serie_name', $config->autoembed_serie_name) }}" placeholder="Nome (Ex: Auto Player)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_serie_quality" value="{{ old('autoembed_serie_quality', $config->autoembed_serie_quality) }}" placeholder="Qualidade (Ex: HD)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" name="autoembed_serie_type" value="{{ old('autoembed_serie_type', $config->autoembed_serie_type) }}" placeholder="Tipo (Ex: embed)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_serie_player_sub" value="{{ old('autoembed_serie_player_sub', $config->autoembed_serie_player_sub) }}" placeholder="Idioma (Ex: Dub/Leg)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                            </div>
                         </div>
                     </div>
                 </div>

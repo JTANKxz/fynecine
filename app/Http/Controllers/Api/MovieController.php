@@ -112,18 +112,25 @@ class MovieController extends Controller
         
         $playLinks = collect();
         if (!$config->security_mode) {
-            if (Auth::guard('sanctum')->check() && Auth::guard('sanctum')->user()->hasPlan()) {
-                
-                $playLinks = $movie->playLinks->map(function ($link) {
-                    return [
+            $user = Auth::guard('sanctum')->user();
+            $hasPlan = $user && $user->hasPlan();
+            
+            foreach ($movie->playLinks as $link) {
+                if ($link->player_sub === 'free' || $hasPlan) {
+                    $playLinks->push([
                         'id' => $link->id,
                         'name' => $link->name,
                         'url' => $link->url,
-                        'type' => $link->type
-                    ];
-                });
+                        'type' => $link->type,
+                        'quality' => $link->quality,
+                        'player_sub' => $link->player_sub
+                    ]);
+                }
+            }
 
-                if ($config->autoembed_movies && $config->autoembed_movie_url) {
+            if ($config->autoembed_movies && $config->autoembed_movie_url) {
+                $autoSub = $config->autoembed_movie_player_sub ?? 'free';
+                if ($autoSub === 'free' || $hasPlan) {
                     $url = str_replace('{tmdb_id}', $movie->tmdb_id, $config->autoembed_movie_url);
                     $playLinks->push([
                         'id' => 'auto', 
@@ -131,7 +138,7 @@ class MovieController extends Controller
                         'url' => $url, 
                         'type' => $config->autoembed_movie_type ?? 'embed',
                         'quality' => $config->autoembed_movie_quality ?? 'HD',
-                        'player_sub' => $config->autoembed_movie_player_sub ?? 'free'
+                        'player_sub' => $autoSub
                     ]);
                 }
             }

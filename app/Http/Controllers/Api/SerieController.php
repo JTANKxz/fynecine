@@ -189,17 +189,22 @@ class SerieController extends Controller
                             $user = Auth::guard('sanctum')->user();
                             $hasPlan = $user && $user->hasPlan();
 
-                            if ($hasPlan) {
-                                $links = $episode->links->map(function ($link) {
-                                    return [
+                            foreach ($episode->links as $link) {
+                                if ($link->player_sub === 'free' || $hasPlan) {
+                                    $links->push([
                                         'id' => $link->id,
                                         'name' => $link->name,
                                         'url' => $link->url,
-                                        'type' => $link->type
-                                    ];
-                                });
+                                        'type' => $link->type,
+                                        'quality' => $link->quality,
+                                        'player_sub' => $link->player_sub
+                                    ]);
+                                }
+                            }
 
-                                if ($config->autoembed_series && $config->autoembed_serie_url) {
+                            if ($config->autoembed_series && $config->autoembed_serie_url) {
+                                $autoSub = $config->autoembed_serie_player_sub ?? 'free';
+                                if ($autoSub === 'free' || $hasPlan) {
                                     $embedUrl = str_replace(
                                         ['{tmdb_id}', '{season}', '{episode}'],
                                         [$serie->tmdb_id, $season->season_number, $episode->episode_number],
@@ -212,7 +217,7 @@ class SerieController extends Controller
                                         'url' => $embedUrl,
                                         'type' => $config->autoembed_serie_type ?? 'embed',
                                         'quality' => $config->autoembed_serie_quality ?? 'HD',
-                                        'player_sub' => $config->autoembed_serie_player_sub ?? 'free'
+                                        'player_sub' => $autoSub
                                     ]);
                                 }
                             }

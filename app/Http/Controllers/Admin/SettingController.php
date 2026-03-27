@@ -24,6 +24,8 @@ class SettingController extends Controller
             
             'update_type' => ['required', 'in:none,in_app,external'],
             'update_url' => ['nullable', 'string'],
+            'version_code' => ['nullable', 'integer', 'min:0'],
+            'update_features' => ['nullable', 'string'],
             
             'autoembed_movie_url' => ['nullable', 'string'],
             'autoembed_serie_url' => ['nullable', 'string'],
@@ -47,6 +49,8 @@ class SettingController extends Controller
         
         $config->update_type = $request->update_type;
         $config->update_url = $request->update_url;
+        $config->version_code = $request->version_code;
+        $config->update_features = $request->update_features;
         
         $config->autoembed_movie_url = $request->autoembed_movie_url;
         $config->autoembed_serie_url = $request->autoembed_serie_url;

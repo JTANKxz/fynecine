@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\ContentRequest;
 use App\Models\MoviePlayLink;
 use App\Models\EpisodeLink;
+use App\Models\TvChannel;
 
 class DashboardController extends Controller
 {
@@ -17,6 +18,7 @@ class DashboardController extends Controller
         $stats = [
             'movies'   => Movie::count(),
             'series'   => Serie::count(),
+            'channels' => TvChannel::count(),
             'users'    => User::count(),
             'requests' => ContentRequest::where('status', 'pending')->count(),
             'movie_links' => MoviePlayLink::count(),

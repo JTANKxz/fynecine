@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Coupon extends Model
 {
     protected $fillable = [
+        'subscription_plan_id',
         'code',
         'plan',
         'days',
@@ -20,6 +21,11 @@ class Coupon extends Model
         'features' => 'array',
         'is_active' => 'boolean',
     ];
+
+    public function subscriptionPlan()
+    {
+        return $this->belongsTo(SubscriptionPlan::class);
+    }
 
     public function users()
     {

@@ -4,31 +4,29 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Slider;
-use App\Models\Movie;
-use App\Models\Serie;
 use App\Models\Genre;
+use App\Models\HomeSection;
 
 class HomeController extends Controller
 {
     public function index()
     {
-
         /*
         ==================
         SLIDERS
         ==================
         */
-
         $sliders = Slider::where('active', true)
             ->orderBy('position')
             ->get()
             ->map(function ($slider) {
-
                 $content = $slider->content;
+
+                if (!$content) return null;
 
                 return [
                     'id' => $content->id,
-                    'slug' => $content->slug, // 👈 AQUI
+                    'slug' => $content->slug,
                     'type' => $slider->content_type,
 
                     'title' => $slider->content_type === 'movie'
@@ -44,78 +42,35 @@ class HomeController extends Controller
                     'poster' => $content->poster_path,
                     'backdrop' => $content->backdrop_path,
                 ];
-            });
+            })->filter()->values();
 
         /*
         ==================
         GENEROS
         ==================
         */
-
         $genres = Genre::select('id', 'name', 'slug')->get();
 
-
         /*
         ==================
-        FILMES POPULARES
+        SEÇÕES DINÂMICAS
         ==================
         */
-
-        $popularMovies = Movie::orderBy('rating', 'desc')
-            ->limit(15)
-            ->get();
-
-
-        /*
-        ==================
-        SERIES POPULARES
-        ==================
-        */
-
-        $popularSeries = Serie::orderBy('rating', 'desc')
-            ->limit(15)
-            ->get();
-
-
-        /*
-        ==================
-        FILMES RECENTES
-        ==================
-        */
-
-        $latestMovies = Movie::latest()
-            ->limit(15)
-            ->get();
-
+        $sections = HomeSection::where('is_active', true)
+            ->orderBy('order')
+            ->get()
+            ->map(function ($section) {
+                return [
+                    'title' => $section->title,
+                    'type' => $section->content_type, // 'movie', 'series', 'both'
+                    'items' => $section->resolveItems()
+                ];
+            });
 
         return response()->json([
-
             'sliders' => $sliders,
-
             'genres' => $genres,
-
-            'sections' => [
-
-                [
-                    'title' => 'Filmes Populares',
-                    'type' => 'movie',
-                    'items' => $popularMovies
-                ],
-
-                [
-                    'title' => 'Séries Populares',
-                    'type' => 'series',
-                    'items' => $popularSeries
-                ],
-
-                [
-                    'title' => 'Filmes Recentes',
-                    'type' => 'movie',
-                    'items' => $latestMovies
-                ]
-
-            ]
-
+            'sections' => $sections
         ]);
     }
 }

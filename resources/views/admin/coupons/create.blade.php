@@ -28,21 +28,40 @@
                             <input type="text" name="code" class="form-control" value="{{ old('code', strtoupper(Str::random(8))) }}" required>
                             <small class="text-muted">Ex: VIP30, LANCAMENTO</small>
                         </div>
-                        <div class="col-md-6">
-                            <label>Plano</label>
-                            <select name="plan" class="form-control" required>
-                                <option value="basic">Basic (2 Perfis)</option>
-                                <option value="premium">Premium (5 Perfis)</option>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="font-weight-bold text-primary">Vincular a um Plano VIP (Opcional)</label>
+                            <select name="subscription_plan_id" class="form-control">
+                                <option value="">Nenhum Plano Associado (Cupom Customizado)</option>
+                                @foreach($plans ?? [] as $pln)
+                                    <option value="{{ $pln->id }}" {{ old('subscription_plan_id') == $pln->id ? 'selected' : '' }}>
+                                        {{ $pln->name }} - R$ {{ number_format($pln->price, 2, ',', '.') }} ({{ $pln->duration_days }} dias)
+                                    </option>
+                                @endforeach
                             </select>
+                            <small class="text-muted">Se selecionado, o Nível e a Duração abaixo serão ignorados e o usuário receberá os benefícios deste plano.</small>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
+                        <div class="col-md-6">
+                            <label>Plano (Se não selecionar um acima)</label>
+                            <select name="plan" class="form-control">
+                                <option value="basic">Basic (2 Perfis)</option>
+                                <option value="premium">Premium (5 Perfis)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label>Dias de Duração</label>
-                            <input type="number" name="days" class="form-control" value="30" min="1" required>
+                            <input type="number" name="days" class="form-control" value="30" min="1">
                             <small class="text-muted">Quantos dias de acesso o cupom concede.</small>
                         </div>
+                    </div>
+
+                    <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Limite de Usos (Max Ativações Globais)</label>
                             <input type="number" name="max_uses" class="form-control" value="" min="1">
@@ -63,6 +82,10 @@
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" name="feature_priority_requests" id="f3" value="1">
                             <label class="form-check-label" for="f3">Pedidos Prioritários</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="feature_premium_channels" id="f4" value="1">
+                            <label class="form-check-label" for="f4">Canais Premium (TV ao Vivo)</label>
                         </div>
                     </div>
 

@@ -37,19 +37,22 @@ class SubscriptionController extends Controller
             return response()->json(['message' => 'Você já resgatou este cupom.'], 403);
         }
 
-        // 3. Calcula nova data de expiração (soma se já tiver plano, ou começa hoje)
+        // 3. Calcula nova data de expiração, pegando os dias e features do Plano Vinculado ou do código legado
+        $daysToAdd = $coupon->subscription_plan_id ? $coupon->subscriptionPlan->duration_days : $coupon->days;
+        $planType = $coupon->subscription_plan_id ? $coupon->subscriptionPlan->plan_type : $coupon->plan;
+        
+        // As features também vêm do plano se ele existir, senão do próprio cupom
+        $features = $coupon->subscription_plan_id ? $coupon->subscriptionPlan->features : $coupon->features;
+
         $currentExpires = $user->plan_expires_at && $user->plan_expires_at->isFuture()
             ? $user->plan_expires_at
             : Carbon::now();
 
-        $newExpires = $currentExpires->copy()->addDays($coupon->days);
-
-        // Se o plano atual for Premium e o Cupom for Basic (downgrade), precisamos decidir se aceita
-        // Para manter simples, o cupom sempre sobrepõe o plano atual (features e tipo).
+        $newExpires = $currentExpires->copy()->addDays($daysToAdd);
         
-        $user->plan_type = $coupon->plan;
+        $user->plan_type = $planType;
         $user->plan_expires_at = $newExpires;
-        $user->features = $coupon->features;
+        $user->features = $features;
         $user->save();
 
         // 4. Registra uso e abate do contador max_uses
@@ -57,7 +60,7 @@ class SubscriptionController extends Controller
         $user->coupons()->attach($coupon->id);
 
         return response()->json([
-            'message' => "Cupom ativado com sucesso! Você agora é {$coupon->plan}.",
+            'message' => "Cupom ativado com sucesso! Você agora é {$planType}.",
             'plan_type' => $user->plan_type,
             'expires_at' => $user->plan_expires_at,
             'features' => $user->features

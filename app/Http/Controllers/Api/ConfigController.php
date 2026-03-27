@@ -28,6 +28,8 @@ class ConfigController extends Controller
             'update_type' => $config->update_type,
             'update_url' => $config->update_url,
             'update_skippable' => $config->update_skippable,
+            'version_code' => $config->version_code,
+            'update_features' => $config->update_features,
             
             // Retorna o security_mode para que o front também possa omitir itens se quiser
             'security_mode' => $config->security_mode,

@@ -36,6 +36,18 @@ Route::get('/{type}/{idOrSlug}/comments', [CommentController::class, 'index'])->
 Route::get('/genres/{slug}', [GenreController::class, 'show']);
 Route::get('/search', [SearchController::class, 'index']);
 
+// TV ao Vivo (Canais)
+Route::get('/channels', [\App\Http\Controllers\Api\TvChannelController::class, 'index']);
+Route::get('/channels/categories', [\App\Http\Controllers\Api\TvChannelController::class, 'categories']);
+Route::get('/channels/{idOrSlug}', [\App\Http\Controllers\Api\TvChannelController::class, 'show']);
+
+// Networks
+Route::get('/networks', [\App\Http\Controllers\Api\NetworkController::class, 'index']);
+Route::get('/networks/{slug}', [\App\Http\Controllers\Api\NetworkController::class, 'show']);
+
+// Views tracking
+Route::post('/views', [\App\Http\Controllers\Api\ContentViewController::class, 'store']);
+
 /*
 |--------------------------------------------------------------------------
 | Autenticação API (Sanctum — Bearer Token)

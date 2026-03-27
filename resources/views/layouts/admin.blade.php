@@ -141,6 +141,29 @@
                 </div>
             </div>
 
+            {{-- TV ao Vivo --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('channelsSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.channels.*') || request()->routeIs('admin.channel-categories.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-satellite-dish mr-2"></i> TV ao Vivo</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-channelsSubmenu"></i>
+                </button>
+                <div id="channelsSubmenu" class="{{ request()->routeIs('admin.channels.*') || request()->routeIs('admin.channel-categories.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.channels.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.channels.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Canais
+                    </a>
+                    <a href="{{ route('admin.channels.create') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.channels.create') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-plus w-4 mr-1"></i> Novo Canal
+                    </a>
+                    <a href="{{ route('admin.channel-categories.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.channel-categories.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-tags w-4 mr-1"></i> Categorias
+                    </a>
+                </div>
+            </div>
+
             {{-- Sliders --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('slidersSubmenu')"
@@ -156,6 +179,25 @@
                     <a href="{{ route('admin.sliders.create') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.sliders.create') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-plus w-4 mr-1"></i> Adicionar Slider
+                    </a>
+                </div>
+            </div>
+
+            {{-- Organização da Home --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('homeSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.sections.*') || request()->routeIs('admin.networks.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-layer-group mr-2"></i> Página Inicial</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-homeSubmenu"></i>
+                </button>
+                <div id="homeSubmenu" class="{{ request()->routeIs('admin.sections.*') || request()->routeIs('admin.networks.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.sections.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.sections.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-bars-staggered w-4 mr-1"></i> Seções da Home
+                    </a>
+                    <a href="{{ route('admin.networks.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.networks.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-tower-broadcast w-4 mr-1"></i> Networks
                     </a>
                 </div>
             </div>
@@ -193,6 +235,14 @@
 
             {{-- Separador --}}
             <div class="border-t border-neutral-800 my-2"></div>
+
+            {{-- Planos de Assinatura --}}
+            <div>
+                <a href="{{ route('admin.subscription-plans.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.subscription-plans.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-crown w-5"></i> Planos VIP
+                </a>
+            </div>
 
             {{-- Cupons VIP --}}
             <div>

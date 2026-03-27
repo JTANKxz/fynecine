@@ -17,29 +17,34 @@ class CouponController extends Controller
 
     public function create()
     {
-        return view('admin.coupons.create');
+        $plans = \App\Models\SubscriptionPlan::where('is_active', true)->get();
+        return view('admin.coupons.create', compact('plans'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'code' => ['required', 'string', 'unique:coupons,code'],
-            'plan' => ['required', 'in:basic,premium'],
-            'days' => ['required', 'integer', 'min:1'],
+            'subscription_plan_id' => ['nullable', 'exists:subscription_plans,id'],
+            'plan' => ['nullable', 'required_without:subscription_plan_id', 'in:basic,premium'],
+            'days' => ['nullable', 'required_without:subscription_plan_id', 'integer', 'min:1'],
             'max_uses' => ['nullable', 'integer', 'min:1'],
-            // Features Opcionais
+            // Features Opcionais (Legacy)
             'feature_no_ads' => ['nullable'],
             'feature_priority_support' => ['nullable'],
             'feature_priority_requests' => ['nullable'],
+            'feature_premium_channels' => ['nullable'],
         ]);
 
         $features = [];
         if ($request->has('feature_no_ads')) $features[] = 'no_ads';
         if ($request->has('feature_priority_support')) $features[] = 'priority_support';
         if ($request->has('feature_priority_requests')) $features[] = 'priority_requests';
+        if ($request->has('feature_premium_channels')) $features[] = 'premium_channels';
 
         Coupon::create([
             'code' => strtoupper($request->code),
+            'subscription_plan_id' => $request->subscription_plan_id,
             'plan' => $request->plan,
             'days' => $request->days,
             'max_uses' => $request->max_uses,
@@ -52,15 +57,17 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
-        return view('admin.coupons.edit', compact('coupon'));
+        $plans = \App\Models\SubscriptionPlan::where('is_active', true)->get();
+        return view('admin.coupons.edit', compact('coupon', 'plans'));
     }
 
     public function update(Request $request, Coupon $coupon)
     {
         $request->validate([
             'code' => ['required', 'string', 'unique:coupons,code,' . $coupon->id],
-            'plan' => ['required', 'in:basic,premium'],
-            'days' => ['required', 'integer', 'min:1'],
+            'subscription_plan_id' => ['nullable', 'exists:subscription_plans,id'],
+            'plan' => ['nullable', 'required_without:subscription_plan_id', 'in:basic,premium'],
+            'days' => ['nullable', 'required_without:subscription_plan_id', 'integer', 'min:1'],
             'max_uses' => ['nullable', 'integer', 'min:1'],
         ]);
 
@@ -68,9 +75,11 @@ class CouponController extends Controller
         if ($request->has('feature_no_ads')) $features[] = 'no_ads';
         if ($request->has('feature_priority_support')) $features[] = 'priority_support';
         if ($request->has('feature_priority_requests')) $features[] = 'priority_requests';
+        if ($request->has('feature_premium_channels')) $features[] = 'premium_channels';
 
         $coupon->update([
             'code' => strtoupper($request->code),
+            'subscription_plan_id' => $request->subscription_plan_id,
             'plan' => $request->plan,
             'days' => $request->days,
             'max_uses' => $request->max_uses,

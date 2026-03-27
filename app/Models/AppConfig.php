@@ -17,6 +17,8 @@ class AppConfig extends Model
         'update_type',
         'update_url',
         'update_skippable',
+        'version_code',
+        'update_features',
         'autoembed_movies',
         'autoembed_series',
         'autoembed_movie_url',

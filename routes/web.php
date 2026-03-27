@@ -10,6 +10,11 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\RequestController;
 use App\Http\Controllers\Admin\LinkController;
+use App\Http\Controllers\Admin\TvChannelController;
+use App\Http\Controllers\Admin\TvChannelCategoryController;
+use App\Http\Controllers\Admin\HomeSectionController;
+use App\Http\Controllers\Admin\NetworkController;
+use App\Http\Controllers\Admin\SubscriptionPlanController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
@@ -47,6 +52,9 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
 
     // Cupons VIP
     Route::resource('coupons', CouponController::class)->except(['show']);
+
+    // Planos de Assinatura
+    Route::resource('subscription-plans', SubscriptionPlanController::class)->except(['show']);
 
     // Configurações Globais
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
@@ -107,6 +115,66 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/series/episode/{episode}/store', [LinkController::class, 'storeEpisodeLink'])->name('series.episode.store');
         Route::put('/series/link/{link}', [LinkController::class, 'updateEpisodeLink'])->name('series.episode.update');
         Route::delete('/series/link/{link}', [LinkController::class, 'destroyEpisodeLink'])->name('series.episode.delete');
+    });
+
+    // ========== TV AO VIVO ==========
+    Route::prefix('channels')->name('channels.')->group(function () {
+        Route::get('/', [TvChannelController::class, 'index'])->name('index');
+        Route::get('/create', [TvChannelController::class, 'create'])->name('create');
+        Route::post('/', [TvChannelController::class, 'store'])->name('store');
+        Route::get('/{channel}/edit', [TvChannelController::class, 'edit'])->name('edit');
+        Route::put('/{channel}', [TvChannelController::class, 'update'])->name('update');
+        Route::delete('/{channel}', [TvChannelController::class, 'delete'])->name('delete');
+
+        // Links do canal
+        Route::get('/{channel}/links', [TvChannelController::class, 'links'])->name('links');
+        Route::get('/{channel}/links/create', [TvChannelController::class, 'createLink'])->name('links.create');
+        Route::post('/{channel}/links', [TvChannelController::class, 'storeLink'])->name('links.store');
+        Route::get('/links/{link}/edit', [TvChannelController::class, 'editLink'])->name('links.edit');
+        Route::put('/links/{link}', [TvChannelController::class, 'updateLink'])->name('links.update');
+        Route::delete('/links/{link}', [TvChannelController::class, 'deleteLink'])->name('links.delete');
+    });
+
+    Route::prefix('channel-categories')->name('channel-categories.')->group(function () {
+        Route::get('/', [TvChannelCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [TvChannelCategoryController::class, 'create'])->name('create');
+        Route::post('/', [TvChannelCategoryController::class, 'store'])->name('store');
+        Route::get('/{category}/edit', [TvChannelCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{category}', [TvChannelCategoryController::class, 'update'])->name('update');
+        Route::delete('/{category}', [TvChannelCategoryController::class, 'delete'])->name('delete');
+    });
+
+    // ========== SEÇÕES DA HOME ==========
+    Route::prefix('sections')->name('sections.')->group(function () {
+        Route::get('/', [HomeSectionController::class, 'index'])->name('index');
+        Route::get('/create', [HomeSectionController::class, 'create'])->name('create');
+        Route::post('/', [HomeSectionController::class, 'store'])->name('store');
+        Route::get('/{section}/edit', [HomeSectionController::class, 'edit'])->name('edit');
+        Route::put('/{section}', [HomeSectionController::class, 'update'])->name('update');
+        Route::delete('/{section}', [HomeSectionController::class, 'destroy'])->name('delete');
+        
+        Route::patch('/{section}/toggle', [HomeSectionController::class, 'toggle'])->name('toggle');
+        Route::post('/reorder', [HomeSectionController::class, 'reorder'])->name('reorder');
+        
+        Route::get('/{section}/items', [HomeSectionController::class, 'items'])->name('items');
+        Route::post('/{section}/items', [HomeSectionController::class, 'addItem'])->name('items.add');
+        Route::delete('/items/{item}', [HomeSectionController::class, 'removeItem'])->name('items.remove');
+        Route::get('/search', [HomeSectionController::class, 'searchContent'])->name('search');
+    });
+
+    // ========== NETWORKS ==========
+    Route::prefix('networks')->name('networks.')->group(function () {
+        Route::get('/', [NetworkController::class, 'index'])->name('index');
+        Route::get('/create', [NetworkController::class, 'create'])->name('create');
+        Route::post('/', [NetworkController::class, 'store'])->name('store');
+        Route::get('/{network}/edit', [NetworkController::class, 'edit'])->name('edit');
+        Route::put('/{network}', [NetworkController::class, 'update'])->name('update');
+        Route::delete('/{network}', [NetworkController::class, 'destroy'])->name('delete');
+        
+        Route::get('/{network}/content', [NetworkController::class, 'content'])->name('content');
+        Route::post('/{network}/content', [NetworkController::class, 'addContent'])->name('content.add');
+        Route::delete('/{network}/content', [NetworkController::class, 'removeContent'])->name('content.remove');
+        Route::get('/search', [NetworkController::class, 'searchContent'])->name('search');
     });
 
     Route::prefix('tickets')->name('tickets.')->group(function () {

@@ -130,6 +130,20 @@
                                class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none text-sm font-mono">
                     </div>
 
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Version Code</label>
+                            <input type="number" name="version_code" value="{{ old('version_code', $config->version_code) }}"
+                                   class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Novidades da Atualização (Update Features)</label>
+                            <textarea name="update_features" rows="4" placeholder="Ex: - Novo player adicionado&#10;- Correção de bugs"
+                                      class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none text-sm">{{ old('update_features', $config->update_features) }}</textarea>
+                        </div>
+                    </div>
+
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="checkbox" name="update_skippable" value="1" {{ $config->update_skippable ? 'checked' : '' }} class="w-5 h-5 accent-red-600 bg-neutral-800 border-neutral-700 rounded">
                         <span class="text-sm text-neutral-300 group-hover:text-white transition">Permitir ignorar atualização (Opcional)</span>

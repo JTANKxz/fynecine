@@ -131,7 +131,7 @@ class MovieController extends Controller
                         'url' => $url, 
                         'type' => $config->autoembed_movie_type ?? 'embed',
                         'quality' => $config->autoembed_movie_quality ?? 'HD',
-                        'player_sub' => $config->autoembed_movie_player_sub ?? 'Dub/Leg'
+                        'player_sub' => $config->autoembed_movie_player_sub ?? 'free'
                     ]);
                 }
             }

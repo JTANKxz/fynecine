@@ -212,7 +212,7 @@ class SerieController extends Controller
                                         'url' => $embedUrl,
                                         'type' => $config->autoembed_serie_type ?? 'embed',
                                         'quality' => $config->autoembed_serie_quality ?? 'HD',
-                                        'player_sub' => $config->autoembed_serie_player_sub ?? 'Dub/Leg'
+                                        'player_sub' => $config->autoembed_serie_player_sub ?? 'free'
                                     ]);
                                 }
                             }

@@ -103,8 +103,8 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <input type="text" name="autoembed_movie_type" value="{{ old('autoembed_movie_type', $config->autoembed_movie_type) }}" placeholder="Tipo (Ex: embed)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
-                                <input type="text" name="autoembed_movie_player_sub" value="{{ old('autoembed_movie_player_sub', $config->autoembed_movie_player_sub) }}" placeholder="Idioma (Ex: Dub/Leg)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_movie_type" value="{{ old('autoembed_movie_type', $config->autoembed_movie_type) }}" placeholder="Tipo (Ex: embed, m3u8, mkv, mp4)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_movie_player_sub" value="{{ old('autoembed_movie_player_sub', $config->autoembed_movie_player_sub) }}" placeholder="Status (Ex: free, premium)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
                             </div>
                         </div>
 
@@ -122,8 +122,8 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <input type="text" name="autoembed_serie_type" value="{{ old('autoembed_serie_type', $config->autoembed_serie_type) }}" placeholder="Tipo (Ex: embed)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
-                                <input type="text" name="autoembed_serie_player_sub" value="{{ old('autoembed_serie_player_sub', $config->autoembed_serie_player_sub) }}" placeholder="Idioma (Ex: Dub/Leg)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_serie_type" value="{{ old('autoembed_serie_type', $config->autoembed_serie_type) }}" placeholder="Tipo (Ex: embed, m3u8, mkv, mp4)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                                <input type="text" name="autoembed_serie_player_sub" value="{{ old('autoembed_serie_player_sub', $config->autoembed_serie_player_sub) }}" placeholder="Status (Ex: free, premium)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
                             </div>
                         </div>
                     </div>

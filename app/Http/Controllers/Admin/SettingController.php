@@ -64,13 +64,13 @@ class SettingController extends Controller
         $config->autoembed_movie_name = $request->autoembed_movie_name ?? 'Auto Player';
         $config->autoembed_movie_quality = $request->autoembed_movie_quality ?? 'HD';
         $config->autoembed_movie_type = $request->autoembed_movie_type ?? 'embed';
-        $config->autoembed_movie_player_sub = $request->autoembed_movie_player_sub ?? 'Dub/Leg';
+        $config->autoembed_movie_player_sub = $request->autoembed_movie_player_sub ?? 'free';
 
         $config->autoembed_serie_url = $request->autoembed_serie_url;
         $config->autoembed_serie_name = $request->autoembed_serie_name ?? 'Auto Player';
         $config->autoembed_serie_quality = $request->autoembed_serie_quality ?? 'HD';
         $config->autoembed_serie_type = $request->autoembed_serie_type ?? 'embed';
-        $config->autoembed_serie_player_sub = $request->autoembed_serie_player_sub ?? 'Dub/Leg';
+        $config->autoembed_serie_player_sub = $request->autoembed_serie_player_sub ?? 'free';
 
         $config->save();
 

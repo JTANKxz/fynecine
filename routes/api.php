@@ -41,6 +41,9 @@ Route::get('/channels', [\App\Http\Controllers\Api\TvChannelController::class, '
 Route::get('/channels/categories', [\App\Http\Controllers\Api\TvChannelController::class, 'categories']);
 Route::get('/channels/{idOrSlug}', [\App\Http\Controllers\Api\TvChannelController::class, 'show']);
 
+// Planos de Assinatura (Para página de Pricing/Vendas)
+Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'plans']);
+
 // Networks
 Route::get('/networks', [\App\Http\Controllers\Api\NetworkController::class, 'index']);
 Route::get('/networks/{slug}', [\App\Http\Controllers\Api\NetworkController::class, 'show']);
@@ -70,6 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Perfis (Netflix Style - Max 5)
     Route::apiResource('profiles', ProfileController::class);
+    Route::post('/profiles/{id}/verify-pin', [ProfileController::class, 'verifyPin']);
+
+    // Conta (Titular)
+    Route::post('/account/update', [\App\Http\Controllers\Api\AccountController::class, 'update']);
 
     // Lista do Perfil (Watchlist)
     // OBS: O cliente DEVE enviar o header `Profile-Id: {id}`

@@ -11,6 +11,26 @@ use Illuminate\Http\Request;
 class SubscriptionController extends Controller
 {
     /**
+     * Lista os planos ativos disponíveis para o aplicativo.
+     * Rota pública: GET /api/plans
+     */
+    public function plans(): JsonResponse
+    {
+        $plans = \App\Models\SubscriptionPlan::where('is_active', true)
+            ->orderBy('price', 'asc')
+            ->get([
+                'id', 
+                'name', 
+                'plan_type', 
+                'price', 
+                'duration_days', 
+                'features'
+            ]);
+
+        return response()->json($plans);
+    }
+
+    /**
      * Resgata um cupom para ativar a assinatura (Basic ou Premium)
      */
     public function redeem(Request $request): JsonResponse

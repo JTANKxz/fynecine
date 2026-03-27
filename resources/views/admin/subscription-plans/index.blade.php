@@ -21,6 +21,7 @@
     @endif
 
     <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden table-container">
+        <div class="overflow-x-auto">
         <table class="w-full text-left text-sm text-neutral-300">
             <thead class="bg-neutral-950 text-neutral-500 uppercase text-xs border-b border-neutral-800">
                 <tr>
@@ -75,6 +76,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
     
     <div class="mt-6">

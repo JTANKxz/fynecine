@@ -5,7 +5,7 @@
 @section('content')
 <!-- STATS -->
 <section>
-    <div class="grid md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <div class="bg-neutral-900 p-5 rounded hover:bg-neutral-800 transition border-l-4 border-netflix">
             <p class="text-neutral-400 text-sm uppercase font-bold">Filmes</p>
             <p class="text-3xl font-bold text-white">{{ $stats['movies'] }}</p>
@@ -41,6 +41,7 @@
             <a href="{{ route('admin.users.index') }}" class="text-netflix text-sm hover:underline">Ver todos</a>
         </div>
         <div class="bg-neutral-900 rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="bg-neutral-800">
                     <tr>
@@ -75,6 +76,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     </section>
 

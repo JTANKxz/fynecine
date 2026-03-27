@@ -153,8 +153,8 @@
         </div>
 
         <!-- FOOTER ACTIONS -->
-        <div class="fixed bottom-0 left-0 md:left-64 right-0 bg-neutral-900/80 backdrop-blur border-t border-neutral-800 p-4 flex justify-end z-10">
-            <button type="submit" class="bg-netflix hover:bg-red-700 text-white font-bold px-10 py-3 rounded shadow-lg transition transform hover:scale-105 active:scale-95">
+        <div class="mt-8 bg-neutral-900 border border-neutral-800 p-4 rounded-xl flex justify-end">
+            <button type="submit" class="bg-netflix hover:bg-red-700 text-white font-bold px-10 py-3 rounded shadow-lg transition transform hover:scale-105 active:scale-95 w-full md:w-auto">
                 SALVAR TODAS AS ALTERAÇÕES
             </button>
         </div>

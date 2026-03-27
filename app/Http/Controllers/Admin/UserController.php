@@ -56,6 +56,61 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuário criado com sucesso!');
     }
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'is_admin' => 'required|boolean',
+            'plan_type' => 'required|in:free,basic,premium',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Usuário atualizado com sucesso!');
+    }
+
+    public function ban(Request $request, User $user)
+    {
+        $user->update([
+            'banned_at' => now(),
+            'ban_reason' => $request->input('reason', 'Violação dos termos')
+        ]);
+
+        // Registrar o IP e Device ID para bloqueio total
+        if ($user->last_login_ip) {
+            \App\Models\BannedDevice::updateOrCreate(
+                ['ip_address' => $user->last_login_ip],
+                ['reason' => "Banimento do usuário {$user->name}"]
+            );
+        }
+
+        if ($user->device_id) {
+            \App\Models\BannedDevice::updateOrCreate(
+                ['device_id' => $user->device_id],
+                ['reason' => "Banimento do usuário {$user->name}"]
+            );
+        }
+
+        return back()->with('success', 'Usuário banido do sistema.');
+    }
+
+    public function unban(User $user)
+    {
+        $user->update([
+            'banned_at' => null,
+            'ban_reason' => null
+        ]);
+
+        return back()->with('success', 'Banimento removido.');
+    }
+
     public function destroy(User $user)
     {
         $user->delete();

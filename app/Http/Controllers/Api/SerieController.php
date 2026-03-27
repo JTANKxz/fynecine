@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Serie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SerieController extends Controller
 {
@@ -129,6 +130,7 @@ class SerieController extends Controller
             ->limit(12)
             ->get();
 
+        $config = \App\Models\AppConfig::getSettings();
 
         return response()->json([
 
@@ -172,13 +174,47 @@ class SerieController extends Controller
                 ];
             }),
 
-            'seasons' => $serie->seasons->map(function ($season) use ($serie) {
+            'seasons' => $serie->seasons->map(function ($season) use ($serie, $config) {
 
                 return [
                     'id' => $season->id,
                     'season_number' => $season->season_number,
 
-                    'episodes' => $season->episodes->map(function ($episode) use ($serie, $season) {
+                    'episodes' => $season->episodes->map(function ($episode) use ($serie, $season, $config) {
+
+                        $links = collect();
+                        $embedUrl = null;
+
+                        if (!$config->security_mode) {
+                            $user = Auth::guard('sanctum')->user();
+                            $hasPlan = $user && $user->hasPlan();
+
+                            if ($hasPlan) {
+                                $links = $episode->links->map(function ($link) {
+                                    return [
+                                        'id' => $link->id,
+                                        'name' => $link->name,
+                                        'url' => $link->url,
+                                        'type' => $link->type
+                                    ];
+                                });
+
+                                if ($config->autoembed_series && $config->autoembed_serie_url) {
+                                    $embedUrl = str_replace(
+                                        ['{tmdb_id}', '{season}', '{episode}'],
+                                        [$serie->tmdb_id, $season->season_number, $episode->episode_number],
+                                        $config->autoembed_serie_url
+                                    );
+                                    
+                                    $links->push([
+                                        'id' => 'auto',
+                                        'name' => 'Auto Player',
+                                        'url' => $embedUrl,
+                                        'type' => 'embed'
+                                    ]);
+                                }
+                            }
+                        }
 
                         return [
                             'id' => $episode->id,
@@ -189,25 +225,9 @@ class SerieController extends Controller
                             'still' => $episode->still_path,
 
                             // 🔥 AUTO EMBED
-                            'embed' => "https://superflixapi.rest/serie/{$serie->tmdb_id}/{$season->season_number}/{$episode->episode_number}",
+                            'embed' => $embedUrl,
 
-                            'links' => $episode->links
-                                ->map(function ($link) {
-                                    return [
-                                        'id' => $link->id,
-                                        'name' => $link->name,
-                                        'url' => $link->url,
-                                        'type' => $link->type
-                                    ];
-                                })
-                                ->push([
-                                    'id' => 'auto',
-                                    'name' => 'Auto Player',
-                                    'url' => "https://superflixapi.rest/serie/{$serie->tmdb_id}/{$season->season_number}/{$episode->episode_number}",
-                                    'type' => 'embed'
-                                ])
-                                ->values()
-
+                            'links' => $links->values()
                         ];
 
                     })

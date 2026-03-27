@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MovieController extends Controller
 {
@@ -107,6 +108,32 @@ class MovieController extends Controller
             ->limit(12)
             ->get();
 
+        $config = \App\Models\AppConfig::getSettings();
+        
+        $playLinks = collect();
+        if (!$config->security_mode) {
+            if (Auth::guard('sanctum')->check() && Auth::guard('sanctum')->user()->hasPlan()) {
+                
+                $playLinks = $movie->playLinks->map(function ($link) {
+                    return [
+                        'id' => $link->id,
+                        'name' => $link->name,
+                        'url' => $link->url,
+                        'type' => $link->type
+                    ];
+                });
+
+                if ($config->autoembed_movies && $config->autoembed_movie_url) {
+                    $url = str_replace('{tmdb_id}', $movie->tmdb_id, $config->autoembed_movie_url);
+                    $playLinks->push([
+                        'id' => 'auto', 
+                        'name' => 'Auto Player', 
+                        'url' => $url, 
+                        'type' => 'embed'
+                    ]);
+                }
+            }
+        }
 
         return response()->json([
 
@@ -147,14 +174,12 @@ class MovieController extends Controller
                 ];
             }),
 
-            'play_links' => $movie->playLinks->map(function ($link) {
-                return [
-                    'id' => $link->id,
-                    'name' => $link->name,
-                    'url' => $link->url,
-                    'type' => $link->type
-                ];
-            }),
+            /*
+            =========================
+            PROTEÇÃO COM PLANO / LINKS
+            =========================
+            */
+            'play_links' => $playLinks->values(),
 
             'related' => $related
 

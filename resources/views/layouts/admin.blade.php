@@ -86,90 +86,133 @@
         </div>
 
         <nav class="p-4 space-y-2">
-            <!-- Menu principal com submenus -->
+
+            {{-- Dashboard --}}
             <div>
-                <a href="{{ route('admin.dash') }}" class="block p-3 rounded hover:bg-neutral-800">
-                    <i class="fa-solid fa-chart-line mr-2"></i> Dashboard
+                <a href="{{ route('admin.dash') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.dash') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-chart-line w-5"></i> Dashboard
                 </a>
             </div>
 
-            <!-- Filmes com submenu -->
+            {{-- Filmes --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('filmesSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between">
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.movies.*') || request()->routeIs('admin.links.movies') ? 'text-netflix' : '' }}">
                     <span><i class="fa-solid fa-film mr-2"></i> Filmes</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-filmesSubmenu"></i>
                 </button>
-                <div id="filmesSubmenu" class="hidden pl-8 space-y-1">
-                    <a href="{{ route('admin.movies.index') }}" class="block p-2 rounded hover:bg-neutral-800 text-sm">Todos os Filmes</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Adicionar Filme</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Categorias</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Em Destaque</a>
+                <div id="filmesSubmenu" class="{{ request()->routeIs('admin.movies.*') || request()->routeIs('admin.links.movies') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.movies.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.movies.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Filmes
+                    </a>
+                    <a href="{{ route('admin.links.movies') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.links.movies') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-link w-4 mr-1"></i> Gerenciar Links
+                    </a>
+                    <a href="{{ route('admin.tmdb') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.tmdb') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-cloud-arrow-down w-4 mr-1"></i> Importar via TMDB
+                    </a>
                 </div>
             </div>
 
-            <!-- Séries com submenu -->
+            {{-- Séries --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('seriesSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between">
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.series.*') || request()->routeIs('admin.links.series') ? 'text-netflix' : '' }}">
                     <span><i class="fa-solid fa-tv mr-2"></i> Séries</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-seriesSubmenu"></i>
                 </button>
-                <div id="seriesSubmenu" class="hidden pl-8 space-y-1">
-                    <a href="{{ route('admin.series.index') }}" class="block p-2 rounded hover:bg-neutral-800 text-sm">Todas as Séries</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Adicionar Série</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Temporadas</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Episódios</a>
+                <div id="seriesSubmenu" class="{{ request()->routeIs('admin.series.*') || request()->routeIs('admin.links.series') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.series.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.series.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-list w-4 mr-1"></i> Todas as Séries
+                    </a>
+                    <a href="{{ route('admin.links.series') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.links.series') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-link w-4 mr-1"></i> Gerenciar Links
+                    </a>
+                    <a href="{{ route('admin.tmdb') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.tmdb') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-cloud-arrow-down w-4 mr-1"></i> Importar via TMDB
+                    </a>
                 </div>
             </div>
 
-            <!-- Usuários com submenu -->
+            {{-- Sliders --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('slidersSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.sliders.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-images mr-2"></i> Sliders</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-slidersSubmenu"></i>
+                </button>
+                <div id="slidersSubmenu" class="{{ request()->routeIs('admin.sliders.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.sliders.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.sliders.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Sliders
+                    </a>
+                    <a href="{{ route('admin.sliders.create') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.sliders.create') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-plus w-4 mr-1"></i> Adicionar Slider
+                    </a>
+                </div>
+            </div>
+
+            {{-- Usuários --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('usuariosSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between">
-                    <span><i class="fa-solid fa-users mr-2"></i> Usuários</span>
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.comments.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-users mr-2"></i> Comunidade</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-usuariosSubmenu"></i>
                 </button>
-                <div id="usuariosSubmenu" class="hidden pl-8 space-y-1">
-                    <a href="{{ route('admin.users.index') }}" class="block p-2 rounded hover:bg-neutral-800 text-sm">Todos os Usuários</a>
-                    <a href="{{ route('admin.users.create') }}" class="block p-2 rounded hover:bg-neutral-800 text-sm">Adicionar Usuário</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Permissões</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Bloqueados</a>
+                <div id="usuariosSubmenu" class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.comments.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.users.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.users.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Usuários
+                    </a>
+                    <a href="{{ route('admin.comments.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.comments.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-comments w-4 mr-1"></i> Moderação (Comentários)
+                    </a>
+                    <a href="{{ route('admin.requests.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.requests.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-hand-holding-heart w-4 mr-1"></i> Pedidos (Requests)
+                    </a>
                 </div>
             </div>
 
-            <!-- Eventos com submenu -->
-            <div class="space-y-1">
-                <button onclick="toggleSubmenu('eventosSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between">
-                    <span><i class="fa-solid fa-calendar mr-2"></i> Eventos</span>
-                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-eventosSubmenu"></i>
-                </button>
-                <div id="eventosSubmenu" class="hidden pl-8 space-y-1">
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Todos os Eventos</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Próximos Eventos</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Passados</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Criar Evento</a>
-                </div>
+            {{-- Configurações Gerais --}}
+            <div>
+                <a href="{{ route('admin.settings.edit') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.settings.edit') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-cogs w-5"></i> Configurações
+                </a>
             </div>
 
-            <!-- Componentes com submenu -->
-            <div class="space-y-1">
-                <button onclick="toggleSubmenu('componentesSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between">
-                    <span><i class="fa-solid fa-puzzle-piece mr-2"></i> Componentes</span>
-                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-componentesSubmenu"></i>
-                </button>
-                <div id="componentesSubmenu" class="hidden pl-8 space-y-1">
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Botões</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Inputs</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Cards</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Modais</a>
-                    <a href="#" class="block p-2 rounded hover:bg-neutral-800 text-sm">Tabelas</a>
-                </div>
+            {{-- Separador --}}
+            <div class="border-t border-neutral-800 my-2"></div>
+
+            {{-- Cupons VIP --}}
+            <div>
+                <a href="{{ route('admin.coupons.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.coupons.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-ticket-alt w-5"></i> Cupons VIP
+                </a>
             </div>
+
+            {{-- TMDB (atalho direto) --}}
+            <div>
+                <a href="{{ route('admin.tmdb') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.tmdb') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-database w-5"></i> TMDB
+                </a>
+            </div>
+
         </nav>
     </aside>
+
 
     <!-- MAIN -->
     <div class="md:ml-72">

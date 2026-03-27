@@ -48,6 +48,11 @@ class Serie extends Model
             ->withPivot('character', 'order');
     }
 
+    public function profileLists()
+    {
+        return $this->morphMany(ProfileList::class, 'listable');
+    }
+
     protected static function booted()
     {
         static::deleting(function ($serie) {
@@ -55,5 +60,10 @@ class Serie extends Model
                 ->where('content_type', 'series')
                 ->delete();
         });
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable')->latest();
     }
 }

@@ -5,6 +5,11 @@ use App\Http\Controllers\Admin\MovieController;
 use App\Http\Controllers\Admin\SerieController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\RequestController;
+use App\Http\Controllers\Admin\LinkController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
@@ -26,6 +31,10 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('/create', [UserController::class, 'create'])->name('create');
         Route::post('/create', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::post('/{user}/ban', [UserController::class, 'ban'])->name('ban');
+        Route::post('/{user}/unban', [UserController::class, 'unban'])->name('unban');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('delete');
     });
     Route::prefix('sliders')->name('sliders.')->group(function () {
@@ -35,6 +44,23 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::delete('/{slider}', [SliderController::class, 'destroy'])->name('delete');
         Route::get('/search', [SliderController::class, 'search'])->name('search');
     });
+
+    // Cupons VIP
+    Route::resource('coupons', CouponController::class)->except(['show']);
+
+    // Configurações Globais
+    Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Comentários Moderação
+    Route::resource('comments', CommentController::class)->only(['index', 'destroy']);
+    Route::put('comments/{comment}/toggle', [CommentController::class, 'toggleApproval'])->name('comments.toggle');
+
+    // Pedidos TMDB Moderação
+    Route::get('requests', [RequestController::class, 'index'])->name('requests.index');
+    Route::delete('requests/{request}', [RequestController::class, 'destroy'])->name('requests.destroy');
+    Route::put('requests/{request}', [RequestController::class, 'updateStatus'])->name('requests.update');
+    Route::post('requests/{request}/autoimport', [RequestController::class, 'autoImport'])->name('requests.autoimport');
 
     Route::prefix('movies')->name('movies.')->group(function () {
         Route::get('/', [MovieController::class, 'index'])->name('index');
@@ -67,6 +93,26 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::put('/links/{link}', [SerieController::class, 'updateEpisodeLink'])->name('episodes.links.update');
         Route::delete('/links/{link}', [SerieController::class, 'deleteEpisodeLink'])->name('episodes.links.delete');
 
+    });
+
+    Route::prefix('links')->name('links.')->group(function () {
+        Route::get('/movies', [LinkController::class, 'movies'])->name('movies');
+        Route::get('/series', [LinkController::class, 'series'])->name('series');
+        Route::get('/series/{serie}/manage', [LinkController::class, 'serieManage'])->name('series.manage');
+        
+        Route::post('/movies/{movie}/store', [LinkController::class, 'storeMovieLink'])->name('movies.store');
+        Route::put('/movies/link/{link}', [LinkController::class, 'updateMovieLink'])->name('movies.update');
+        Route::delete('/movies/link/{link}', [LinkController::class, 'destroyMovieLink'])->name('movies.delete');
+
+        Route::post('/series/episode/{episode}/store', [LinkController::class, 'storeEpisodeLink'])->name('series.episode.store');
+        Route::put('/series/link/{link}', [LinkController::class, 'updateEpisodeLink'])->name('series.episode.update');
+        Route::delete('/series/link/{link}', [LinkController::class, 'destroyEpisodeLink'])->name('series.episode.delete');
+    });
+
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/', [TicketController::class, 'index'])->name('index');
+        Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
+        Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('delete');
     });
 
 });

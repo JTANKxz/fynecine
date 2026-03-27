@@ -46,6 +46,11 @@ class Movie extends Model
         return $this->morphToMany(Cast::class, 'castable')
             ->withPivot('character', 'order');
     }
+
+    public function profileLists()
+    {
+        return $this->morphMany(ProfileList::class, 'listable');
+    }
     protected static function booted()
     {
         static::deleting(function ($movie) {
@@ -55,4 +60,8 @@ class Movie extends Model
         });
     }
 
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable')->latest();
+    }
 }

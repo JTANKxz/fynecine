@@ -7,11 +7,12 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +24,10 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'is_admin', // adiciona aqui
+        'is_admin',
+        'plan_type',
+        'plan_expires_at',
+        'features',
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -45,11 +49,69 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'plan_expires_at' => 'datetime',
+            'features' => 'array',
         ];
     }
 
     public function isAdmin(): bool
     {
         return $this->is_admin; // retorna true ou false
+    }
+
+    public function profiles()
+    {
+        return $this->hasMany(Profile::class);
+    }
+
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'user_coupons');
+    }
+
+    public function hasPlan(): bool
+    {
+        if ($this->plan_type === 'free') {
+            return false;
+        }
+
+        // Se tem data de expiração, confere se ainda é válida
+        if ($this->plan_expires_at && $this->plan_expires_at->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isPremium(): bool
+    {
+        return $this->hasPlan() && ($this->plan_type === 'premium');
+    }
+
+    public function isBasic(): bool
+    {
+        return $this->hasPlan() && ($this->plan_type === 'basic');
+    }
+
+    public function hasFeature(string $feature): bool
+    {
+        if (!$this->hasPlan() || !is_array($this->features)) {
+            return false;
+        }
+
+        return in_array($feature, $this->features);
+    }
+
+    public function maxProfilesCount(): int
+    {
+        if ($this->isPremium()) {
+            return 5;
+        }
+
+        if ($this->isBasic()) {
+            return 2;
+        }
+
+        return 1; // Free
     }
 }

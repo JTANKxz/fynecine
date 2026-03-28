@@ -24,8 +24,11 @@ class SettingController extends Controller
             
             'update_type' => ['required', 'in:none,in_app,external'],
             'update_url' => ['nullable', 'string'],
+            'update_status' => ['nullable', 'boolean'],
             'version_code' => ['nullable', 'integer', 'min:0'],
             'update_features' => ['nullable', 'string'],
+            'custom_message_status' => ['nullable', 'boolean'],
+            'security_mode' => ['nullable', 'boolean'],
             
             'autoembed_movie_url' => ['nullable', 'string'],
             'autoembed_movie_name' => ['nullable', 'string', 'max:50'],
@@ -45,7 +48,9 @@ class SettingController extends Controller
         $config->force_login = $request->has('force_login');
         $config->show_onboarding = $request->has('show_onboarding');
         $config->security_mode = $request->has('security_mode');
+        $config->custom_message_status = $request->has('custom_message_status');
         $config->update_skippable = $request->has('update_skippable');
+        $config->update_status = $request->has('update_status');
         $config->autoembed_movies = $request->has('autoembed_movies');
         $config->autoembed_series = $request->has('autoembed_series');
 

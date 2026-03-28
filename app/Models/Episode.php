@@ -32,4 +32,9 @@ class Episode extends Model
     {
         return $this->hasMany(EpisodeLink::class);
     }
+
+    public function downloadLinks()
+    {
+        return $this->hasMany(EpisodeDownloadLink::class)->orderBy('order');
+    }
 }

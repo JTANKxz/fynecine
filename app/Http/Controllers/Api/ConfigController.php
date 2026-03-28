@@ -21,18 +21,20 @@ class ConfigController extends Controller
             'app_name' => $config->app_name,
             'api_token_key' => $config->api_token_key,
             'custom_message' => $config->custom_message,
+            'custom_message_status' => (bool) $config->custom_message_status,
             
-            'force_login' => $config->force_login,
-            'show_onboarding' => $config->show_onboarding,
+            'force_login' => (bool) $config->force_login,
+            'show_onboarding' => (bool) $config->show_onboarding,
             
             'update_type' => $config->update_type,
+            'update_status' => (bool) $config->update_status,
             'update_url' => $config->update_url,
-            'update_skippable' => $config->update_skippable,
+            'update_skippable' => (bool) $config->update_skippable,
             'version_code' => $config->version_code,
             'update_features' => $config->update_features,
             
             // Retorna o security_mode para que o front também possa omitir itens se quiser
-            'security_mode' => $config->security_mode,
+            'security_mode' => (bool) $config->security_mode,
         ]);
     }
 }

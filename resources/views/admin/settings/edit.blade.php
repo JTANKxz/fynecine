@@ -35,7 +35,7 @@
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" name="security_mode" value="1" {{ $config->security_mode ? 'checked' : '' }} class="sr-only peer">
                         <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                        <span class="ml-3 text-sm font-medium text-red-500 uppercase tracking-widest">{{ $config->security_mode ? 'Modo Ativo' : 'Ativar Agora' }}</span>
+                        <span class="ml-3 text-sm font-medium text-red-500 uppercase tracking-widest" id="security-mode-label">{{ $config->security_mode ? 'MODO ATIVO' : 'ATIVAR MODO' }}</span>
                     </label>
                 </div>
             </div>
@@ -64,6 +64,18 @@
                     <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">API Token Key (Frontend Auth)</label>
                     <input type="text" name="api_token_key" value="{{ old('api_token_key', $config->api_token_key) }}"
                            class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none font-mono text-sm">
+                </div>
+
+                <div class="border-t border-neutral-800 pt-6">
+                    <div class="flex items-center justify-between mb-2">
+                         <label class="block text-xs font-bold text-neutral-500 uppercase">Mensagem Customizada (Aviso no App)</label>
+                         <label class="relative inline-flex items-center cursor-pointer scale-75">
+                            <input type="checkbox" name="custom_message_status" value="1" {{ $config->custom_message_status ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
+                        </label>
+                    </div>
+                    <textarea name="custom_message" rows="3" placeholder="Ex: Manutenção agendada para às 22h..."
+                              class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none text-sm">{{ old('custom_message', $config->custom_message) }}</textarea>
                 </div>
 
                 <div class="space-y-4 pt-2">
@@ -135,6 +147,17 @@
                         <i class="fa-solid fa-cloud-arrow-down text-green-500"></i> Atualização do App
                     </h3>
 
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-1">Status da Atualização</label>
+                            <p class="text-[10px] text-neutral-500">Se desativado, o app não irá checar por novas versões</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="update_status" value="1" {{ $config->update_status ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                        </label>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Comportamento</label>
                         <select name="update_type" class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
@@ -180,4 +203,19 @@
         </div>
     </form>
 </section>
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle label text for security mode
+        const securityCheckbox = document.querySelector('input[name="security_mode"]');
+        const securityLabel = document.getElementById('security-mode-label');
+        
+        if (securityCheckbox && securityLabel) {
+            securityCheckbox.addEventListener('change', function() {
+                securityLabel.textContent = this.checked ? 'MODO ATIVO' : 'ATIVAR MODO';
+            });
+        }
+    });
+</script>
+@endpush
 @endsection

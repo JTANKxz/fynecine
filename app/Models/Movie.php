@@ -60,6 +60,11 @@ class Movie extends Model
         });
     }
 
+    public function downloadLinks()
+    {
+        return $this->hasMany(MovieDownloadLink::class)->orderBy('order');
+    }
+
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable')->latest();

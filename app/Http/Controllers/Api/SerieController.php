@@ -101,6 +101,7 @@ class SerieController extends Controller
         $serie = Serie::with([
             'genres',
             'seasons.episodes.links',
+            'seasons.episodes.downloadLinks',
             'cast' => function ($q) {
                 $q->orderBy('pivot_order');
             }
@@ -184,6 +185,7 @@ class SerieController extends Controller
 
                         $links = collect();
                         $embedUrl = null;
+                        $downloadLinks = collect();
 
                         if (!$config->security_mode) {
                             $user = Auth::guard('sanctum')->user();
@@ -221,6 +223,21 @@ class SerieController extends Controller
                                     ]);
                                 }
                             }
+
+                            // Download links do episódio filtrados por plano
+                            foreach ($episode->downloadLinks as $dl) {
+                                if ($dl->download_sub === 'free' || $hasPlan) {
+                                    $downloadLinks->push([
+                                        'id'           => $dl->id,
+                                        'name'         => $dl->name,
+                                        'url'          => $dl->url,
+                                        'quality'      => $dl->quality,
+                                        'size'         => $dl->size,
+                                        'type'         => $dl->type,
+                                        'download_sub' => $dl->download_sub,
+                                    ]);
+                                }
+                            }
                         }
 
                         return [
@@ -234,7 +251,8 @@ class SerieController extends Controller
                             // 🔥 AUTO EMBED
                             'embed' => $embedUrl,
 
-                            'links' => $links->values()
+                            'links'          => $links->values(),
+                            'download_links' => $downloadLinks->values(),
                         ];
 
                     })

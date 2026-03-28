@@ -117,6 +117,21 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::delete('/series/link/{link}', [LinkController::class, 'destroyEpisodeLink'])->name('series.episode.delete');
     });
 
+    // ========== DOWNLOADS ==========
+    Route::prefix('downloads')->name('downloads.')->group(function () {
+        Route::get('/movies', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'movies'])->name('movies');
+        Route::get('/series', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'series'])->name('series');
+        Route::get('/series/{serie}/manage', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'serieManage'])->name('series.manage');
+
+        Route::post('/movies/{movie}/store', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'storeMovieDownload'])->name('movies.store');
+        Route::put('/movies/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'updateMovieDownload'])->name('movies.update');
+        Route::delete('/movies/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'destroyMovieDownload'])->name('movies.delete');
+
+        Route::post('/series/episode/{episode}/store', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'storeEpisodeDownload'])->name('series.episode.store');
+        Route::put('/series/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'updateEpisodeDownload'])->name('series.episode.update');
+        Route::delete('/series/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'destroyEpisodeDownload'])->name('series.episode.delete');
+    });
+
     // ========== TV AO VIVO ==========
     Route::prefix('channels')->name('channels.')->group(function () {
         Route::get('/', [TvChannelController::class, 'index'])->name('index');

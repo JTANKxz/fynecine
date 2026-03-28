@@ -79,6 +79,7 @@ class MovieController extends Controller
         $movie = Movie::with([
             'genres',
             'playLinks',
+            'downloadLinks',
             'cast' => function ($q) {
                 $q->orderBy('pivot_order');
             }
@@ -110,11 +111,11 @@ class MovieController extends Controller
 
         $config = \App\Models\AppConfig::getSettings();
         
+        $user = Auth::guard('sanctum')->user();
+        $hasPlan = $user && $user->hasPlan();
+
         $playLinks = collect();
         if (!$config->security_mode) {
-            $user = Auth::guard('sanctum')->user();
-            $hasPlan = $user && $user->hasPlan();
-            
             foreach ($movie->playLinks as $link) {
                 if ($link->player_sub === 'free' || $hasPlan) {
                     $playLinks->push([
@@ -139,6 +140,24 @@ class MovieController extends Controller
                         'type' => $config->autoembed_movie_type ?? 'embed',
                         'quality' => $config->autoembed_movie_quality ?? 'HD',
                         'player_sub' => $autoSub
+                    ]);
+                }
+            }
+        }
+
+        // Download links filtrados por plano
+        $downloadLinks = collect();
+        if (!$config->security_mode) {
+            foreach ($movie->downloadLinks as $dl) {
+                if ($dl->download_sub === 'free' || $hasPlan) {
+                    $downloadLinks->push([
+                        'id'           => $dl->id,
+                        'name'         => $dl->name,
+                        'url'          => $dl->url,
+                        'quality'      => $dl->quality,
+                        'size'         => $dl->size,
+                        'type'         => $dl->type,
+                        'download_sub' => $dl->download_sub,
                     ]);
                 }
             }
@@ -188,7 +207,8 @@ class MovieController extends Controller
             PROTEÇÃO COM PLANO / LINKS
             =========================
             */
-            'play_links' => $playLinks->values(),
+            'play_links'     => $playLinks->values(),
+            'download_links' => $downloadLinks->values(),
 
             'related' => $related
 

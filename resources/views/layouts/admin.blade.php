@@ -98,18 +98,22 @@
             {{-- Filmes --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('filmesSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.movies.*') || request()->routeIs('admin.links.movies') ? 'text-netflix' : '' }}">
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.movies.*') || request()->routeIs('admin.links.movies') || request()->routeIs('admin.downloads.movies') ? 'text-netflix' : '' }}">
                     <span><i class="fa-solid fa-film mr-2"></i> Filmes</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-filmesSubmenu"></i>
                 </button>
-                <div id="filmesSubmenu" class="{{ request()->routeIs('admin.movies.*') || request()->routeIs('admin.links.movies') ? '' : 'hidden' }} pl-8 space-y-1">
+                <div id="filmesSubmenu" class="{{ request()->routeIs('admin.movies.*') || request()->routeIs('admin.links.movies') || request()->routeIs('admin.downloads.movies') ? '' : 'hidden' }} pl-8 space-y-1">
                     <a href="{{ route('admin.movies.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.movies.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Filmes
                     </a>
                     <a href="{{ route('admin.links.movies') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.links.movies') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-link w-4 mr-1"></i> Gerenciar Links
+                        <i class="fa-solid fa-link w-4 mr-1"></i> Player Links
+                    </a>
+                    <a href="{{ route('admin.downloads.movies') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.downloads.movies') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-download w-4 mr-1"></i> Download Links
                     </a>
                     <a href="{{ route('admin.tmdb') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.tmdb') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
@@ -121,18 +125,22 @@
             {{-- Séries --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('seriesSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.series.*') || request()->routeIs('admin.links.series') ? 'text-netflix' : '' }}">
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.series.*') || request()->routeIs('admin.links.series') || request()->routeIs('admin.downloads.series') ? 'text-netflix' : '' }}">
                     <span><i class="fa-solid fa-tv mr-2"></i> Séries</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-seriesSubmenu"></i>
                 </button>
-                <div id="seriesSubmenu" class="{{ request()->routeIs('admin.series.*') || request()->routeIs('admin.links.series') ? '' : 'hidden' }} pl-8 space-y-1">
+                <div id="seriesSubmenu" class="{{ request()->routeIs('admin.series.*') || request()->routeIs('admin.links.series') || request()->routeIs('admin.downloads.series') ? '' : 'hidden' }} pl-8 space-y-1">
                     <a href="{{ route('admin.series.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.series.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-list w-4 mr-1"></i> Todas as Séries
                     </a>
                     <a href="{{ route('admin.links.series') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.links.series') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-link w-4 mr-1"></i> Gerenciar Links
+                        <i class="fa-solid fa-link w-4 mr-1"></i> Player Links
+                    </a>
+                    <a href="{{ route('admin.downloads.series') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.downloads.series') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-download w-4 mr-1"></i> Download Links
                     </a>
                     <a href="{{ route('admin.tmdb') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.tmdb') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">

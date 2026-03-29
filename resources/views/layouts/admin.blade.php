@@ -225,6 +225,25 @@
                 </div>
             </div>
 
+            {{-- Avatares --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('avataresSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.avatars.*') || request()->routeIs('admin.avatar-categories.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-circle-user mr-2"></i> Avatares</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-avataresSubmenu"></i>
+                </button>
+                <div id="avataresSubmenu" class="{{ request()->routeIs('admin.avatars.*') || request()->routeIs('admin.avatar-categories.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.avatars.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.avatars.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Avatares
+                    </a>
+                    <a href="{{ route('admin.avatar-categories.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.avatar-categories.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-tags w-4 mr-1"></i> Categorias
+                    </a>
+                </div>
+            </div>
+
             {{-- Configurações Gerais --}}
             <div>
                 <a href="{{ route('admin.settings.edit') }}"

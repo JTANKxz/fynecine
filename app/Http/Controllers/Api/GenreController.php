@@ -10,9 +10,13 @@ use Illuminate\Http\Request;
 
 class GenreController extends Controller
 {
-    public function show($slug, Request $request)
+    public function show($idOrSlug, Request $request)
     {
-        $genre = Genre::where('slug', $slug)->firstOrFail();
+        if (is_numeric($idOrSlug)) {
+            $genre = Genre::findOrFail($idOrSlug);
+        } else {
+            $genre = Genre::where('slug', $idOrSlug)->firstOrFail();
+        }
 
         /*
         =========================

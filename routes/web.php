@@ -15,6 +15,9 @@ use App\Http\Controllers\Admin\TvChannelCategoryController;
 use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\NetworkController;
 use App\Http\Controllers\Admin\SubscriptionPlanController;
+use App\Http\Controllers\Admin\AvatarController;
+use App\Http\Controllers\Admin\AvatarCategoryController;
+use App\Http\Controllers\Admin\TicketController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
@@ -197,6 +200,10 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
         Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('delete');
     });
+
+    // ========== AVATARES ==========
+    Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
+    Route::resource('avatars', AvatarController::class)->names('avatars');
 
 });
 

@@ -14,9 +14,13 @@ class NetworkController extends Controller
         return response()->json($networks);
     }
 
-    public function show($slug)
+    public function show($idOrSlug)
     {
-        $network = Network::where('slug', $slug)->firstOrFail();
+        if (is_numeric($idOrSlug)) {
+            $network = Network::findOrFail($idOrSlug);
+        } else {
+            $network = Network::where('slug', $idOrSlug)->firstOrFail();
+        }
 
         return response()->json([
             'id' => $network->id,

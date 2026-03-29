@@ -33,7 +33,7 @@ Route::get('/series/{idOrSlug}', [SerieController::class, 'show']);
 Route::get('/movies', [MovieController::class, 'index']);
 Route::get('/movies/{idOrSlug}', [MovieController::class, 'show']);
 Route::get('/{type}/{idOrSlug}/comments', [CommentController::class, 'index'])->where('type', 'movies|series');
-Route::get('/genres/{slug}', [GenreController::class, 'show']);
+Route::get('/genres/{idOrSlug}', [GenreController::class, 'show']);
 Route::get('/search', [SearchController::class, 'index']);
 
 // TV ao Vivo (Canais)
@@ -46,7 +46,7 @@ Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, '
 
 // Networks
 Route::get('/networks', [\App\Http\Controllers\Api\NetworkController::class, 'index']);
-Route::get('/networks/{slug}', [\App\Http\Controllers\Api\NetworkController::class, 'show']);
+Route::get('/networks/{idOrSlug}', [\App\Http\Controllers\Api\NetworkController::class, 'show']);
 
 // Views tracking
 Route::post('/views', [\App\Http\Controllers\Api\ContentViewController::class, 'store']);

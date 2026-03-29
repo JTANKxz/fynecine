@@ -14,8 +14,41 @@ class ProfileController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $profiles = $request->user()->profiles;
+        $user = $request->user();
+        $maxProfiles = $user->maxProfilesCount();
+
+        $profiles = $user->profiles()
+            ->orderByDesc('is_main')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $profiles->each(function ($profile, $index) use ($maxProfiles) {
+            $profile->setAttribute('is_locked', $index >= $maxProfiles);
+        });
+
         return response()->json($profiles);
+    }
+
+    /**
+     * Verifica se um perfil está bloqueado devido ao limite do plano atual.
+     */
+    private function isProfileLocked($user, int $profileId): bool
+    {
+        $maxProfiles = $user->maxProfilesCount();
+        
+        $profileIds = $user->profiles()
+            ->orderByDesc('is_main')
+            ->orderBy('id', 'asc')
+            ->pluck('id')
+            ->toArray();
+            
+        $index = array_search($profileId, $profileIds);
+        
+        if ($index === false) {
+            return false;
+        }
+
+        return $index >= $maxProfiles;
     }
 
     /**
@@ -55,7 +88,15 @@ class ProfileController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
-        $profile = $request->user()->profiles()->findOrFail($id);
+        $user = $request->user();
+        $profile = $user->profiles()->findOrFail($id);
+
+        if ($this->isProfileLocked($user, $profile->id)) {
+            return response()->json([
+                'message' => 'Este perfil está bloqueado devido ao limite do seu plano atual. Renove seu VIP para acessá-lo.'
+            ], 403);
+        }
+
         return response()->json($profile);
     }
 
@@ -64,7 +105,14 @@ class ProfileController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $profile = $request->user()->profiles()->findOrFail($id);
+        $user = $request->user();
+        $profile = $user->profiles()->findOrFail($id);
+
+        if ($this->isProfileLocked($user, $profile->id)) {
+            return response()->json([
+                'message' => 'Você não pode editar um perfil bloqueado. Renove seu VIP.'
+            ], 403);
+        }
 
         $validated = $request->validate([
             'name'    => ['sometimes', 'string', 'max:50'],
@@ -96,6 +144,19 @@ class ProfileController extends Controller
         }
 
         $profile = $user->profiles()->findOrFail($id);
+
+        if (!empty($profile->pin)) {
+            $request->validate([
+                'pin' => ['required', 'string', 'size:4']
+            ]);
+
+            if ($profile->pin !== $request->pin) {
+                return response()->json([
+                    'message' => 'PIN incorreto. Não é possível excluir o perfil.'
+                ], 403);
+            }
+        }
+
         $profile->delete();
 
         return response()->json(['message' => 'Perfil deletado com sucesso.']);
@@ -111,7 +172,14 @@ class ProfileController extends Controller
             'pin' => ['required', 'string', 'size:4']
         ]);
 
-        $profile = $request->user()->profiles()->findOrFail($id);
+        $user = $request->user();
+        $profile = $user->profiles()->findOrFail($id);
+
+        if ($this->isProfileLocked($user, $profile->id)) {
+            return response()->json([
+                'message' => 'Este perfil está bloqueado devido ao limite do seu plano atual. Renove seu VIP para acessá-lo.'
+            ], 403);
+        }
 
         if ($profile->pin !== $request->pin) {
             return response()->json(['message' => 'PIN incorreto. Tente novamente.'], 403);

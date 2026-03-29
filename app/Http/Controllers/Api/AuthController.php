@@ -35,6 +35,8 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
+        $user->features = $user->features ?? [];
+
         return response()->json([
             'user'  => $user,
             'token' => $token,
@@ -68,6 +70,8 @@ class AuthController extends Controller
         // $user->tokens()->delete();
 
         $token = $user->createToken('api-token')->plainTextToken;
+
+        $user->features = $user->features ?? [];
 
         return response()->json([
             'user'  => $user,

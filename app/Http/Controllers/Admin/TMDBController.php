@@ -15,12 +15,15 @@ use App\Models\Cast;
 
 class TMDBController extends Controller
 {
-    private string $apiKey;
-
-    public function __construct()
+    private function fetchTMDB(string $endpoint, array $params = [])
     {
-        // Use environment variable if available, otherwise use hardcoded key
-        $this->apiKey = env('TMDB_API_KEY', 'edcd52275afd8b8c152c82f1ce3933a2');
+        $config = \App\Models\AppConfig::getSettings();
+        $apiKey = $config->tmdb_key ?: env('TMDB_API_KEY', 'edcd52275afd8b8c152c82f1ce3933a2');
+
+        $params['api_key'] = $apiKey;
+        $params['endpoint'] = $endpoint;
+
+        return Http::get('https://joetank.online/tmdb.php', $params);
     }
 
     public function index()
@@ -38,9 +41,8 @@ class TMDBController extends Controller
             $yearTo = $request->query('yearTo');
 
             if ($query) {
-                $endpoint = "https://api.themoviedb.org/3/search/$type";
+                $endpoint = "search/$type";
                 $params = [
-                    'api_key' => $this->apiKey,
                     'query' => $query,
                     'language' => 'pt-BR',
                     'page' => $page,
@@ -53,7 +55,7 @@ class TMDBController extends Controller
                 }
 
             } else {
-                $endpoint = "https://api.themoviedb.org/3/discover/$type";
+                $endpoint = "discover/$type";
                 $sort = $request->query('sortBy', 'popularity.desc');
 
                 if ($type === 'tv') {
@@ -61,7 +63,6 @@ class TMDBController extends Controller
                 }
 
                 $params = [
-                    'api_key' => $this->apiKey,
                     'language' => 'pt-BR',
                     'page' => $page,
                     'sort_by' => $sort,
@@ -80,7 +81,7 @@ class TMDBController extends Controller
                 }
             }
 
-            $response = Http::get($endpoint, $params);
+            $response = $this->fetchTMDB($endpoint, $params);
 
             if (!$response->successful()) {
                 $errorData = $response->json();
@@ -138,8 +139,7 @@ class TMDBController extends Controller
     public function importMovie($tmdbId)
     {
         try {
-            $response = Http::get("https://api.themoviedb.org/3/movie/$tmdbId", [
-                'api_key' => $this->apiKey,
+            $response = $this->fetchTMDB("movie/$tmdbId", [
                 'language' => 'pt-BR'
             ]);
 
@@ -164,8 +164,7 @@ class TMDBController extends Controller
         ====================
         */
 
-        $videos = Http::get("https://api.themoviedb.org/3/movie/$tmdbId/videos", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
+        $videos = $this->fetchTMDB("movie/$tmdbId/videos", [
             'language' => 'pt-BR'
         ])->json();
 
@@ -239,8 +238,7 @@ IMPORTAR ELENCO
 ====================
 */
 
-        $credits = Http::get("https://api.themoviedb.org/3/movie/$tmdbId/credits", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
+        $credits = $this->fetchTMDB("movie/$tmdbId/credits", [
             'language' => 'pt-BR'
         ])->json();
 
@@ -280,8 +278,7 @@ IMPORTAR ELENCO
     public function importSeries($tmdbId, $fullImport = false)
     {
         try {
-            $response = Http::get("https://api.themoviedb.org/3/tv/$tmdbId", [
-                'api_key' => $this->apiKey,
+            $response = $this->fetchTMDB("tv/$tmdbId", [
                 'language' => 'pt-BR'
             ]);
 
@@ -307,8 +304,7 @@ IMPORTAR ELENCO
         ====================
         */
 
-        $videos = Http::get("https://api.themoviedb.org/3/tv/$tmdbId/videos", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
+        $videos = $this->fetchTMDB("tv/$tmdbId/videos", [
             'language' => 'pt-BR'
         ])->json();
 
@@ -402,8 +398,7 @@ IMPORTAR ELENCO
 ====================
 */
 
-        $credits = Http::get("https://api.themoviedb.org/3/tv/$tmdbId/credits", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
+        $credits = $this->fetchTMDB("tv/$tmdbId/credits", [
             'language' => 'pt-BR'
         ])->json();
 
@@ -448,8 +443,7 @@ IMPORTAR ELENCO
 
             if (!$series) {
 
-                $seriesResponse = Http::get("https://api.themoviedb.org/3/tv/$tmdbId", [
-                    'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
+                $seriesResponse = $this->fetchTMDB("tv/$tmdbId", [
                     'language' => 'pt-BR'
                 ]);
 
@@ -469,8 +463,7 @@ IMPORTAR ELENCO
             $seriesId = $series->id;
         }
 
-        $response = Http::get("https://api.themoviedb.org/3/tv/$tmdbId/season/$seasonNumber", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
+        $response = $this->fetchTMDB("tv/$tmdbId/season/$seasonNumber", [
             'language' => 'pt-BR'
         ]);
 

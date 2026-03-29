@@ -35,6 +35,18 @@ class ConfigController extends Controller
             
             // Retorna o security_mode para que o front também possa omitir itens se quiser
             'security_mode' => (bool) $config->security_mode,
+            
+            // Redes Sociais
+            'instagram_url' => $config->instagram_url,
+            'is_instagram_active' => (bool) $config->is_instagram_active,
+            'telegram_url' => $config->telegram_url,
+            'is_telegram_active' => (bool) $config->is_telegram_active,
+            'whatsapp_url' => $config->whatsapp_url,
+            'is_whatsapp_active' => (bool) $config->is_whatsapp_active,
+            
+            // Textos Legais
+            'terms_of_use' => $config->terms_of_use,
+            'privacy_policy' => $config->privacy_policy,
         ]);
     }
 }

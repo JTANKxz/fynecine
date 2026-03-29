@@ -25,6 +25,16 @@ class AppConfig extends Model
         'autoembed_series',
         'autoembed_movie_url',
         'autoembed_serie_url',
+        
+        'instagram_url',
+        'is_instagram_active',
+        'telegram_url',
+        'is_telegram_active',
+        'whatsapp_url',
+        'is_whatsapp_active',
+        
+        'terms_of_use',
+        'privacy_policy',
     ];
 
     protected $casts = [
@@ -36,6 +46,9 @@ class AppConfig extends Model
         'update_status' => 'boolean',
         'autoembed_movies' => 'boolean',
         'autoembed_series' => 'boolean',
+        'is_instagram_active' => 'boolean',
+        'is_telegram_active' => 'boolean',
+        'is_whatsapp_active' => 'boolean',
     ];
 
     /**

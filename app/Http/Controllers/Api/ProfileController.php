@@ -150,7 +150,7 @@ class ProfileController extends Controller
                 'pin' => ['required', 'string', 'size:4']
             ]);
 
-            if ($profile->pin !== $request->pin) {
+            if ((string) $profile->pin !== (string) $request->pin) {
                 return response()->json([
                     'message' => 'PIN incorreto. Não é possível excluir o perfil.'
                 ], 403);
@@ -181,7 +181,7 @@ class ProfileController extends Controller
             ], 403);
         }
 
-        if ($profile->pin !== $request->pin) {
+        if ((string) $profile->pin !== (string) $request->pin) {
             return response()->json(['message' => 'PIN incorreto. Tente novamente.'], 403);
         }
 

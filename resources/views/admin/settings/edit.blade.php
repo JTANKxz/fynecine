@@ -195,6 +195,87 @@
             </div>
         </div>
 
+        <!-- SOCIAL & LEGAL -->
+        <div class="grid lg:grid-cols-2 gap-8 mt-8">
+            <!-- SOCIAL MEDIA -->
+            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-share-nodes text-pink-500"></i> Redes Sociais no App
+                </h3>
+                <p class="text-[10px] text-neutral-500 mb-4 leading-tight">Os links aparecerão no menu inferior do aplicativo caso estejam ativos.</p>
+
+                <div class="space-y-4">
+                    <!-- Instagram -->
+                    <div class="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700/50">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <i class="fa-brands fa-instagram text-pink-500 text-lg"></i>
+                                <span class="text-xs font-bold uppercase tracking-widest text-white">Instagram</span>
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="is_instagram_active" value="1" {{ $config->is_instagram_active ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                            </label>
+                        </div>
+                        <input type="url" name="instagram_url" value="{{ old('instagram_url', $config->instagram_url) }}" 
+                               class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none" placeholder="https://instagram.com/seu_perfil">
+                    </div>
+
+                    <!-- Telegram -->
+                    <div class="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700/50">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <i class="fa-brands fa-telegram text-blue-400 text-lg"></i>
+                                <span class="text-xs font-bold uppercase tracking-widest text-white">Telegram</span>
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="is_telegram_active" value="1" {{ $config->is_telegram_active ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                        <input type="url" name="telegram_url" value="{{ old('telegram_url', $config->telegram_url) }}" 
+                               class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none" placeholder="https://t.me/seu_grupo">
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700/50">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-green-500 text-lg"></i>
+                                <span class="text-xs font-bold uppercase tracking-widest text-white">WhatsApp</span>
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="is_whatsapp_active" value="1" {{ $config->is_whatsapp_active ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                            </label>
+                        </div>
+                        <input type="url" name="whatsapp_url" value="{{ old('whatsapp_url', $config->whatsapp_url) }}" 
+                               class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none" placeholder="https://wa.me/551199999999">
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEGAL DOCUMENTS -->
+            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced text-yellow-500"></i> Documentos Legais
+                </h3>
+                <p class="text-[10px] text-neutral-500 mb-4 leading-tight">Esses textos serão exibidos em modais dentro do aplicativo. Aceita tags básicas de formatação HTML (`<br>`, `<b>`).</p>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Termos de Uso</label>
+                    <textarea name="terms_of_use" rows="7" placeholder="Insira aqui os regulamentos do app..."
+                              class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-3 focus:ring-2 focus:ring-netflix outline-none text-xs leading-relaxed">{{ old('terms_of_use', $config->terms_of_use) }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Política de Privacidade</label>
+                    <textarea name="privacy_policy" rows="7" placeholder="Insira como os dados serão armazenados..."
+                              class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-3 focus:ring-2 focus:ring-netflix outline-none text-xs leading-relaxed">{{ old('privacy_policy', $config->privacy_policy) }}</textarea>
+                </div>
+            </div>
+        </div>
+
         <!-- FOOTER ACTIONS -->
         <div class="mt-8 bg-neutral-900 border border-neutral-800 p-4 rounded-xl flex justify-end">
             <button type="submit" class="bg-netflix hover:bg-red-700 text-white font-bold px-10 py-3 rounded shadow-lg transition transform hover:scale-105 active:scale-95 w-full md:w-auto">

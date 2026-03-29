@@ -40,6 +40,18 @@ class SettingController extends Controller
             'autoembed_serie_quality' => ['nullable', 'string', 'max:50'],
             'autoembed_serie_type' => ['nullable', 'string', 'max:50'],
             'autoembed_serie_player_sub' => ['nullable', 'string', 'max:50'],
+
+            'instagram_url' => ['nullable', 'url'],
+            'is_instagram_active' => ['nullable', 'boolean'],
+            
+            'telegram_url' => ['nullable', 'url'],
+            'is_telegram_active' => ['nullable', 'boolean'],
+            
+            'whatsapp_url' => ['nullable', 'url'],
+            'is_whatsapp_active' => ['nullable', 'boolean'],
+            
+            'terms_of_use' => ['nullable', 'string'],
+            'privacy_policy' => ['nullable', 'string'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -53,6 +65,9 @@ class SettingController extends Controller
         $config->update_status = $request->has('update_status');
         $config->autoembed_movies = $request->has('autoembed_movies');
         $config->autoembed_series = $request->has('autoembed_series');
+        $config->is_instagram_active = $request->has('is_instagram_active');
+        $config->is_telegram_active = $request->has('is_telegram_active');
+        $config->is_whatsapp_active = $request->has('is_whatsapp_active');
 
         // Inputs text/enums
         $config->app_name = $request->app_name;
@@ -76,6 +91,13 @@ class SettingController extends Controller
         $config->autoembed_serie_quality = $request->autoembed_serie_quality ?? 'HD';
         $config->autoembed_serie_type = $request->autoembed_serie_type ?? 'embed';
         $config->autoembed_serie_player_sub = $request->autoembed_serie_player_sub ?? 'free';
+
+        $config->instagram_url = $request->instagram_url;
+        $config->telegram_url = $request->telegram_url;
+        $config->whatsapp_url = $request->whatsapp_url;
+        
+        $config->terms_of_use = $request->terms_of_use;
+        $config->privacy_policy = $request->privacy_policy;
 
         $config->save();
 

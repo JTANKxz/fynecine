@@ -29,6 +29,15 @@ class User extends Authenticatable
         'plan_expires_at',
         'features',
     ];
+
+    /**
+     * The attributes that should be appends for serialization.
+     *
+     * @var array<string, string>
+     */
+    protected $appends = [
+        'has_plan',
+    ];
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -49,9 +58,15 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
             'plan_expires_at' => 'datetime',
             'features' => 'array',
         ];
+    }
+
+    public function getHasPlanAttribute()
+    {
+        return $this->hasPlan();
     }
 
     public function isAdmin(): bool

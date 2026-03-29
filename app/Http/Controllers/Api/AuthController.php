@@ -35,10 +35,8 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-        $user->features = $user->features ?? [];
-
         return response()->json([
-            'user'  => $user,
+            'user'  => $user->refresh(),
             'token' => $token,
         ], 201);
     }
@@ -71,8 +69,6 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-        $user->features = $user->features ?? [];
-
         return response()->json([
             'user'  => $user,
             'token' => $token,
@@ -102,19 +98,6 @@ class AuthController extends Controller
      */
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user();
-
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'is_admin' => $user->is_admin,
-            
-            // Dados de assinatura
-            'plan_type' => $user->plan_type,
-            'plan_expires_at' => $user->plan_expires_at,
-            'has_plan' => $user->hasPlan(),
-            'features' => $user->features ?? []
-        ]);
+        return response()->json($request->user());
     }
 }

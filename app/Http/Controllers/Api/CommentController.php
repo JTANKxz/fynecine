@@ -94,7 +94,8 @@ class CommentController extends Controller
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'avatar' => $request->user()->avatar,
-                ]
+                ],
+                'approved' => $comment->approved
             ]
         ], 201);
     }

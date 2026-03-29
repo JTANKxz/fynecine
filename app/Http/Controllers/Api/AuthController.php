@@ -33,6 +33,12 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        // Criar perfil padrão (Principal) para o novo usuário
+        $user->profiles()->create([
+            'name'    => 'Principal',
+            'is_main' => true,
+        ]);
+
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

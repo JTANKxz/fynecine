@@ -52,6 +52,9 @@ class SettingController extends Controller
             
             'terms_of_use' => ['nullable', 'string'],
             'privacy_policy' => ['nullable', 'string'],
+            
+            'comments_status' => ['nullable', 'boolean'],
+            'comments_auto_approve' => ['nullable', 'boolean'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -68,6 +71,8 @@ class SettingController extends Controller
         $config->is_instagram_active = $request->has('is_instagram_active');
         $config->is_telegram_active = $request->has('is_telegram_active');
         $config->is_whatsapp_active = $request->has('is_whatsapp_active');
+        $config->comments_status = $request->has('comments_status');
+        $config->comments_auto_approve = $request->has('comments_auto_approve');
 
         // Inputs text/enums
         $config->app_name = $request->app_name;

@@ -100,8 +100,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Assinaturas e Cupons
     Route::post('/subscription/redeem', [SubscriptionController::class, 'redeem']);
 
-    // Comentários (Envio protegido por login e CheckBanned middleware setado globalmente ou aqui)
+    // Comentários
     Route::post('/{type}/{idOrSlug}/comments', [CommentController::class, 'store'])->whereIn('type', ['movies', 'series']);
+    Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
 
     // Pedidos (Requests) protegidos
     Route::get('/requests/search', [\App\Http\Controllers\Api\RequestController::class, 'search']);

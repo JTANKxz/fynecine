@@ -42,6 +42,7 @@
         </div>
 
         <div class="grid lg:grid-cols-2 gap-8">
+            <div class="space-y-8">
             <!-- APP INFO -->
             <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                 <h3 class="text-white font-bold flex items-center gap-2">
@@ -91,7 +92,38 @@
                 </div>
             </div>
 
-            <!-- AUTOEMBED & UPDATES -->
+            <!-- COMMENTS CONTROL -->
+            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-purple-500"></i> Motor de Comentários
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="block text-sm font-bold text-white mb-1">Comentários Ativos</span>
+                            <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Mestre: Ativa ou desativa a listagem e os posts no app inteiro.</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer scale-75">
+                            <input type="checkbox" name="comments_status" value="1" {{ $config->comments_status ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-neutral-800 pt-4">
+                        <div>
+                            <span class="block text-sm font-bold text-white mb-1">Aprovação Automática</span>
+                            <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Ao desligar, novos posts ficarão ocultos aguardando liberação.</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer scale-75">
+                            <input type="checkbox" name="comments_auto_approve" value="1" {{ $config->comments_auto_approve ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            </div>
             <div class="space-y-8">
                 <!-- AUTOEMBED -->
                 <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">

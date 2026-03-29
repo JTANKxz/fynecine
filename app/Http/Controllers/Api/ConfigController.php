@@ -47,6 +47,10 @@ class ConfigController extends Controller
             // Textos Legais
             'terms_of_use' => $config->terms_of_use,
             'privacy_policy' => $config->privacy_policy,
+
+            // Comentários
+            'comments_status' => (bool) $config->comments_status,
+            'comments_auto_approve' => (bool) $config->comments_auto_approve,
         ]);
     }
 }

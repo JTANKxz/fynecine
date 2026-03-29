@@ -20,6 +20,14 @@ class CommentController extends Controller
      */
     public function index($type, $idOrSlug): JsonResponse
     {
+        $config = \App\Models\AppConfig::getSettings();
+        
+        if (!$config->comments_status) {
+            return response()->json([
+                'message' => 'Os comentários estão desativados globalmente.'
+            ], 403);
+        }
+
         $modelStr = $type === 'movies' ? Movie::class : Serie::class;
         
         $content = $modelStr::where(function ($query) use ($idOrSlug) {
@@ -45,6 +53,14 @@ class CommentController extends Controller
      */
     public function store(Request $request, $type, $idOrSlug): JsonResponse
     {
+        $config = \App\Models\AppConfig::getSettings();
+        
+        if (!$config->comments_status) {
+            return response()->json([
+                'message' => 'Os comentários estão desativados na plataforma.'
+            ], 403);
+        }
+
         $request->validate([
             'body' => ['required', 'string', 'max:500'],
         ]);
@@ -64,7 +80,7 @@ class CommentController extends Controller
         $comment = $content->comments()->create([
             'user_id' => $request->user()->id,
             'body'    => $request->body,
-            'approved' => true // Poderia passar por moderação dependendo de config
+            'approved' => (bool) $config->comments_auto_approve
         ]);
 
         // Retorna o formato para anexar na listagem dinamicamente
@@ -81,5 +97,24 @@ class CommentController extends Controller
                 ]
             ]
         ], 201);
+    }
+
+    /**
+     * Usuário deleta o próprio comentário.
+     * DELETE /api/comments/{id}
+     */
+    public function destroy(Request $request, $id): JsonResponse
+    {
+        $comment = Comment::findOrFail($id);
+
+        if ($comment->user_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Você não tem permissão para excluir este comentário.'
+            ], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json(['message' => 'Comentário excluído com sucesso.']);
     }
 }

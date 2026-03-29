@@ -35,6 +35,9 @@ class AppConfig extends Model
         
         'terms_of_use',
         'privacy_policy',
+        
+        'comments_status',
+        'comments_auto_approve',
     ];
 
     protected $casts = [
@@ -49,6 +52,8 @@ class AppConfig extends Model
         'is_instagram_active' => 'boolean',
         'is_telegram_active' => 'boolean',
         'is_whatsapp_active' => 'boolean',
+        'comments_status' => 'boolean',
+        'comments_auto_approve' => 'boolean',
     ];
 
     /**

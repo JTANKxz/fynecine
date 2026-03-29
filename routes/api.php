@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\SerieController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\NetworkController;
+use App\Http\Controllers\Api\HomeSectionController;
+use App\Http\Controllers\Api\AvatarController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +36,7 @@ Route::get('/series/{idOrSlug}', [SerieController::class, 'show']);
 Route::get('/movies', [MovieController::class, 'index']);
 Route::get('/movies/{idOrSlug}', [MovieController::class, 'show']);
 Route::get('/{type}/{idOrSlug}/comments', [CommentController::class, 'index'])->where('type', 'movies|series');
+Route::get('/genres', [GenreController::class, 'index']);
 Route::get('/genres/{idOrSlug}', [GenreController::class, 'show']);
 Route::get('/search', [SearchController::class, 'index']);
 
@@ -45,8 +49,14 @@ Route::get('/channels/{idOrSlug}', [\App\Http\Controllers\Api\TvChannelControlle
 Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'plans']);
 
 // Networks
-Route::get('/networks', [\App\Http\Controllers\Api\NetworkController::class, 'index']);
-Route::get('/networks/{idOrSlug}', [\App\Http\Controllers\Api\NetworkController::class, 'show']);
+Route::get('/networks', [NetworkController::class, 'index']);
+Route::get('/networks/{idOrSlug}', [NetworkController::class, 'show']);
+
+// Custom Home Sections (View All)
+Route::get('/sections/{id}', [HomeSectionController::class, 'show']);
+
+// Avatares
+Route::get('/avatars', [AvatarController::class, 'index']);
 
 // Views tracking
 Route::post('/views', [\App\Http\Controllers\Api\ContentViewController::class, 'store']);

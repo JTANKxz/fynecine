@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 
 class GenreController extends Controller
 {
+    public function index()
+    {
+        $genres = Genre::select('id', 'name', 'slug')->get();
+        return response()->json($genres);
+    }
+
     public function show($idOrSlug, Request $request)
     {
         if (is_numeric($idOrSlug)) {

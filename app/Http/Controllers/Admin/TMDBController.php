@@ -15,6 +15,14 @@ use App\Models\Cast;
 
 class TMDBController extends Controller
 {
+    private string $apiKey;
+
+    public function __construct()
+    {
+        // Use environment variable if available, otherwise use hardcoded key
+        $this->apiKey = env('TMDB_API_KEY', 'edcd52275afd8b8c152c82f1ce3933a2');
+    }
+
     public function index()
     {
         return view('admin.tmdb.tmdb');
@@ -22,55 +30,89 @@ class TMDBController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->query('query');
-        $type = $request->query('type', 'movie');
-        $page = $request->query('page', 1);
+        try {
+            $query = $request->query('query');
+            $type = $request->query('type', 'movie');
+            $page = $request->query('page', 1);
+            $yearFrom = $request->query('yearFrom');
+            $yearTo = $request->query('yearTo');
 
-        if ($query) {
+            if ($query) {
+                $endpoint = "https://api.themoviedb.org/3/search/$type";
+                $params = [
+                    'api_key' => $this->apiKey,
+                    'query' => $query,
+                    'language' => 'pt-BR',
+                    'page' => $page,
+                    'include_adult' => $request->query('adult', 'false') === 'true',
+                ];
 
-            $endpoint = "https://api.themoviedb.org/3/search/$type";
+                if ($yearFrom) {
+                    $yearKey = $type === 'movie' ? 'primary_release_year' : 'first_air_date_year';
+                    $params[$yearKey] = $yearFrom;
+                }
 
-            $params = [
-                'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
-                'query' => $query,
-                'language' => 'pt-BR',
-                'page' => $page
-            ];
+            } else {
+                $endpoint = "https://api.themoviedb.org/3/discover/$type";
+                $sort = $request->query('sortBy', 'popularity.desc');
 
-        } else {
+                if ($type === 'tv') {
+                    $sort = str_replace('release_date', 'first_air_date', $sort);
+                }
 
-            $endpoint = "https://api.themoviedb.org/3/discover/$type";
-            $sort = $request->query('sortBy', 'popularity.desc');
+                $params = [
+                    'api_key' => $this->apiKey,
+                    'language' => 'pt-BR',
+                    'page' => $page,
+                    'sort_by' => $sort,
+                    'with_genres' => $request->query('genre'),
+                    'include_adult' => $request->query('adult', 'false') === 'true'
+                ];
 
-            if ($type === 'tv') {
-                $sort = str_replace('release_date', 'first_air_date', $sort);
+                if ($yearFrom) {
+                    $yearKey = $type === 'movie' ? 'primary_release_date.gte' : 'first_air_date.gte';
+                    $params[$yearKey] = $yearFrom . "-01-01";
+                }
+
+                if ($yearTo) {
+                    $yearKey = $type === 'movie' ? 'primary_release_date.lte' : 'first_air_date.lte';
+                    $params[$yearKey] = $yearTo . "-12-31";
+                }
             }
 
-            $params = [
-                'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
-                'language' => 'pt-BR',
-                'page' => $page,
-                'sort_by' => $sort,
-                'with_genres' => $request->query('genre'),
-                'include_adult' => $request->query('adult', false)
-            ];
+            $response = Http::get($endpoint, $params);
+
+            if (!$response->successful()) {
+                $errorData = $response->json();
+                $message = $errorData['status_message'] ?? 'Erro desconhecido no TMDB';
+                return response()->json(['error' => $message], $response->status());
+            }
+
+            $data = $response->json();
+
+            if (!isset($data['results'])) {
+                return response()->json(['results' => [], 'page' => 1, 'total_pages' => 1]);
+            }
+
+            $tmdbIds = collect($data['results'])->pluck('id');
+
+            if ($type === 'tv') {
+                $imported = Serie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+            } else {
+                $imported = Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+            }
+
+            foreach ($data['results'] as &$item) {
+                $item['imported'] = $imported->contains($item['id']);
+            }
+
+            return response()->json($data);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erro interno ao buscar dados: ' . $e->getMessage()
+            ], 500);
         }
-
-        $response = Http::get($endpoint, $params)->json();
-
-        $tmdbIds = collect($response['results'])->pluck('id');
-
-        if ($type === 'tv') {
-            $imported = Serie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
-        } else {
-            $imported = Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
-        }
-
-        foreach ($response['results'] as &$item) {
-            $item['imported'] = $imported->contains($item['id']);
-        }
-
-        return response()->json($response);
     }
 
     public function import(Request $request)
@@ -95,17 +137,17 @@ class TMDBController extends Controller
     }
     public function importMovie($tmdbId)
     {
+        try {
+            $response = Http::get("https://api.themoviedb.org/3/movie/$tmdbId", [
+                'api_key' => $this->apiKey,
+                'language' => 'pt-BR'
+            ]);
 
-        $response = Http::get("https://api.themoviedb.org/3/movie/$tmdbId", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
-            'language' => 'pt-BR'
-        ]);
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Filme não encontrado ou erro na API'], 404);
+            }
 
-        $data = $response->json();
-
-        if (!$data) {
-            return response()->json(['error' => 'Filme não encontrado'], 404);
-        }
+            $data = $response->json();
 
         $title = $data['title'];
         $year = substr($data['release_date'], 0, 4);
@@ -230,20 +272,24 @@ IMPORTAR ELENCO
             'success' => true,
             'movie' => $movie
         ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao importar filme: ' . $e->getMessage()], 500);
+        }
     }
 
     public function importSeries($tmdbId, $fullImport = false)
     {
-        $response = Http::get("https://api.themoviedb.org/3/tv/$tmdbId", [
-            'api_key' => 'edcd52275afd8b8c152c82f1ce3933a2',
-            'language' => 'pt-BR'
-        ]);
+        try {
+            $response = Http::get("https://api.themoviedb.org/3/tv/$tmdbId", [
+                'api_key' => $this->apiKey,
+                'language' => 'pt-BR'
+            ]);
 
-        $data = $response->json();
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Série não encontrada ou erro na API'], 404);
+            }
 
-        if (!$data) {
-            return response()->json(['error' => 'Série não encontrada'], 404);
-        }
+            $data = $response->json();
 
         $name = $data['name'];
 
@@ -389,6 +435,9 @@ IMPORTAR ELENCO
             'success' => true,
             'series' => $series
         ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao importar série: ' . $e->getMessage()], 500);
+        }
     }
 
     public function importSeason($tmdbId, $seasonNumber, $seriesId = null)

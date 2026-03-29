@@ -128,6 +128,15 @@
             const response = await fetch(`/dashzin/tmdb/search?${params}`);
             const data = await response.json();
 
+            if (!response.ok) {
+                loading.classList.add("hidden");
+                results.innerHTML = `
+                    <div class="col-span-full text-center p-5 bg-red-900/20 border border-red-900 rounded">
+                        <p class="text-red-500 font-bold">Erro: ${data.error || 'Erro desconhecido'}</p>
+                    </div>`;
+                return;
+            }
+
             loading.classList.add("hidden");
 
             const imageBase = "https://image.tmdb.org/t/p/w500";

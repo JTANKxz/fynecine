@@ -22,6 +22,8 @@ class WatchProgressController extends Controller
             'duration' => ['required', 'integer', 'min:0'],
             'season_id' => ['nullable', 'integer'],
             'episode_id' => ['nullable', 'integer'],
+            'link_id' => ['nullable', 'string'],
+            'link_type' => ['nullable', 'string'],
             'guest_id' => ['nullable', 'string'],
         ]);
 
@@ -36,6 +38,8 @@ class WatchProgressController extends Controller
             guestId: $validated['guest_id'] ?? null,
             seasonId: $validated['season_id'] ?? null,
             episodeId: $validated['episode_id'] ?? null,
+            linkId: $validated['link_id'] ?? null,
+            linkType: $validated['link_type'] ?? null,
         );
 
         if (!$progress) {

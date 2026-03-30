@@ -18,6 +18,8 @@ class WatchProgress extends Model
         'duration',
         'season_id',
         'episode_id',
+        'link_id',
+        'link_type',
     ];
 
     protected $casts = [
@@ -57,6 +59,9 @@ class WatchProgress extends Model
         if ($this->content_type === 'movie') {
             $movie = $this->movie;
             if (!$movie) return null;
+            
+            $movie->loadMissing('playLinks');
+            
             return [
                 'title' => $movie->title,
                 'backdrop_path' => $movie->backdrop_path,
@@ -64,12 +69,21 @@ class WatchProgress extends Model
                 'type' => 'movie',
                 'label' => null,
                 'year' => $movie->release_year,
+                'last_link_id' => $this->link_id,
+                'sources' => $movie->playLinks->map(fn($l) => [
+                    'id' => (string)$l->id,
+                    'name' => $l->name,
+                    'url' => $l->url,
+                    'type' => $l->type,
+                    'quality' => $l->quality,
+                    'player_sub' => $l->player_sub,
+                ]),
             ];
         } elseif ($this->content_type === 'episode') {
             $episode = $this->episode;
             if (!$episode) return null;
             
-            $episode->loadMissing(['series', 'season']);
+            $episode->loadMissing(['series', 'season', 'links']);
             
             return [
                 'title' => $episode->series?->name ?? 'Série',
@@ -79,6 +93,23 @@ class WatchProgress extends Model
                 'type' => 'series',
                 'label' => "T" . ($episode->season?->season_number ?? 1) . ":E" . ($episode->episode_number),
                 'year' => $episode->series?->first_air_year,
+                'last_link_id' => $this->link_id,
+                'sources' => $episode->links->map(fn($l) => [
+                    'id' => (string)$l->id,
+                    'name' => $l->name,
+                    'url' => $l->url,
+                    'type' => $l->type,
+                    'quality' => $l->quality,
+                    'player_sub' => $l->player_sub,
+                    'skip_intro' => [
+                        'start' => $l->skip_intro_start,
+                        'end' => $l->skip_intro_end,
+                    ],
+                    'skip_ending' => [
+                        'start' => $l->skip_ending_start,
+                        'end' => $l->skip_ending_end,
+                    ]
+                ]),
             ];
         }
         return null;
@@ -94,6 +125,8 @@ class WatchProgress extends Model
      * @param string|null $guestId
      * @param int|null $seasonId
      * @param int|null $episodeId
+     * @param string|null $linkId
+     * @param string|null $linkType
      */
     public static function saveProgress(
         string $contentId,
@@ -103,7 +136,9 @@ class WatchProgress extends Model
         ?int $userId = null,
         ?string $guestId = null,
         ?int $seasonId = null,
-        ?int $episodeId = null
+        ?int $episodeId = null,
+        ?string $linkId = null,
+        ?string $linkType = null
     ): ?self {
         // Não salva se progresso < 30 segundos
         if ($progress < 30) {
@@ -138,6 +173,8 @@ class WatchProgress extends Model
                 'duration' => $duration,
                 'season_id' => $seasonId,
                 'episode_id' => $episodeId,
+                'link_id' => $linkId,
+                'link_type' => $linkType,
                 'updated_at' => now(),
             ]
         );

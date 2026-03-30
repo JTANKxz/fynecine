@@ -24,6 +24,7 @@ class EventController extends Controller
                 'away_team' => $event->away_team,
                 'image_url' => $event->image_url,
                 'start_time' => $event->start_time->toIso8601String(),
+                'display_time' => $event->start_time->format('H:i'),
                 'end_time' => $event->end_time->toIso8601String(),
                 'status' => $event->status, // Em Breve, Ao Vivo, etc
             ];
@@ -62,6 +63,7 @@ class EventController extends Controller
             'image_url' => $event->image_url,
             'description' => $event->description,
             'start_time' => $event->start_time->toIso8601String(),
+            'display_time' => $event->start_time->format('H:i'),
             'end_time' => $event->end_time->toIso8601String(),
             'status' => $event->status,
             'play_links' => $playLinks->values()->map(function($link) {

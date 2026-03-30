@@ -65,6 +65,13 @@ Route::get('/avatars', [AvatarController::class, 'index']);
 // Views tracking
 Route::post('/views', [\App\Http\Controllers\Api\ContentViewController::class, 'store']);
 
+// Watch Progress (Continuar Assistindo) - Público para guest_id
+Route::prefix('progress')->group(function () {
+    Route::post('/', [\App\Http\Controllers\Api\WatchProgressController::class, 'store']);
+    Route::get('/', [\App\Http\Controllers\Api\WatchProgressController::class, 'index']);
+    Route::get('/{contentId}', [\App\Http\Controllers\Api\WatchProgressController::class, 'show']);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Autenticação API (Sanctum — Bearer Token)
@@ -115,6 +122,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Downloads — registro e controle de limite diário
     Route::post('/downloads/log', [\App\Http\Controllers\Api\DownloadController::class, 'log']);
     Route::get('/downloads/status', [\App\Http\Controllers\Api\DownloadController::class, 'status']);
+
+    // Watch Progress (Continuar Assistindo) - Delete requer auth
+    Route::prefix('progress')->group(function () {
+        Route::delete('/{contentId}', [\App\Http\Controllers\Api\WatchProgressController::class, 'destroy']);
+        Route::delete('/', [\App\Http\Controllers\Api\WatchProgressController::class, 'destroyAll']);
+    });
 
     // Notificações
     Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);

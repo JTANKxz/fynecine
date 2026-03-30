@@ -29,6 +29,7 @@ class SettingController extends Controller
             'update_features' => ['nullable', 'string'],
             'custom_message_status' => ['nullable', 'boolean'],
             'security_mode' => ['nullable', 'boolean'],
+            'is_channels_active' => ['nullable', 'boolean'],
             
             'autoembed_movie_url' => ['nullable', 'string'],
             'autoembed_movie_name' => ['nullable', 'string', 'max:50'],
@@ -65,6 +66,7 @@ class SettingController extends Controller
         $config->force_login = $request->has('force_login');
         $config->show_onboarding = $request->has('show_onboarding');
         $config->security_mode = $request->has('security_mode');
+        $config->is_channels_active = $request->has('is_channels_active');
         $config->custom_message_status = $request->has('custom_message_status');
         $config->update_skippable = $request->has('update_skippable');
         $config->update_status = $request->has('update_status');

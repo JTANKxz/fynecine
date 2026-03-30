@@ -15,7 +15,7 @@
     </div>
 
     <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl">
-        <form action="{{ route('events.links.update', $link->id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.events.links.update', $link->id) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 

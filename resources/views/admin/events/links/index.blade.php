@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <a href="{{ route('events.links.create', $event->id) }}" class="bg-netflix hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded shadow-lg transition flex items-center gap-2">
+        <a href="{{ route('admin.events.links.create', $event->id) }}" class="bg-netflix hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded shadow-lg transition flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> ADICIONAR LINK
         </a>
     </div>
@@ -65,10 +65,10 @@
                             </td>
                             <td class="p-4 text-right">
                                 <div class="flex items-center justify-end gap-3 opacity-20 group-hover:opacity-100 transition">
-                                    <a href="{{ route('events.links.edit', $link->id) }}" class="text-neutral-400 hover:text-white">
+                                    <a href="{{ route('admin.events.links.edit', $link->id) }}" class="text-neutral-400 hover:text-white">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
-                                    <form action="{{ route('events.links.destroy', $link->id) }}" method="POST" class="inline" onsubmit="return confirm('Remover este link?')">
+                                    <form action="{{ route('admin.events.links.destroy', $link->id) }}" method="POST" class="inline" onsubmit="return confirm('Remover este link?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-400">

@@ -14,14 +14,20 @@ class SetActiveProfile
      */
     public function handle(Request $request, Closure $next)
     {
-        $profileId = $request->header('X-Profile-Id');
+        // Aceita tanto Profile-Id (padrão) quanto X-Profile-Id (Android legado ou específico)
+        $profileId = $request->header('Profile-Id') ?: $request->header('X-Profile-Id');
 
         if ($profileId) {
-            // Se o request->user() for nulo, tentamos autenticar manualmente via Sanctum
-            // Isso permite que o perfil seja identificado até em rotas públicas (como Home e Movies)
-            $user = $request->user() ?: Auth::guard('sanctum')->user();
+            // Tenta obter o usuário do request primeiro
+            $user = $request->user();
+
+            // Se não houver usuário no request mas houver token de autorização, tenta autenticar via Sanctum
+            if (!$user && $request->hasHeader('Authorization')) {
+                $user = Auth::guard('sanctum')->user();
+            }
             
             if ($user) {
+                // Busca o perfil pertencente a este usuário
                 $profile = $user->profiles()->find($profileId);
                 if ($profile) {
                     ProfileContext::set($profile);

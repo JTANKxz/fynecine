@@ -19,7 +19,8 @@ class Movie extends Model
         'backdrop_path',
         'trailer_key',
         'trailer_url',
-        'content_type'
+        'content_type',
+        'age_rating'
     ];
 
     public function genres()
@@ -53,6 +54,8 @@ class Movie extends Model
     }
     protected static function booted()
     {
+        static::addGlobalScope(new \App\Models\Scopes\KidsFilterScope);
+
         static::deleting(function ($movie) {
             \App\Models\Slider::where('content_id', $movie->id)
                 ->where('content_type', 'movie')

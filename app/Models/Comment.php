@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Comment extends Model
 {
     protected $fillable = [
-        'user_id',
+        'profile_id',
         'commentable_id',
         'commentable_type',
         'body',
@@ -18,9 +18,9 @@ class Comment extends Model
         'approved' => 'boolean'
     ];
 
-    public function user()
+    public function profile()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Profile::class);
     }
 
     public function commentable()

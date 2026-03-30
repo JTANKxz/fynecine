@@ -26,6 +26,35 @@ class TMDBController extends Controller
         return Http::get('https://joetank.online/tmdb.php', $params);
     }
 
+    private function getAgeRating(string $type, $tmdbId)
+    {
+        $endpoint = $type === 'movie' ? "movie/$tmdbId/release_dates" : "tv/$tmdbId/content_ratings";
+        $response = $this->fetchTMDB($endpoint);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $results = $data['results'] ?? [];
+
+            foreach ($results as $result) {
+                if (($result['iso_3166_1'] ?? '') === 'BR') {
+                    if ($type === 'movie') {
+                        // Para filmes, release_dates é um array
+                        foreach ($result['release_dates'] as $rd) {
+                            if (!empty($rd['certification'])) {
+                                return $rd['certification'];
+                            }
+                        }
+                    } else {
+                        // Para séries, o rating está direto no objeto
+                        return $result['rating'] ?? null;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function index()
     {
         return view('admin.tmdb.tmdb');
@@ -207,7 +236,8 @@ class TMDBController extends Controller
             'backdrop_path' => $data['backdrop_path'] ? $baseImage . $data['backdrop_path'] : null,
             'trailer_key' => $trailerKey,
             'trailer_url' => $trailerKey ? "https://www.youtube.com/watch?v=" . $trailerKey : null,
-            'content_type' => 'movie'
+            'content_type' => 'movie',
+            'age_rating' => $this->getAgeRating('movie', $tmdbId)
         ]);
         /*
         ====================
@@ -354,7 +384,8 @@ IMPORTAR ELENCO
             'backdrop_path' => $data['backdrop_path'] ? $baseImage . $data['backdrop_path'] : null,
             'trailer_key' => $trailerKey,
             'trailer_url' => $trailerKey ? "https://www.youtube.com/watch?v=" . $trailerKey : null,
-            'content_type' => 'series'
+            'content_type' => 'series',
+            'age_rating' => $this->getAgeRating('tv', $tmdbId)
         ]);
 
         /*

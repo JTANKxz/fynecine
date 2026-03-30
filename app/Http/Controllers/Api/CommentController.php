@@ -40,7 +40,7 @@ class CommentController extends Controller
 
         $comments = $content->comments()
             ->where('approved', true) // Apenas aprovados
-            ->with(['user:id,name,avatar']) // Traz dados do usuário (avatar pra thumbnail)
+            ->with(['profile:id,name,avatar']) // Traz dados do perfil (avatar pra thumbnail)
             ->paginate(15);
 
         return response()->json($comments);
@@ -62,8 +62,18 @@ class CommentController extends Controller
         }
 
         $request->validate([
+            'profile_id' => ['required', 'integer', 'exists:profiles,id'],
             'body' => ['required', 'string', 'max:500'],
         ]);
+
+        $user = $request->user();
+        $profile = $user->profiles()->findOrFail($request->profile_id);
+
+        if ($profile->is_kids) {
+            return response()->json([
+                'message' => 'Perfis infantis não têm permissão para comentar.'
+            ], 403);
+        }
 
         $modelStr = $type === 'movies' ? Movie::class : Serie::class;
 
@@ -78,9 +88,9 @@ class CommentController extends Controller
         // Opcional: Anti-spam (1 comentario a cada X min), limitamos nas constraints de frontend pro agora.
         
         $comment = $content->comments()->create([
-            'user_id' => $request->user()->id,
-            'body'    => $request->body,
-            'approved' => (bool) $config->comments_auto_approve
+            'profile_id' => $profile->id,
+            'body'       => $request->body,
+            'approved'   => (bool) $config->comments_auto_approve
         ]);
 
         // Retorna o formato para anexar na listagem dinamicamente
@@ -90,10 +100,10 @@ class CommentController extends Controller
                 'id' => $comment->id,
                 'body' => $comment->body,
                 'created_at' => $comment->created_at,
-                'user' => [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'avatar' => $request->user()->avatar,
+                'profile' => [
+                    'id' => $profile->id,
+                    'name' => $profile->name,
+                    'avatar' => $profile->avatar,
                 ],
                 'approved' => $comment->approved
             ]
@@ -107,8 +117,10 @@ class CommentController extends Controller
     public function destroy(Request $request, $id): JsonResponse
     {
         $comment = Comment::findOrFail($id);
+        $user = $request->user();
 
-        if ($comment->user_id !== $request->user()->id) {
+        // Verifica se o comentário pertence a um perfil do usuário logado
+        if (!$user->profiles()->where('id', $comment->profile_id)->exists()) {
             return response()->json([
                 'message' => 'Você não tem permissão para excluir este comentário.'
             ], 403);

@@ -21,7 +21,8 @@ class Serie extends Model
         'backdrop_path',
         'trailer_key',
         'trailer_url',
-        'content_type'
+        'content_type',
+        'age_rating'
 
     ];
 
@@ -55,6 +56,8 @@ class Serie extends Model
 
     protected static function booted()
     {
+        static::addGlobalScope(new \App\Models\Scopes\KidsFilterScope);
+
         static::deleting(function ($serie) {
             \App\Models\Slider::where('content_id', $serie->id)
                 ->where('content_type', 'series')

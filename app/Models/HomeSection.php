@@ -64,9 +64,17 @@ class HomeSection extends Model
             case 'recently_added':
                 return $this->resolveRecentlyAdded($limit);
 
+            case 'events':
+                return $this->resolveEvents($limit);
+
             default:
                 return collect();
         }
+    }
+
+    private function resolveEvents($limit)
+    {
+        return Event::visible()->orderBy('start_time')->limit($limit)->get();
     }
 
     private function resolveCustom($limit)

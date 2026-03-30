@@ -204,6 +204,16 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // ========== AVATARES ==========
     Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
     Route::resource('avatars', AvatarController::class)->names('avatars');
+    Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
+
+    // ========== EVENTOS AO VIVO ==========
+    Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
+    Route::get('events/{event}/links', [\App\Http\Controllers\Admin\EventController::class, 'links'])->name('events.links');
+    Route::get('events/{event}/links/create', [\App\Http\Controllers\Admin\EventController::class, 'createLink'])->name('events.links.create');
+    Route::post('events/{event}/links', [\App\Http\Controllers\Admin\EventController::class, 'storeLink'])->name('events.links.store');
+    Route::get('event-links/{link}/edit', [\App\Http\Controllers\Admin\EventController::class, 'editLink'])->name('events.links.edit');
+    Route::put('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'updateLink'])->name('events.links.update');
+    Route::delete('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'deleteLink'])->name('events.links.destroy');
 
 });
 

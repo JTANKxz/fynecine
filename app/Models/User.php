@@ -129,4 +129,36 @@ class User extends Authenticatable
 
         return 1; // Free
     }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function readNotifications()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_user')
+            ->withPivot('read_at')
+            ->withTimestamps();
+    }
+
+    public function unreadNotifications()
+    {
+        // Pega as notificações que o usuário ainda não leu (não estão na tabela pivô)
+        return Notification::active()
+            ->where(function ($q) {
+                $q->where('is_global', true)
+                  ->orWhere('user_id', $this->id);
+            })
+            ->whereNotExists(function ($query) {
+                $query->select(\DB::raw(1))
+                      ->from('notification_user')
+                      ->whereColumn('notification_user.notification_id', 'notifications.id')
+                      ->where('notification_user.user_id', $this->id);
+            });
+    }
+
+    public function unreadNotificationsCount(): int
+    {
+        return $this->unreadNotifications()->count();
+    }
 }

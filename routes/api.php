@@ -45,6 +45,10 @@ Route::get('/channels', [\App\Http\Controllers\Api\TvChannelController::class, '
 Route::get('/channels/categories', [\App\Http\Controllers\Api\TvChannelController::class, 'categories']);
 Route::get('/channels/{idOrSlug}', [\App\Http\Controllers\Api\TvChannelController::class, 'show']);
 
+// Eventos Ao Vivo
+Route::get('/events', [\App\Http\Controllers\Api\EventController::class, 'index']);
+Route::get('/events/{id}', [\App\Http\Controllers\Api\EventController::class, 'show']);
+
 // Planos de Assinatura (Para página de Pricing/Vendas)
 Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'plans']);
 
@@ -112,4 +116,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/downloads/log', [\App\Http\Controllers\Api\DownloadController::class, 'log']);
     Route::get('/downloads/status', [\App\Http\Controllers\Api\DownloadController::class, 'status']);
 
+    // Notificações
+    Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
 });

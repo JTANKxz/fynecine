@@ -172,6 +172,14 @@
                 </div>
             </div>
 
+            {{-- Eventos Ao Vivo --}}
+            <div>
+                <a href="{{ route('admin.events.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.events.*') || request()->routeIs('events.links.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-trophy w-5"></i> Eventos Ao Vivo
+                </a>
+            </div>
+
             {{-- Sliders --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('slidersSubmenu')"
@@ -229,6 +237,10 @@
                     <a href="{{ route('admin.requests.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.requests.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-hand-holding-heart w-4 mr-1"></i> Pedidos (Requests)
+                    </a>
+                    <a href="{{ route('admin.notifications.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.notifications.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-bell w-4 mr-1"></i> Notificações In-App
                     </a>
                 </div>
             </div>

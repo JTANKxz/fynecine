@@ -31,6 +31,7 @@
                         class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
                         <option value="embed">Embed</option>
                         <option value="m3u8">M3U8</option>
+                        <option value="custom">Custom (Sniffer)</option>
                     </select>
                 </div>
             </div>

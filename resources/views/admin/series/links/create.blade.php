@@ -58,6 +58,7 @@
                         <option value="mp4">MP4</option>
                         <option value="m3u8">M3U8</option>
                         <option value="mkv">MKV</option>
+                        <option value="custom">Custom (Sniffer)</option>
 
                     </select>
                 </div>

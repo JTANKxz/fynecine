@@ -55,6 +55,7 @@
                         <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
                         <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
                         <option value="mkv" {{ $link->type == 'mkv' ? 'selected' : '' }}>MKV</option>
+                        <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>
 
                     </select>
                 </div>

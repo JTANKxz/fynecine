@@ -16,8 +16,8 @@ class EventController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('title', 'like', "%{$search}%")
-                  ->orWhere('home_team', 'like', "%{$search}%")
-                  ->orWhere('away_team', 'like', "%{$search}%");
+                ->orWhere('home_team', 'like', "%{$search}%")
+                ->orWhere('away_team', 'like', "%{$search}%");
         }
 
         $events = $query->orderBy('start_time', 'desc')->paginate(10);
@@ -100,7 +100,7 @@ class EventController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|string',
-            'type' => 'required|in:embed,direct,m3u8,mp4,mkv',
+            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom',
             'player_sub' => 'required|in:free,premium',
         ]);
 
@@ -120,7 +120,7 @@ class EventController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|string',
-            'type' => 'required|in:embed,direct,m3u8,mp4,mkv',
+            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom',
             'player_sub' => 'required|in:free,premium',
         ]);
 

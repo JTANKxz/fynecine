@@ -32,6 +32,7 @@
                         class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
                         <option value="embed" {{ $link->type == 'embed' ? 'selected' : '' }}>Embed</option>
                         <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
+                        <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>
                     </select>
                 </div>
             </div>

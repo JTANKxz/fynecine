@@ -34,16 +34,16 @@ class TvChannelController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'image_url'  => 'nullable|string|max:500',
+            'name' => 'required|string|max:255',
+            'image_url' => 'nullable|string|max:500',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:tv_channel_categories,id',
         ]);
 
         $channel = TvChannel::create([
-            'name'       => $validated['name'],
-            'slug'       => Str::slug($validated['name']),
-            'image_url'  => $validated['image_url'] ?? null,
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+            'image_url' => $validated['image_url'] ?? null,
         ]);
 
         if (!empty($validated['categories'])) {
@@ -64,16 +64,16 @@ class TvChannelController extends Controller
     public function update(Request $request, TvChannel $channel)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'image_url'  => 'nullable|string|max:500',
+            'name' => 'required|string|max:255',
+            'image_url' => 'nullable|string|max:500',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:tv_channel_categories,id',
         ]);
 
         $channel->update([
-            'name'       => $validated['name'],
-            'slug'       => Str::slug($validated['name']),
-            'image_url'  => $validated['image_url'] ?? null,
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+            'image_url' => $validated['image_url'] ?? null,
         ]);
 
         $channel->categories()->sync($validated['categories'] ?? []);
@@ -105,10 +105,10 @@ class TvChannelController extends Controller
     public function storeLink(Request $request, TvChannel $channel)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'order'      => 'nullable|integer',
-            'url'        => 'required|string',
-            'type'       => 'required|in:embed,m3u8',
+            'name' => 'required|string|max:255',
+            'order' => 'nullable|integer',
+            'url' => 'required|string',
+            'type' => 'required|in:embed,m3u8,custom',
             'player_sub' => 'required|in:free,premium',
         ]);
 
@@ -129,10 +129,10 @@ class TvChannelController extends Controller
     public function updateLink(Request $request, TvChannelLink $link)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'order'      => 'nullable|integer',
-            'url'        => 'required|string',
-            'type'       => 'required|in:embed,m3u8',
+            'name' => 'required|string|max:255',
+            'order' => 'nullable|integer',
+            'url' => 'required|string',
+            'type' => 'required|in:embed,m3u8,custom',
             'player_sub' => 'required|in:free,premium',
         ]);
 

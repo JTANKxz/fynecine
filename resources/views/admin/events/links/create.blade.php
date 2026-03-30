@@ -43,6 +43,7 @@
                         <option value="m3u8">M3U8 (HLS)</option>
                         <option value="mp4">MP4</option>
                         <option value="mkv">MKV</option>
+                        <option value="custom">Custom (Sniffer)</option>
                     </select>
                 </div>
 

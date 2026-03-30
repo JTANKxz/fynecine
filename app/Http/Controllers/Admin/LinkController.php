@@ -18,7 +18,7 @@ class LinkController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%{$search}%")
-                  ->orWhere('tmdb_id', $search);
+                ->orWhere('tmdb_id', $search);
         }
 
         $movies = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
@@ -32,7 +32,7 @@ class LinkController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('tmdb_id', $search);
+                ->orWhere('tmdb_id', $search);
         }
 
         $series = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
@@ -45,7 +45,7 @@ class LinkController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
-            'type' => 'required|in:embed,mp4,m3u8,mkv',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
@@ -61,7 +61,7 @@ class LinkController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
-            'type' => 'required|in:embed,mp4,m3u8,mkv',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',

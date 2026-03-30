@@ -52,7 +52,7 @@ class MovieController extends Controller
             'quality' => 'nullable|string|max:50',
             'order' => 'nullable|integer',
             'url' => 'required|url',
-            'type' => 'required|in:embed,mp4,m3u8,mkv',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
             'player_sub' => 'required|in:free,premium',
         ]);
 
@@ -76,7 +76,7 @@ class MovieController extends Controller
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'url' => 'required|string',
-            'type' => 'required|in:embed,mp4,m3u8,mkv',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
             'player_sub' => 'required|in:free,premium',
         ]);
 

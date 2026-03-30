@@ -20,23 +20,56 @@
         @method('PUT')
 
         <!-- MODO SEGURANÇA -->
-        <div class="bg-red-900/10 border border-red-900/30 p-6 rounded-xl">
-            <div class="flex items-start gap-4">
-                <div class="bg-red-600 p-3 rounded-lg">
-                    <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+        <div class="grid lg:grid-cols-2 gap-8">
+            <div class="bg-red-900/10 border border-red-900/30 p-6 rounded-xl">
+                <div class="flex items-start gap-4">
+                    <div class="bg-red-600 p-3 rounded-lg">
+                        <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold text-lg mb-1 text-red-500">Modo de Segurança (Loja)</h3>
+                        <p class="text-neutral-400 text-xs mb-4 leading-relaxed">
+                            Oculta links de reprodução para aprovações em lojas.
+                        </p>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="security_mode" value="1" {{ $config->security_mode ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                            <span class="ml-3 text-xs font-medium text-red-500 uppercase tracking-widest" id="security-mode-label">{{ $config->security_mode ? 'ATIVO' : 'DESATIVADO' }}</span>
+                        </label>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-white font-bold text-lg mb-1 text-red-500">Modo de Segurança (Aprovação Loja)</h3>
-                    <p class="text-neutral-400 text-sm mb-4 leading-relaxed">
-                        Ao ativar este modo, a API omitirá <strong>TODOS</strong> os links de reprodução. 
-                        A plataforma passará a se comportar como um catálogo oficial legal (estilo "Guia de Filmes"). 
-                        Ideal para usar durante a análise da Google Play e App Store.
-                    </p>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="security_mode" value="1" {{ $config->security_mode ? 'checked' : '' }} class="sr-only peer">
-                        <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                        <span class="ml-3 text-sm font-medium text-red-500 uppercase tracking-widest" id="security-mode-label">{{ $config->security_mode ? 'MODO ATIVO' : 'ATIVAR MODO' }}</span>
-                    </label>
+            </div>
+
+            <div class="bg-blue-900/10 border border-blue-900/30 p-6 rounded-xl">
+                <div class="flex items-start gap-4">
+                    <div class="bg-blue-600 p-3 rounded-lg">
+                        <i class="fa-solid fa-user-shield text-white text-xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-white font-bold text-lg mb-4 text-blue-400">Segurança de Rede</h3>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <span class="block text-sm font-bold text-white mb-0.5">Bloquear VPN</span>
+                                <span class="text-[10px] text-neutral-500 block leading-tight">Impede acesso via conexões VPN.</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="block_vpn" value="1" {{ $config->block_vpn ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="block text-sm font-bold text-white mb-0.5">Bloquear DNS Privado</span>
+                                <span class="text-[10px] text-neutral-500 block leading-tight">Detecta DoH/DNS adblockers.</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="block_dns" value="1" {{ $config->block_dns ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

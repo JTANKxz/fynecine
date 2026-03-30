@@ -55,6 +55,8 @@ class SettingController extends Controller
             
             'comments_status' => ['nullable', 'boolean'],
             'comments_auto_approve' => ['nullable', 'boolean'],
+            'block_vpn' => ['nullable', 'boolean'],
+            'block_dns' => ['nullable', 'boolean'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -73,6 +75,8 @@ class SettingController extends Controller
         $config->is_whatsapp_active = $request->has('is_whatsapp_active');
         $config->comments_status = $request->has('comments_status');
         $config->comments_auto_approve = $request->has('comments_auto_approve');
+        $config->block_vpn = $request->has('block_vpn');
+        $config->block_dns = $request->has('block_dns');
 
         // Inputs text/enums
         $config->app_name = $request->app_name;

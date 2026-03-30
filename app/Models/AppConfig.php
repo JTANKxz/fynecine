@@ -38,6 +38,8 @@ class AppConfig extends Model
         
         'comments_status',
         'comments_auto_approve',
+        'block_vpn',
+        'block_dns',
     ];
 
     protected $casts = [
@@ -54,6 +56,8 @@ class AppConfig extends Model
         'is_whatsapp_active' => 'boolean',
         'comments_status' => 'boolean',
         'comments_auto_approve' => 'boolean',
+        'block_vpn' => 'boolean',
+        'block_dns' => 'boolean',
     ];
 
     /**

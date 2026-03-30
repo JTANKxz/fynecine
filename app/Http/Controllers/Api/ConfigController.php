@@ -51,6 +51,8 @@ class ConfigController extends Controller
             // Comentários
             'comments_status' => (bool) $config->comments_status,
             'comments_auto_approve' => (bool) $config->comments_auto_approve,
+            'block_vpn' => (bool) $config->block_vpn,
+            'block_dns' => (bool) $config->block_dns,
         ]);
     }
 }

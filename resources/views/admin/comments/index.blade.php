@@ -40,11 +40,11 @@
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                                         <div class="flex items-center">
                                             <div class="h-10 w-10 flex-shrink-0">
-                                                <img class="h-10 w-10 rounded-full" src="{{ $comment->user->avatar ?? 'https://ui-avatars.com/api/?name='.$comment->user->name }}" alt="">
+                                                <img class="h-10 w-10 rounded-full object-cover" src="{{ $comment->profile->avatar_url ?? 'https://ui-avatars.com/api/?name='.$comment->profile->name }}" alt="">
                                             </div>
                                             <div class="ml-4">
-                                                <div class="font-medium text-white">{{ collect(explode(' ', $comment->user->name))->take(2)->implode(' ') }}</div>
-                                                <div class="text-neutral-500">{{ $comment->user->email }}</div>
+                                                <div class="font-medium text-white">{{ $comment->profile->name }}</div>
+                                                <div class="text-neutral-500 text-xs">{{ $comment->profile->user->email ?? '' }}</div>
                                             </div>
                                         </div>
                                     </td>

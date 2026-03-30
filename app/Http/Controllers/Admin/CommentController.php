@@ -10,8 +10,8 @@ class CommentController extends Controller
 {
     public function index()
     {
-        // Traz o user e a model polimórfica associada (Filme ou Série)
-        $comments = Comment::with(['user', 'commentable'])->latest()->paginate(20);
+        // Traz o perfil e a model polimórfica associada (Filme ou Série)
+        $comments = Comment::with(['profile.user', 'commentable'])->latest()->paginate(20);
         return view('admin.comments.index', compact('comments'));
     }
 

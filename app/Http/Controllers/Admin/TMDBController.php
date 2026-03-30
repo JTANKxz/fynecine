@@ -29,7 +29,8 @@ class TMDBController extends Controller
     private function getAgeRating(string $type, $tmdbId)
     {
         $endpoint = $type === 'movie' ? "movie/$tmdbId/release_dates" : "tv/$tmdbId/content_ratings";
-        $response = $this->fetchTMDB($endpoint);
+        $params = $type === 'movie' ? ['region' => 'BR'] : [];
+        $response = $this->fetchTMDB($endpoint, $params);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -37,19 +38,21 @@ class TMDBController extends Controller
 
             foreach ($results as $result) {
                 if (($result['iso_3166_1'] ?? '') === 'BR') {
-                    if ($type === 'movie') {
-                        // Para filmes, release_dates é um array
+                    if ($type === 'movie' && isset($result['release_dates'])) {
                         foreach ($result['release_dates'] as $rd) {
                             if (!empty($rd['certification'])) {
+                                \Log::info("TMDB Age Rating Found for $type $tmdbId: " . $rd['certification']);
                                 return $rd['certification'];
                             }
                         }
-                    } else {
-                        // Para séries, o rating está direto no objeto
+                    } elseif ($type === 'tv') {
+                        \Log::info("TMDB Age Rating Found for $type $tmdbId: " . ($result['rating'] ?? 'null'));
                         return $result['rating'] ?? null;
                     }
                 }
             }
+        } else {
+            \Log::error("TMDB Age Rating Fetch Failed for $type $tmdbId: " . $response->status());
         }
 
         return null;

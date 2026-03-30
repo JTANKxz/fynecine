@@ -34,6 +34,56 @@ class WatchProgress extends Model
     }
 
     /**
+     * Relação com filme (se content_type = movie)
+     */
+    public function movie(): BelongsTo
+    {
+        return $this->belongsTo(Movie::class, 'content_id');
+    }
+
+    /**
+     * Relação com episódio (se content_type = episode)
+     */
+    public function episode(): BelongsTo
+    {
+        return $this->belongsTo(Episode::class, 'content_id');
+    }
+
+    /**
+     * Retorna metadados do conteúdo para o Watch Progress
+     */
+    public function getContentMetadata(): ?array
+    {
+        if ($this->content_type === 'movie') {
+            $movie = $this->movie;
+            if (!$movie) return null;
+            return [
+                'title' => $movie->title,
+                'backdrop_path' => $movie->backdrop_path,
+                'poster_path' => $movie->poster_path,
+                'type' => 'movie',
+                'label' => null,
+                'year' => $movie->release_year,
+            ];
+        } elseif ($this->content_type === 'episode') {
+            $episode = $this->episode;
+            if (!$episode) return null;
+            
+            $episode->loadMissing(['series', 'season']);
+            
+            return [
+                'title' => $episode->series?->name ?? 'Série',
+                'sub_title' => $episode->name,
+                'backdrop_path' => $episode->still_path ?: $episode->series?->backdrop_path,
+                'poster_path' => $episode->series?->poster_path,
+                'type' => 'series',
+                'label' => "T" . ($episode->season?->season_number ?? 1) . ":E" . ($episode->episode_number),
+                'year' => $episode->series?->first_air_year,
+            ];
+        }
+        return null;
+    }
+    /**
      * Salva ou atualiza progresso
      * 
      * @param string $contentId

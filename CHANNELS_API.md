@@ -89,9 +89,9 @@ Retorna todas as categorias disponíveis e a quantidade de canais em cada uma.
 Retorna os detalhes de um canal específico e seus links de reprodução filtrados por segurança e plano do usuário.
 
 **Lógica de Filtro dos Links:**
-1. Se `security_mode` estiver ativado nas configurações globais, a lista `play_links` virá vazia (independente do usuário).
+1. Se `security_mode` estiver ativado nas configurações globais, a lista `play_links` virá vazia (independente do usuário) E também não mostrará seção de canais nem os botoes pra ir pra tela de canais.
 2. Se o usuário estiver logado e possuir um plano ativo (`hasPlan`), todos os links do canal são retornados.
-3. Se o usuário NÃO estiver logado ou NÃO possuir plano, apenas os links marcados como `free` (gratuitos) são retornados.
+3. Se o usuário NÃO estiver logado ou NÃO possuir plano, apenas os links marcados como `free` (gratuitos) são retornados, mas se tiver um link premium disponivel, pode usar a mesma logica dos links de filmes e séries.
 
 **Exemplo de Resposta (Usuário com Plano):**
 ```json

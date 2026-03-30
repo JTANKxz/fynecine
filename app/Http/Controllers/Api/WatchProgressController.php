@@ -79,6 +79,7 @@ class WatchProgressController extends Controller
                 'season_id' => $p->season_id,
                 'episode_id' => $p->episode_id,
                 'updated_at' => $p->updated_at,
+                'content' => $p->getContentMetadata(),
             ]),
             'total' => $progressList->count(),
         ], 200);
@@ -122,6 +123,7 @@ class WatchProgressController extends Controller
                 'season_id' => $progress->season_id,
                 'episode_id' => $progress->episode_id,
                 'updated_at' => $progress->updated_at,
+                'content' => $progress->getContentMetadata(),
             ],
         ], 200);
     }

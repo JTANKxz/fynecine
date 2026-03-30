@@ -50,6 +50,16 @@
             </div>
         </div>
 
+        <div class="grid md:grid-cols-1 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-neutral-400 mb-2">Nova Senha (deixe em branco para não alterar)</label>
+                <input type="password" name="password" 
+                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-netflix outline-none"
+                       placeholder="Mínimo 6 caracteres">
+                @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
         <div class="pt-4 flex items-center gap-4">
             <button type="submit" class="bg-netflix px-8 py-2.5 rounded text-white font-bold hover:bg-red-700 transition">
                 Salvar Alterações

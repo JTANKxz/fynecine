@@ -68,9 +68,18 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'is_admin' => 'required|boolean',
             'plan_type' => 'required|in:free,basic,premium',
+            'password' => 'nullable|string|min:6',
         ]);
 
-        $user->update($validated);
+        if ($request->filled('password')) {
+            $user->password = $request->password;
+        }
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->is_admin = $validated['is_admin'];
+        $user->plan_type = $validated['plan_type'];
+        $user->save();
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuário atualizado com sucesso!');

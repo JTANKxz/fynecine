@@ -15,22 +15,7 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::visible()->orderBy('start_time')->get();
-
-        $data = $events->map(function ($event) {
-            return [
-                'id' => $event->id,
-                'title' => $event->title,
-                'home_team' => $event->home_team,
-                'away_team' => $event->away_team,
-                'image_url' => $event->image_url,
-                'start_time' => $event->start_time->toIso8601String(),
-                'display_time' => $event->start_time->format('H:i'),
-                'end_time' => $event->end_time->toIso8601String(),
-                'status' => $event->status, // Em Breve, Ao Vivo, etc
-            ];
-        });
-
-        return response()->json($data);
+        return response()->json($events);
     }
 
     /**
@@ -55,25 +40,28 @@ class EventController extends Controller
             }
         }
 
-        return response()->json([
-            'id' => $event->id,
-            'title' => $event->title,
-            'home_team' => $event->home_team,
-            'away_team' => $event->away_team,
-            'image_url' => $event->image_url,
-            'description' => $event->description,
-            'start_time' => $event->start_time->toIso8601String(),
-            'display_time' => $event->start_time->format('H:i'),
-            'end_time' => $event->end_time->toIso8601String(),
-            'status' => $event->status,
-            'play_links' => $playLinks->values()->map(function($link) {
-                return [
-                    'id' => $link->id,
-                    'name' => $link->name,
-                    'url' => $link->url,
-                    'type' => $link->type
-                ];
-            }),
-        ]);
+        $playLinks = collect();
+
+        // Se o modo de segurança não estiver bloqueando
+        if (!$config->security_mode) {
+            if ($user && $user->hasPlan()) {
+                // Usuário VIP vê todos os links
+                $playLinks = $event->links;
+            } else {
+                // Usuário sem plano (ou não logado) vê apenas links Free
+                $playLinks = $event->links->where('player_sub', 'free');
+            }
+        }
+
+        $event->play_links = $playLinks->values()->map(function($link) {
+            return [
+                'id' => $link->id,
+                'name' => $link->name,
+                'url' => $link->url,
+                'type' => $link->type
+            ];
+        });
+
+        return response()->json($event);
     }
 }

@@ -23,6 +23,13 @@ class Event extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = ['status', 'display_time'];
+
+    public function getDisplayTimeAttribute()
+    {
+        return $this->start_time->format('H:i');
+    }
+
     public function links()
     {
         return $this->hasMany(EventLink::class);

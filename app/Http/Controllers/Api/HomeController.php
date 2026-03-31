@@ -69,9 +69,17 @@ class HomeController extends Controller
                 ];
             });
 
+        /*
+        ==================
+        NETWORKS
+        ==================
+        */
+        $networks = \App\Models\Network::select('id', 'name', 'slug', 'image_url')->orderBy('name')->get();
+
         return response()->json([
             'sliders' => $sliders,
             'genres' => $genres,
+            'networks' => $networks,
             'sections' => $sections
         ]);
     }

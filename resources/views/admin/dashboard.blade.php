@@ -33,6 +33,28 @@
     </div>
 </section>
 
+<!-- NETWORKS -->
+<section class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Networks / Plataformas</h2>
+        <a href="{{ route('admin.networks.index') }}" class="text-netflix text-sm hover:underline">Gerenciar Redes</a>
+    </div>
+    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4">
+        @foreach($networks as $network)
+        <a href="{{ route('admin.networks.content', $network) }}" class="bg-neutral-900 aspect-square rounded-lg flex flex-col items-center justify-center p-4 hover:bg-neutral-800 transition border border-neutral-800 group">
+            <div class="w-12 h-12 mb-2 flex items-center justify-center overflow-hidden rounded">
+                @if($network->image_url)
+                    <img src="{{ $network->image_url }}" alt="{{ $network->name }}" class="w-full h-full object-contain group-hover:scale-110 transition">
+                @else
+                    <i class="fa-solid fa-layer-group text-2xl text-neutral-600"></i>
+                @endif
+            </div>
+            <span class="text-[10px] uppercase font-bold text-neutral-400 text-center truncate w-full">{{ $network->name }}</span>
+        </a>
+        @endforeach
+    </div>
+</section>
+
 <div class="grid md:grid-cols-2 gap-8">
     <!-- ÚLTIMOS USUÁRIOS -->
     <section>

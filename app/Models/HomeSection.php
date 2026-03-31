@@ -43,9 +43,9 @@ class HomeSection extends Model
     /**
      * Resolve os itens da seção baseado no tipo
      */
-    public function resolveItems()
+    public function resolveItems($limit = null)
     {
-        $limit = $this->limit ?? 15;
+        $limit = $limit ?? $this->limit ?? 15;
 
         switch ($this->type) {
 

@@ -22,13 +22,23 @@ class NetworkController extends Controller
             $network = Network::where('slug', $idOrSlug)->firstOrFail();
         }
 
+        $movieIds = \DB::table('network_content')
+            ->where('network_id', $network->id)
+            ->where('content_type', 'movie')
+            ->pluck('content_id');
+
+        $serieIds = \DB::table('network_content')
+            ->where('network_id', $network->id)
+            ->where('content_type', 'series')
+            ->pluck('content_id');
+
         return response()->json([
             'id' => $network->id,
             'name' => $network->name,
             'slug' => $network->slug,
             'image_url' => $network->image_url,
-            'movies' => $network->movies(),
-            'series' => $network->series(),
+            'movies' => \App\Models\Movie::whereIn('id', $movieIds)->latest()->limit(50)->get(),
+            'series' => \App\Models\Serie::whereIn('id', $serieIds)->latest()->limit(50)->get(),
         ]);
     }
 }

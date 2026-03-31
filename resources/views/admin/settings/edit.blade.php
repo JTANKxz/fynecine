@@ -413,7 +413,7 @@
 
     function addSource(type) {
         const container = document.getElementById(`${type}-sources-container`);
-        const index = container.querySelectorAll('.source-item').length;
+        const index = Date.now(); // Unique index for new fields
         const html = `
             <div class="bg-neutral-800 border border-purple-900/20 p-4 rounded-lg relative group source-item animate-pulse-once">
                 <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center shadow-lg">×</button>

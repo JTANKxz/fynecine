@@ -6,12 +6,28 @@
 <section>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-white">Notificações In-App</h2>
-            <p class="text-sm text-neutral-500">Envie mensagens e alertas direto para os usuários no aplicativo.</p>
+            <h2 class="text-2xl font-bold text-white">Gestão de Notificações</h2>
+            <p class="text-sm text-neutral-500">Controle disparos Push e histórico interno (In-App).</p>
         </div>
 
         <a href="{{ route('admin.notifications.create') }}" class="bg-netflix hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded shadow-lg transition flex items-center gap-2">
-            <i class="fa-solid fa-paper-plane"></i> NOVA NOTIFICAÇÃO
+            <i class="fa-solid fa-paper-plane"></i> NOVO DISPARO
+        </a>
+    </div>
+
+    {{-- Abas de Navegação --}}
+    <div class="flex items-center gap-2 mb-6 border-b border-neutral-800 pb-px overflow-x-auto whitespace-nowrap">
+        <a href="{{ route('admin.notifications.index') }}" 
+           class="px-6 py-3 text-sm font-bold transition border-b-2 {{ !request('type') ? 'border-purple-600 text-white' : 'border-transparent text-neutral-500 hover:text-white' }}">
+            Todas as Notificações
+        </a>
+        <a href="{{ route('admin.notifications.index', ['type' => 'push']) }}" 
+           class="px-6 py-3 text-sm font-bold transition border-b-2 {{ request('type') === 'push' ? 'border-purple-600 text-white' : 'border-transparent text-neutral-500 hover:text-white' }}">
+            <i class="fa-solid fa-mobile-screen-button mr-2"></i> Disparos Push
+        </a>
+        <a href="{{ route('admin.notifications.index', ['type' => 'in_app']) }}" 
+           class="px-6 py-3 text-sm font-bold transition border-b-2 {{ request('type') === 'in_app' ? 'border-purple-600 text-white' : 'border-transparent text-neutral-500 hover:text-white' }}">
+            <i class="fa-solid fa-bell mr-2"></i> Histórico In-App
         </a>
     </div>
 
@@ -26,7 +42,7 @@
             <table class="w-full text-left text-sm">
                 <thead class="bg-neutral-800/50 text-neutral-400">
                     <tr>
-                        <th class="p-4 font-bold uppercase tracking-widest text-[10px]">TÍTULO / MENSAGEM</th>
+                        <th class="p-4 font-bold uppercase tracking-widest text-[10px]">TÍTULO / MODO</th>
                         <th class="p-4 font-bold uppercase tracking-widest text-[10px]">ALVO</th>
                         <th class="p-4 font-bold uppercase tracking-widest text-[10px]">AÇÃO</th>
                         <th class="p-4 font-bold uppercase tracking-widest text-[10px]">DATA ENVIO</th>
@@ -39,8 +55,22 @@
                         <tr class="hover:bg-neutral-800/20 transition group">
                             <td class="p-4">
                                 <div class="flex flex-col">
-                                    <span class="text-white font-bold">{{ $n->title }}</span>
-                                    <span class="text-neutral-500 text-xs line-clamp-1">{{ $n->content }}</span>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-white font-bold">{{ $n->title }}</span>
+                                        <div class="flex gap-1">
+                                            @if($n->push_status && $n->push_status !== 'none')
+                                                <span class="bg-blue-600/20 text-blue-400 text-[8px] font-black px-1.5 py-0.5 rounded border border-blue-600/30" title="Push Enviado">
+                                                    PUSH
+                                                </span>
+                                            @endif
+                                            @if($n->is_in_app)
+                                                <span class="bg-green-600/20 text-green-400 text-[8px] font-black px-1.5 py-0.5 rounded border border-green-600/30" title="Salvo no Histórico">
+                                                    IN-APP
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <span class="text-neutral-500 text-xs line-clamp-1 italic">{{ $n->content }}</span>
                                 </div>
                             </td>
                             <td class="p-4">

@@ -20,9 +20,18 @@ class NotificationController extends Controller
         $this->fcmService = $fcmService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = Notification::orderBy('created_at', 'desc')->paginate(20);
+        $query = Notification::query()->orderBy('created_at', 'desc');
+
+        $type = $request->query('type');
+        if ($type === 'push') {
+            $query->whereNotNull('push_status')->where('push_status', '!=', 'none');
+        } elseif ($type === 'in_app') {
+            $query->where('is_in_app', true);
+        }
+
+        $notifications = $query->paginate(20)->withQueryString();
         return view('admin.notifications.index', compact('notifications'));
     }
 

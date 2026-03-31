@@ -28,6 +28,29 @@
         <form action="{{ route('admin.notifications.store') }}" method="POST" class="space-y-6">
             @csrf
 
+            {{-- Delivery Modes (Two Modes Selection) --}}
+            <div class="bg-black/60 border border-purple-900/30 p-5 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="flex items-center gap-4 bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl hover:border-purple-500/50 transition cursor-pointer group">
+                    <input type="checkbox" name="send_push" id="send_push" value="1" checked
+                        class="w-6 h-6 accent-purple-600 cursor-pointer">
+                    <div class="flex-1">
+                        <label for="send_push" class="block text-sm font-black text-white uppercase tracking-wider cursor-pointer group-hover:text-purple-400 transition">Modo 1: Push Notification</label>
+                        <p class="text-[10px] text-neutral-500">Disparo em tempo real para celulares (FCM/OneSignal).</p>
+                    </div>
+                    <i class="fa-solid fa-mobile-screen-button text-neutral-700 group-hover:text-purple-500 transition"></i>
+                </div>
+                
+                <div class="flex items-center gap-4 bg-neutral-900/50 border border-neutral-800 p-4 rounded-xl hover:border-green-500/50 transition cursor-pointer group">
+                    <input type="checkbox" name="is_in_app" id="is_in_app" value="1" checked
+                        class="w-6 h-6 accent-green-600 cursor-pointer">
+                    <div class="flex-1">
+                        <label for="is_in_app" class="block text-sm font-black text-white uppercase tracking-wider cursor-pointer group-hover:text-green-400 transition">Modo 2: Histórico In-App</label>
+                        <p class="text-[10px] text-neutral-500">Salva no histórico interno do app (Sininho).</p>
+                    </div>
+                    <i class="fa-solid fa-bell text-neutral-700 group-hover:text-green-500 transition"></i>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Título --}}
                 <div class="space-y-2">
@@ -111,26 +134,6 @@
                 </div>
             </div>
 
-            {{-- Delivery Options --}}
-            <div class="border-t border-neutral-800 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="flex items-center gap-3 bg-black/40 border border-neutral-800 p-4 rounded-xl">
-                    <input type="checkbox" name="send_push" id="send_push" value="1" checked
-                        class="w-5 h-5 accent-purple-600 cursor-pointer">
-                    <div>
-                        <label for="send_push" class="block text-xs font-bold text-white uppercase tracking-wider cursor-pointer">Enviar Push Notification</label>
-                        <p class="text-[9px] text-neutral-500">Alerta em tempo real no dispositivo.</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-3 bg-black/40 border border-neutral-800 p-4 rounded-xl">
-                    <input type="checkbox" name="is_in_app" id="is_in_app" value="1" checked
-                        class="w-5 h-5 accent-purple-600 cursor-pointer">
-                    <div>
-                        <label for="is_in_app" class="block text-xs font-bold text-white uppercase tracking-wider cursor-pointer">Salvar no Histórico (In-App)</label>
-                        <p class="text-[9px] text-neutral-500">Exibirá o ícone do sininho no aplicativo.</p>
-                    </div>
-                </div>
-            </div>
 
             <div class="pt-2 flex flex-col md:flex-row gap-8 items-center justify-end">
                 <button type="submit" class="w-full md:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black px-12 py-4 rounded-xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-3">

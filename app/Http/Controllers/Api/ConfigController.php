@@ -54,6 +54,12 @@ class ConfigController extends Controller
             'comments_auto_approve' => (bool) $config->comments_auto_approve,
             'block_vpn' => (bool) $config->block_vpn,
             'block_dns' => (bool) $config->block_dns,
+
+            // Corporate and Multi-Embed
+            'app_version' => $config->app_version,
+            'contact_email' => $config->contact_email,
+            'autoembed_movie_sources' => $config->autoembed_movie_sources ?? [],
+            'autoembed_serie_sources' => $config->autoembed_serie_sources ?? [],
         ]);
     }
 }

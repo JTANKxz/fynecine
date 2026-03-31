@@ -100,6 +100,19 @@
                            class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none font-mono text-sm">
                 </div>
 
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2 text-purple-400">Versão do App (Ex: 1.0.5)</label>
+                        <input type="text" name="app_version" value="{{ old('app_version', $config->app_version) }}"
+                               class="w-full bg-neutral-800 border border-purple-900/30 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-purple-500 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2 text-purple-400">E-mail de Contato/Suporte</label>
+                        <input type="email" name="contact_email" value="{{ old('contact_email', $config->contact_email) }}"
+                               class="w-full bg-neutral-800 border border-purple-900/30 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-purple-500 outline-none text-sm" placeholder="suporte@fynecine.com">
+                    </div>
+                </div>
+
                 <div class="border-t border-neutral-800 pt-6">
                     <div class="flex items-center justify-between mb-2">
                          <label class="block text-xs font-bold text-neutral-500 uppercase">Mensagem Customizada (Aviso no App)</label>
@@ -158,49 +171,66 @@
 
             </div>
             <div class="space-y-8">
-                <!-- AUTOEMBED -->
+                <!-- AUTOEMBED MULTI-SOURCES -->
                 <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
-                    <h3 class="text-white font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-play text-blue-500"></i> AutoEmbed Dinâmico
+                    <h3 class="text-white font-bold flex items-center justify-between">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-play text-blue-500"></i> AutoEmbed Dinâmico</span>
                     </h3>
-                    <p class="text-[10px] text-neutral-500 leading-tight">Use tags como <code>{tmdb_id}</code>, <code>{season}</code> e <code>{episode}</code>.</p>
+                    
+                    <p class="text-[10px] text-neutral-500 leading-tight">Múltiplas opções de auto player. Use tags como <code>{tmdb_id}</code>, <code>{season}</code> e <code>{episode}</code>.</p>
 
-                    <div class="space-y-4">
-                        <div class="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700/50">
-                            <label class="flex items-center gap-3 mb-3 cursor-pointer">
-                                <input type="checkbox" name="autoembed_movies" value="1" {{ $config->autoembed_movies ? 'checked' : '' }} class="w-4 h-4 accent-netflix rounded">
-                                <span class="text-xs font-bold uppercase tracking-widest">Filmes</span>
-                            </label>
-                            <input type="text" name="autoembed_movie_url" value="{{ old('autoembed_movie_url', $config->autoembed_movie_url) }}" 
-                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-3" placeholder="URL do player">
-                            
-                            <div class="grid grid-cols-2 gap-3 mb-3">
-                                <input type="text" name="autoembed_movie_name" value="{{ old('autoembed_movie_name', $config->autoembed_movie_name) }}" placeholder="Nome (Ex: Auto Player)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
-                                <input type="text" name="autoembed_movie_quality" value="{{ old('autoembed_movie_quality', $config->autoembed_movie_quality) }}" placeholder="Qualidade (Ex: HD)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                    <div class="space-y-8">
+                        {{-- Movies Section --}}
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="autoembed_movies" value="1" {{ $config->autoembed_movies ? 'checked' : '' }} class="w-4 h-4 accent-netflix rounded">
+                                    <span class="text-xs font-bold uppercase tracking-widest">Filmes</span>
+                                </label>
+                                <button type="button" onclick="addSource('movie')" class="text-[10px] bg-neutral-800 px-2 py-1 rounded hover:bg-neutral-700">+ ADD FONTE</button>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-3">
-                                <input type="text" name="autoembed_movie_type" value="{{ old('autoembed_movie_type', $config->autoembed_movie_type) }}" placeholder="Tipo (Ex: embed, m3u8, mkv, mp4)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
-                                <input type="text" name="autoembed_movie_player_sub" value="{{ old('autoembed_movie_player_sub', $config->autoembed_movie_player_sub) }}" placeholder="Status (Ex: free, premium)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                            
+                            <div id="movie-sources-container" class="space-y-3">
+                                @php $movieSources = $config->autoembed_movie_sources ?? []; @endphp
+                                @foreach($movieSources as $index => $source)
+                                    <div class="bg-neutral-800/40 p-4 rounded-lg border border-neutral-700/30 relative group source-item">
+                                        <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] hidden group-hover:flex items-center justify-center">×</button>
+                                        <input type="text" name="autoembed_movie_sources[{{$index}}][url]" value="{{ $source['url'] ?? '' }}" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-2" placeholder="URL do player">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][name]" value="{{ $source['name'] ?? '' }}" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][quality]" value="{{ $source['quality'] ?? '' }}" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][type]" value="{{ $source['type'] ?? '' }}" placeholder="Tipo" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][player_sub]" value="{{ $source['player_sub'] ?? '' }}" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
-                        <div class="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700/50">
-                            <label class="flex items-center gap-3 mb-3 cursor-pointer">
-                                <input type="checkbox" name="autoembed_series" value="1" {{ $config->autoembed_series ? 'checked' : '' }} class="w-4 h-4 accent-blue-500 rounded">
-                                <span class="text-xs font-bold uppercase tracking-widest text-blue-500">Séries / Episódios</span>
-                            </label>
-                            <input type="text" name="autoembed_serie_url" value="{{ old('autoembed_serie_url', $config->autoembed_serie_url) }}" 
-                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-3" placeholder="URL do player">
-                                   
-                            <div class="grid grid-cols-2 gap-3 mb-3">
-                                <input type="text" name="autoembed_serie_name" value="{{ old('autoembed_serie_name', $config->autoembed_serie_name) }}" placeholder="Nome (Ex: Auto Player)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
-                                <input type="text" name="autoembed_serie_quality" value="{{ old('autoembed_serie_quality', $config->autoembed_serie_quality) }}" placeholder="Qualidade (Ex: HD)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                        {{-- Series Section --}}
+                        <div class="space-y-4 border-t border-neutral-800 pt-6">
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="autoembed_series" value="1" {{ $config->autoembed_series ? 'checked' : '' }} class="w-4 h-4 accent-blue-500 rounded">
+                                    <span class="text-xs font-bold uppercase tracking-widest text-blue-500">Séries / Episódios</span>
+                                </label>
+                                <button type="button" onclick="addSource('serie')" class="text-[10px] bg-neutral-800 px-2 py-1 rounded hover:bg-neutral-700">+ ADD FONTE</button>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-3">
-                                <input type="text" name="autoembed_serie_type" value="{{ old('autoembed_serie_type', $config->autoembed_serie_type) }}" placeholder="Tipo (Ex: embed, m3u8, mkv, mp4)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
-                                <input type="text" name="autoembed_serie_player_sub" value="{{ old('autoembed_serie_player_sub', $config->autoembed_serie_player_sub) }}" placeholder="Status (Ex: free, premium)" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none">
+                            
+                            <div id="serie-sources-container" class="space-y-3">
+                                @php $serieSources = $config->autoembed_serie_sources ?? []; @endphp
+                                @foreach($serieSources as $index => $source)
+                                    <div class="bg-neutral-800/40 p-4 rounded-lg border border-neutral-700/30 relative group source-item">
+                                        <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] hidden group-hover:flex items-center justify-center">×</button>
+                                        <input type="text" name="autoembed_serie_sources[{{$index}}][url]" value="{{ $source['url'] ?? '' }}" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-2" placeholder="URL do player">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][name]" value="{{ $source['name'] ?? '' }}" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][quality]" value="{{ $source['quality'] ?? '' }}" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][type]" value="{{ $source['type'] ?? '' }}" placeholder="Tipo" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][player_sub]" value="{{ $source['player_sub'] ?? '' }}" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -380,6 +410,31 @@
             });
         }
     });
+
+    function addSource(type) {
+        const container = document.getElementById(`${type}-sources-container`);
+        const index = container.querySelectorAll('.source-item').length;
+        const html = `
+            <div class="bg-neutral-800 border border-purple-900/20 p-4 rounded-lg relative group source-item animate-pulse-once">
+                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center shadow-lg">×</button>
+                <input type="text" name="autoembed_${type}_sources[${index}][url]" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-2" placeholder="URL do player">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" name="autoembed_${type}_sources[${index}][name]" value="Auto Player" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                    <input type="text" name="autoembed_${type}_sources[${index}][quality]" value="HD" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                    <input type="text" name="autoembed_${type}_sources[${index}][type]" value="embed" placeholder="Tipo" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                    <input type="text" name="autoembed_${type}_sources[${index}][player_sub]" value="free" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
 </script>
+<style>
+    @keyframes pulse-once {
+        0% { transform: scale(0.98); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pulse-once { animation: pulse-once 0.3s ease-out; }
+</style>
 @endpush
 @endsection

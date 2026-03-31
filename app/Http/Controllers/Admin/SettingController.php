@@ -30,6 +30,23 @@ class SettingController extends Controller
             'custom_message_status' => ['nullable', 'boolean'],
             'security_mode' => ['nullable', 'boolean'],
             'is_channels_active' => ['nullable', 'boolean'],
+            'app_version' => ['nullable', 'string', 'max:50'],
+            'contact_email' => ['nullable', 'email', 'max:100'],
+            
+            // New arrays for multiple autoembeds
+            'autoembed_movie_sources' => ['nullable', 'array'],
+            'autoembed_movie_sources.*.name' => ['required_with:autoembed_movie_sources', 'string', 'max:50'],
+            'autoembed_movie_sources.*.url' => ['required_with:autoembed_movie_sources', 'string'],
+            'autoembed_movie_sources.*.quality' => ['nullable', 'string', 'max:50'],
+            'autoembed_movie_sources.*.type' => ['nullable', 'string', 'max:50'],
+            'autoembed_movie_sources.*.player_sub' => ['nullable', 'string', 'max:50'],
+
+            'autoembed_serie_sources' => ['nullable', 'array'],
+            'autoembed_serie_sources.*.name' => ['required_with:autoembed_serie_sources', 'string', 'max:50'],
+            'autoembed_serie_sources.*.url' => ['required_with:autoembed_serie_sources', 'string'],
+            'autoembed_serie_sources.*.quality' => ['nullable', 'string', 'max:50'],
+            'autoembed_serie_sources.*.type' => ['nullable', 'string', 'max:50'],
+            'autoembed_serie_sources.*.player_sub' => ['nullable', 'string', 'max:50'],
             
             'autoembed_movie_url' => ['nullable', 'string'],
             'autoembed_movie_name' => ['nullable', 'string', 'max:50'],
@@ -102,6 +119,12 @@ class SettingController extends Controller
         $config->autoembed_serie_quality = $request->autoembed_serie_quality ?? 'HD';
         $config->autoembed_serie_type = $request->autoembed_serie_type ?? 'embed';
         $config->autoembed_serie_player_sub = $request->autoembed_serie_player_sub ?? 'free';
+
+        // Corporate and Multiple Sources
+        $config->app_version = $request->app_version;
+        $config->contact_email = $request->contact_email;
+        $config->autoembed_movie_sources = $request->autoembed_movie_sources;
+        $config->autoembed_serie_sources = $request->autoembed_serie_sources;
 
         $config->instagram_url = $request->instagram_url;
         $config->telegram_url = $request->telegram_url;

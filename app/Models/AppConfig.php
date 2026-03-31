@@ -41,6 +41,11 @@ class AppConfig extends Model
         'comments_auto_approve',
         'block_vpn',
         'block_dns',
+
+        'app_version',
+        'contact_email',
+        'autoembed_movie_sources',
+        'autoembed_serie_sources',
     ];
 
     protected $casts = [
@@ -60,6 +65,8 @@ class AppConfig extends Model
         'comments_auto_approve' => 'boolean',
         'block_vpn' => 'boolean',
         'block_dns' => 'boolean',
+        'autoembed_movie_sources' => 'array',
+        'autoembed_serie_sources' => 'array',
     ];
 
     /**

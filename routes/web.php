@@ -22,6 +22,11 @@ use App\Http\Controllers\Admin\TicketController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TMDBController;
+use App\Http\Controllers\PageController;
+
+// Rotas Públicas (Legal)
+Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.authenticate');

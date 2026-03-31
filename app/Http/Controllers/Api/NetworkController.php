@@ -32,13 +32,23 @@ class NetworkController extends Controller
             ->where('content_type', 'series')
             ->pluck('content_id');
 
+        $movies = \App\Models\Movie::whereIn('id', $movieIds)->latest()->limit(100)->get()->map(function($m) {
+            $m->display_type = 'movie';
+            return $m;
+        });
+        $series = \App\Models\Serie::whereIn('id', $serieIds)->latest()->limit(100)->get()->map(function($s) {
+            $s->display_type = 'series';
+            return $s;
+        });
+
+        $data = $movies->concat($series)->sortByDesc('created_at')->values();
+
         return response()->json([
             'id' => $network->id,
             'name' => $network->name,
             'slug' => $network->slug,
             'image_url' => $network->image_url,
-            'movies' => \App\Models\Movie::whereIn('id', $movieIds)->latest()->limit(50)->get(),
-            'series' => \App\Models\Serie::whereIn('id', $serieIds)->latest()->limit(50)->get(),
+            'data' => $data
         ]);
     }
 }

@@ -36,8 +36,8 @@ class HomeController extends Controller
                     'rating' => $content->rating,
 
                     'year' => $slider->content_type === 'movie'
-                        ? $content->release_year
-                        : $content->first_air_year,
+                        ? (int)$content->release_year
+                        : (int)$content->first_air_year,
 
                     'poster' => $content->poster_path,
                     'backdrop' => $content->backdrop_path,

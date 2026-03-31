@@ -61,6 +61,8 @@
                                     <div class="grid grid-cols-2 gap-2">
                                         <input type="number" name="skip_intro_start" placeholder="Skip Intro Início (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
                                         <input type="number" name="skip_intro_end" placeholder="Skip Intro Fim (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
+                                        <input type="number" name="skip_ending_start" placeholder="Skip Encerramento Início (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
+                                        <input type="number" name="skip_ending_end" placeholder="Skip Encerramento Fim (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
                                     </div>
 
                                     <button type="submit" class="bg-netflix text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-red-700 transition shadow-lg">

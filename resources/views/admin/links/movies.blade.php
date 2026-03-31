@@ -78,6 +78,7 @@
                                         <input type="number" name="order" value="{{ $link->order }}" placeholder="Ordem" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px]">
                                     </div>
 
+
                                     <div class="flex justify-between items-center gap-2 pt-1 border-t border-neutral-800 mt-1">
                                         <select name="type" class="bg-transparent border-none text-[9px] p-0 outline-none">
                                             <option value="embed" {{ $link->type == 'embed' ? 'selected' : '' }}>EMBED</option>

@@ -19,14 +19,16 @@ class NotificationController extends Controller
 
         $notifications = Notification::active()
             ->where(function ($q) use ($user) {
-                $q->where('is_global', true)
-                  ->orWhere('user_id', $user->id);
+                $q->where('is_global', true);
+                if ($user) {
+                    $q->orWhere('user_id', $user->id);
+                }
             })
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Mapear para incluir status de 'read' baseado na pivot
-        $readIds = $user->readNotifications()->pluck('notification_id')->toArray();
+        $readIds = $user ? $user->readNotifications()->pluck('notification_id')->toArray() : [];
 
         $data = $notifications->map(function ($n) use ($readIds) {
             return [
@@ -42,7 +44,7 @@ class NotificationController extends Controller
         });
 
         return response()->json([
-            'unread_count' => $user->unreadNotificationsCount(),
+            'unread_count' => $user ? $user->unreadNotificationsCount() : $notifications->count(),
             'notifications' => $data
         ]);
     }

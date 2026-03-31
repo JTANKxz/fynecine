@@ -129,8 +129,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/', [\App\Http\Controllers\Api\WatchProgressController::class, 'destroyAll']);
     });
 
-    // Notificações
-    Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+    // Notificações - Ações que requerem Auth
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
 });
+
+// Notificações — Listagem Pública (Internamente decide se mostra globais ou privadas)
+Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);

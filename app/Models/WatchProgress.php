@@ -110,9 +110,59 @@ class WatchProgress extends Model
                         'end' => $l->skip_ending_end,
                     ]
                 ]),
+                'next_episode' => $this->getNextEpisodeMetadata($episode),
             ];
         }
         return null;
+    }
+
+    /**
+     * Busca metadados do próximo episódio
+     */
+    private function getNextEpisodeMetadata(Episode $episode): ?array
+    {
+        $currentSeasonNumber = $episode->season->season_number;
+
+        $next = Episode::where('series_id', $episode->series_id)
+            ->whereHas('season', function($q) use ($currentSeasonNumber, $episode) {
+                $q->where('season_number', '>', $currentSeasonNumber)
+                  ->orWhere(function($q2) use ($currentSeasonNumber, $episode) {
+                      $q2->where('season_number', $currentSeasonNumber)
+                         ->where('episode_number', '>', $episode->episode_number);
+                  });
+            })
+            ->with(['season', 'links'])
+            ->join('seasons', 'episodes.season_id', '=', 'seasons.id')
+            ->orderBy('seasons.season_number', 'asc')
+            ->orderBy('episodes.episode_number', 'asc')
+            ->select('episodes.*')
+            ->first();
+
+        if (!$next) return null;
+
+        return [
+            'id' => $next->id,
+            'episode_number' => $next->episode_number,
+            'season_number' => $next->season->season_number,
+            'name' => $next->name,
+            'backdrop_path' => $next->still_path ?: $episode->series?->backdrop_path,
+            'sources' => $next->links->map(fn($l) => [
+                'id' => (string)$l->id,
+                'name' => $l->name,
+                'url' => $l->url,
+                'type' => $l->type,
+                'quality' => $l->quality,
+                'player_sub' => $l->player_sub,
+                'skip_intro' => [
+                    'start' => $l->skip_intro_start,
+                    'end' => $l->skip_intro_end,
+                ],
+                'skip_ending' => [
+                    'start' => $l->skip_ending_start,
+                    'end' => $l->skip_ending_end,
+                ]
+            ]),
+        ];
     }
     /**
      * Salva ou atualiza progresso

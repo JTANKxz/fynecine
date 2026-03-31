@@ -31,36 +31,21 @@ class EventController extends Controller
 
         // Se o modo de segurança não estiver bloqueando
         if (!$config->security_mode) {
-            if ($user && $user->hasPlan()) {
-                // Usuário VIP vê todos os links
-                $playLinks = $event->links;
-            } else {
-                // Usuário sem plano (ou não logado) vê apenas links Free
-                $playLinks = $event->links->where('player_sub', 'free');
+            $hasPlan = $user && $user->hasPlan();
+            
+            foreach ($event->links as $link) {
+                $playLinks->push([
+                    'id' => $link->id,
+                    'name' => $link->name,
+                    'url' => ($hasPlan || $link->player_sub === 'free') ? $link->url : null,
+                    'type' => $link->type
+                ]);
             }
         }
 
-        $playLinks = collect();
-
-        // Se o modo de segurança não estiver bloqueando
-        if (!$config->security_mode) {
-            if ($user && $user->hasPlan()) {
-                // Usuário VIP vê todos os links
-                $playLinks = $event->links;
-            } else {
-                // Usuário sem plano (ou não logado) vê apenas links Free
-                $playLinks = $event->links->where('player_sub', 'free');
-            }
-        }
-
-        $event->play_links = $playLinks->values()->map(function($link) {
-            return [
-                'id' => $link->id,
-                'name' => $link->name,
-                'url' => $link->url,
-                'type' => $link->type
-            ];
-        });
+        $event->play_links = $playLinks->values();
+        // Remove relationships from the root to keep it clean
+        unset($event->links);
 
         return response()->json($event);
     }

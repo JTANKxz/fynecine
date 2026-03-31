@@ -13,7 +13,7 @@ class DownloadController extends Controller
      * Limites diários de download por tipo de plano.
      */
     private const LIMITS = [
-        'free'    => 2,
+        'free'    => 3,
         'basic'   => PHP_INT_MAX,
         'premium' => PHP_INT_MAX,
     ];

@@ -192,55 +192,49 @@ class SerieController extends Controller
                             $hasPlan = $user && $user->hasPlan();
 
                             foreach ($episode->links as $link) {
-                                if ($link->player_sub === 'free' || $hasPlan) {
-                                    $links->push([
-                                        'id' => $link->id,
-                                        'name' => $link->name,
-                                        'url' => $link->url,
-                                        'type' => $link->type,
-                                        'quality' => $link->quality,
-                                        'player_sub' => $link->player_sub,
-                                        'skip_intro_start' => $link->skip_intro_start,
-                                        'skip_intro_end' => $link->skip_intro_end,
-                                        'skip_ending_start' => $link->skip_ending_start,
-                                        'skip_ending_end' => $link->skip_ending_end,
-                                    ]);
-                                }
+                                $links->push([
+                                    'id' => $link->id,
+                                    'name' => $link->name,
+                                    'url' => $hasPlan || $link->player_sub === 'free' ? $link->url : null,
+                                    'type' => $link->type,
+                                    'quality' => $link->quality,
+                                    'player_sub' => $link->player_sub,
+                                    'skip_intro_start' => $link->skip_intro_start,
+                                    'skip_intro_end' => $link->skip_intro_end,
+                                    'skip_ending_start' => $link->skip_ending_start,
+                                    'skip_ending_end' => $link->skip_ending_end,
+                                ]);
                             }
 
                             if ($config->autoembed_series && $config->autoembed_serie_url) {
                                 $autoSub = $config->autoembed_serie_player_sub ?? 'free';
-                                if ($autoSub === 'free' || $hasPlan) {
-                                    $embedUrl = str_replace(
-                                        ['{tmdb_id}', '{season}', '{episode}'],
-                                        [$serie->tmdb_id, $season->season_number, $episode->episode_number],
-                                        $config->autoembed_serie_url
-                                    );
-                                    
-                                    $links->push([
-                                        'id' => 'auto',
-                                        'name' => $config->autoembed_serie_name ?? 'Auto Player',
-                                        'url' => $embedUrl,
-                                        'type' => $config->autoembed_serie_type ?? 'embed',
-                                        'quality' => $config->autoembed_serie_quality ?? 'HD',
-                                        'player_sub' => $autoSub
-                                    ]);
-                                }
+                                $embedUrl = str_replace(
+                                    ['{tmdb_id}', '{season}', '{episode}'],
+                                    [$serie->tmdb_id, $season->season_number, $episode->episode_number],
+                                    $config->autoembed_serie_url
+                                );
+                                
+                                $links->push([
+                                    'id' => 'auto',
+                                    'name' => $config->autoembed_serie_name ?? 'Auto Player',
+                                    'url' => $hasPlan || $autoSub === 'free' ? $embedUrl : null,
+                                    'type' => $config->autoembed_serie_type ?? 'embed',
+                                    'quality' => $config->autoembed_serie_quality ?? 'HD',
+                                    'player_sub' => $autoSub
+                                ]);
                             }
 
                             // Download links do episódio filtrados por plano
                             foreach ($episode->downloadLinks as $dl) {
-                                if ($dl->download_sub === 'free' || $hasPlan) {
-                                    $downloadLinks->push([
-                                        'id'           => $dl->id,
-                                        'name'         => $dl->name,
-                                        'url'          => $dl->url,
-                                        'quality'      => $dl->quality,
-                                        'size'         => $dl->size,
-                                        'type'         => $dl->type,
-                                        'download_sub' => $dl->download_sub,
-                                    ]);
-                                }
+                                $downloadLinks->push([
+                                    'id'           => $dl->id,
+                                    'name'         => $dl->name,
+                                    'url'          => $hasPlan || $dl->download_sub === 'free' ? $dl->url : null,
+                                    'quality'      => $dl->quality,
+                                    'size'         => $dl->size,
+                                    'type'         => $dl->type,
+                                    'download_sub' => $dl->download_sub,
+                                ]);
                             }
                         }
 

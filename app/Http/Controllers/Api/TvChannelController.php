@@ -49,31 +49,16 @@ class TvChannelController extends Controller
         $playLinks = collect();
 
         if (!$config->security_mode) {
-            // Se o usuário está logado e tem plano, mostra todos os links
-            if (Auth::guard('sanctum')->check() && Auth::guard('sanctum')->user()->hasPlan()) {
+            $user = Auth::guard('sanctum')->user();
+            $hasPlan = $user && $user->hasPlan();
 
-                $playLinks = $channel->links->map(function ($link) {
-                    return [
-                        'id'   => $link->id,
-                        'name' => $link->name,
-                        'url'  => $link->url,
-                        'type' => $link->type,
-                    ];
-                });
-
-            } else {
-                // Se não tem plano, mostra apenas links free
-                $playLinks = $channel->links
-                    ->where('player_sub', 'free')
-                    ->values()
-                    ->map(function ($link) {
-                        return [
-                            'id'   => $link->id,
-                            'name' => $link->name,
-                            'url'  => $link->url,
-                            'type' => $link->type,
-                        ];
-                    });
+            foreach ($channel->links as $link) {
+                $playLinks->push([
+                    'id'   => $link->id,
+                    'name' => $link->name,
+                    'url'  => ($hasPlan || $link->player_sub === 'free') ? $link->url : null,
+                    'type' => $link->type,
+                ]);
             }
         }
 

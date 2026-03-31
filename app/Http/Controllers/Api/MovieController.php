@@ -117,35 +117,31 @@ class MovieController extends Controller
         $playLinks = collect();
         if (!$config->security_mode) {
             foreach ($movie->playLinks as $link) {
-                if ($link->player_sub === 'free' || $hasPlan) {
-                    $playLinks->push([
-                        'id' => $link->id,
-                        'name' => $link->name,
-                        'url' => $link->url,
-                        'type' => $link->type,
-                        'quality' => $link->quality,
-                        'player_sub' => $link->player_sub,
-                        'skip_intro_start' => $link->skip_intro_start,
-                        'skip_intro_end' => $link->skip_intro_end,
-                        'skip_ending_start' => $link->skip_ending_start,
-                        'skip_ending_end' => $link->skip_ending_end,
-                    ]);
-                }
+                $playLinks->push([
+                    'id' => $link->id,
+                    'name' => $link->name,
+                    'url' => $hasPlan || $link->player_sub === 'free' ? $link->url : null,
+                    'type' => $link->type,
+                    'quality' => $link->quality,
+                    'player_sub' => $link->player_sub,
+                    'skip_intro_start' => $link->skip_intro_start,
+                    'skip_intro_end' => $link->skip_intro_end,
+                    'skip_ending_start' => $link->skip_ending_start,
+                    'skip_ending_end' => $link->skip_ending_end,
+                ]);
             }
 
             if ($config->autoembed_movies && $config->autoembed_movie_url) {
                 $autoSub = $config->autoembed_movie_player_sub ?? 'free';
-                if ($autoSub === 'free' || $hasPlan) {
-                    $url = str_replace('{tmdb_id}', $movie->tmdb_id, $config->autoembed_movie_url);
-                    $playLinks->push([
-                        'id' => 'auto', 
-                        'name' => $config->autoembed_movie_name ?? 'Auto Player', 
-                        'url' => $url, 
-                        'type' => $config->autoembed_movie_type ?? 'embed',
-                        'quality' => $config->autoembed_movie_quality ?? 'HD',
-                        'player_sub' => $autoSub
-                    ]);
-                }
+                $url = str_replace('{tmdb_id}', $movie->tmdb_id, $config->autoembed_movie_url);
+                $playLinks->push([
+                    'id' => 'auto', 
+                    'name' => $config->autoembed_movie_name ?? 'Auto Player', 
+                    'url' => $hasPlan || $autoSub === 'free' ? $url : null, 
+                    'type' => $config->autoembed_movie_type ?? 'embed',
+                    'quality' => $config->autoembed_movie_quality ?? 'HD',
+                    'player_sub' => $autoSub
+                ]);
             }
         }
 
@@ -153,17 +149,15 @@ class MovieController extends Controller
         $downloadLinks = collect();
         if (!$config->security_mode) {
             foreach ($movie->downloadLinks as $dl) {
-                if ($dl->download_sub === 'free' || $hasPlan) {
-                    $downloadLinks->push([
-                        'id'           => $dl->id,
-                        'name'         => $dl->name,
-                        'url'          => $dl->url,
-                        'quality'      => $dl->quality,
-                        'size'         => $dl->size,
-                        'type'         => $dl->type,
-                        'download_sub' => $dl->download_sub,
-                    ]);
-                }
+                $downloadLinks->push([
+                    'id'           => $dl->id,
+                    'name'         => $dl->name,
+                    'url'          => $hasPlan || $dl->download_sub === 'free' ? $dl->url : null,
+                    'quality'      => $dl->quality,
+                    'size'         => $dl->size,
+                    'type'         => $dl->type,
+                    'download_sub' => $dl->download_sub,
+                ]);
             }
         }
 

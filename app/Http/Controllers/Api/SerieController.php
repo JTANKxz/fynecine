@@ -74,6 +74,7 @@ class SerieController extends Controller
 
                 return [
                     'id' => $serie->id,
+                    'type' => 'series',
                     'name' => $serie->name,
                     'slug' => $serie->slug,
                     'year' => $serie->first_air_year,

@@ -26,6 +26,13 @@ class Serie extends Model
 
     ];
 
+    protected $appends = ['type'];
+
+    public function getTypeAttribute()
+    {
+        return 'series';
+    }
+
 
 
     public function genres()

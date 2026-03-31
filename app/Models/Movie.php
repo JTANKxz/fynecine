@@ -22,6 +22,13 @@ class Movie extends Model
         'content_type',
         'age_rating'
     ];
+    
+    protected $appends = ['type'];
+
+    public function getTypeAttribute()
+    {
+        return 'movie';
+    }
 
     public function genres()
     {

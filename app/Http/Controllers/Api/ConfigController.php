@@ -58,8 +58,8 @@ class ConfigController extends Controller
             // Corporate and Multi-Embed
             'app_version' => $config->app_version,
             'contact_email' => $config->contact_email,
-            'autoembed_movie_sources' => $config->autoembed_movie_sources ?? [],
-            'autoembed_serie_sources' => $config->autoembed_serie_sources ?? [],
+            'autoembed_movie_sources' => array_values($config->autoembed_movie_sources ?? []),
+            'autoembed_serie_sources' => array_values($config->autoembed_serie_sources ?? []),
 
             // Ads Settings
             'ads_banner_status' => (bool) $config->ads_banner_status,

@@ -204,6 +204,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // ========== AVATARES ==========
     Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
     Route::resource('avatars', AvatarController::class)->names('avatars');
+    Route::get('notifications/search-content', [\App\Http\Controllers\Admin\NotificationController::class, 'searchContent'])->name('notifications.search');
     Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
 
     // ========== EVENTOS AO VIVO ==========

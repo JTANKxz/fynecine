@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID', 'fynelabs'),
+        'service_account' => storage_path('app/firebase-auth.json'),
+    ],
+
 ];

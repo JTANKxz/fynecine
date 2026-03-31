@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/settings', [\App\Http\Controllers\Api\ConfigController::class, 'index']);
+Route::post('/fcm/register', [\App\Http\Controllers\Api\FcmDeviceController::class, 'register']);
 
 /*
 |--------------------------------------------------------------------------

@@ -14,8 +14,10 @@
             theme: {
                 extend: {
                     colors: {
-                        netflix: "#e50914",
+                    colors: {
+                        netflix: "#8B2FFF",
                         netflixDark: "#0f0f0f"
+                    }
                     }
                 }
             }
@@ -41,12 +43,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #e50914;
+            background: #8B2FFF;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #ff0a16;
+            background: #9b4dff;
         }
 
         /* Estilo para tabelas responsivas com scroll */
@@ -54,7 +56,7 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            scrollbar-color: #e50914 #1a1a1a;
+            scrollbar-color: #8B2FFF #1a1a1a;
         }
 
         table {

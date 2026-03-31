@@ -10,11 +10,14 @@ class Notification extends Model
         'title',
         'content',
         'image_url',
+        'big_picture_url',
         'action_type',
         'action_value',
         'is_global',
         'user_id',
         'expires_at',
+        'push_status',
+        'segment',
     ];
 
     protected $casts = [

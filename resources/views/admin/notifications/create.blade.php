@@ -9,8 +9,8 @@
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
-            <h2 class="text-2xl font-bold text-white">Disparar Notificação</h2>
-            <p class="text-sm text-neutral-500">Crie e envie um novo alerta para o aplicativo.</p>
+            <h2 class="text-2xl font-bold text-white">Disparar Notificação FCM</h2>
+            <p class="text-sm text-neutral-500">Crie alertas profissionais com Big Picture e segmentação.</p>
         </div>
     </div>
 
@@ -32,74 +32,88 @@
                 {{-- Título --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Título do Alerta</label>
-                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="Ex: Estreia de Hoje"
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="Ex: Novo Filme Disponível!"
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition">
                 </div>
 
-                {{-- Imagem Opcional --}}
+                {{-- Image URL (Icon/Small) --}}
                 <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">URL da Imagem (Opcional)</label>
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">URL do Ícone (Opcional)</label>
                     <input type="url" name="image_url" value="{{ old('image_url') }}" placeholder="https://..."
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition text-xs font-mono">
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition text-xs font-mono">
                 </div>
+            </div>
+
+            {{-- Big Picture URL --}}
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">URL da Imagem Grande (Big Picture - 16:9)</label>
+                <input type="url" name="big_picture_url" value="{{ old('big_picture_url') }}" placeholder="https://... (Sugerido 1280x720)"
+                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition text-xs font-mono">
+                <p class="text-[9px] text-neutral-500">Aparecerá expandida na central de notificações do Android.</p>
             </div>
 
             {{-- Conteúdo --}}
             <div class="space-y-2">
-                <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Mensagem (Curta e Clara)</label>
+                <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Mensagem (Corpo da Notificação)</label>
                 <textarea name="content" rows="3" required placeholder="Escreva aqui o corpo da notificação..."
-                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">{{ old('content') }}</textarea>
+                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition">{{ old('content') }}</textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Segmentação --}}
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Público Alvo (Segmento)</label>
+                    <select name="segment" id="segment_select" required
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                        <option value="all" selected>Todos os Dispositivos</option>
+                        <option value="premium">Apenas Usuários Premium</option>
+                        <option value="basic">Apenas Usuários Basic</option>
+                        <option value="free">Apenas Usuários Free</option>
+                        <option value="guest">Apenas Visitantes (Não Logados)</option>
+                        <option value="individual">Usuário Individual (ID Específico)</option>
+                    </select>
+                </div>
+
+                {{-- User ID (Hidden by default) --}}
+                <div id="user_id_group" class="space-y-2 hidden">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">ID do Usuário</label>
+                    <input type="number" name="user_id" value="{{ old('user_id') }}" placeholder="ID do Usuário"
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Tipo de Ação --}}
                 <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Ação ao Clicar</label>
-                    <select name="action_type" required
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition cursor-pointer">
-                        <option value="none">Nenhuma Ação (Apenas Texto)</option>
-                        <option value="url">Abrir Link Externo (Browser)</option>
-                        <option value="movie">Abrir Filme (Slug/ID)</option>
-                        <option value="series">Abrir Série (Slug/ID)</option>
-                        <option value="plans">Abrir Planos de Assinatura</option>
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Ação ao Clicar (Deep Link)</label>
+                    <select name="action_type" id="action_type" required
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                        <option value="none">Nenhuma Ação</option>
+                        <option value="url">Abrir Link Externo</option>
+                        <option value="movie">Abrir Filme</option>
+                        <option value="series">Abrir Série</option>
+                        <option value="plans">Abrir Planos</option>
                     </select>
                 </div>
 
                 {{-- Valor da Ação --}}
                 <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Valor da Ação (Link/Slug)</label>
-                    <input type="text" name="action_value" value="{{ old('action_value') }}" placeholder="Ex: avatar-2 ou https://..."
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition font-mono text-xs">
-                    <p class="text-[9px] text-neutral-500">Obrigatório se a ação não for 'none' ou 'plans'.</p>
-                </div>
-
-                {{-- Data de Expiração --}}
-                <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Data de Expiração (Opcional)</label>
-                    <input type="datetime-local" name="expires_at" value="{{ old('expires_at') }}"
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition text-sm">
-                    <p class="text-[9px] text-neutral-500">Após esta data, a notificação sumirá.</p>
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Valor da Ação / Pesquisa</label>
+                    <div class="relative">
+                        <input type="text" name="action_value" id="action_value" value="{{ old('action_value') }}" placeholder="Ex: link ou slug"
+                            class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 transition font-mono text-xs">
+                        
+                        {{-- Dropdown de Busca AJAX --}}
+                        <div id="search_results" class="absolute z-50 w-full mt-1 bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden hidden shadow-2xl">
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-neutral-500">Digite para pesquisar filmes/séries quando selecionado.</p>
                 </div>
             </div>
 
-            <div class="border-t border-neutral-800 pt-6 flex flex-col md:flex-row gap-8 items-center justify-between">
-                {{-- Destinatário --}}
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" name="is_global" id="is_global" checked value="1"
-                            class="w-5 h-5 accent-netflix rounded bg-black border-neutral-800">
-                        <span class="text-white font-bold text-sm group-hover:text-netflix transition">ENVIAR PARA TODOS (GLOBAL)</span>
-                    </label>
-
-                    <div id="user_id_field" class="hidden flex items-center gap-2">
-                        <span class="text-neutral-500 text-xs uppercase font-bold">USER ID:</span>
-                        <input type="number" name="user_id" value="{{ old('user_id') }}" placeholder="Ex: 12"
-                            class="w-24 bg-black border border-neutral-800 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-netflix transition text-sm">
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full md:w-auto bg-netflix hover:bg-red-700 text-white font-black px-10 py-4 rounded-xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> DISPARAR AGORA
+            <div class="border-t border-neutral-800 pt-6 flex flex-col md:flex-row gap-8 items-center justify-end">
+                <button type="submit" class="w-full md:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black px-12 py-4 rounded-xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-paper-plane"></i> ENVIAR NOTIFICAÇÃO
                 </button>
             </div>
         </form>
@@ -107,18 +121,75 @@
 </section>
 
 <script>
-    const globalCheck = document.getElementById('is_global');
-    const userField = document.getElementById('user_id_field');
+    const segmentSelect = document.getElementById('segment_select');
+    const userGroup = document.getElementById('user_id_group');
+    const actionType = document.getElementById('action_type');
+    const actionValue = document.getElementById('action_value');
+    const searchResults = document.getElementById('search_results');
 
-    function updateFields() {
-        if (globalCheck.checked) {
-            userField.classList.add('hidden');
+    // Toggle User ID field
+    segmentSelect.addEventListener('change', () => {
+        if (segmentSelect.value === 'individual') {
+            userGroup.classList.remove('hidden');
         } else {
-            userField.classList.remove('hidden');
+            userGroup.classList.add('hidden');
         }
-    }
+    });
 
-    globalCheck.addEventListener('change', updateFields);
-    window.onload = updateFields;
+    // Content Search AJAX
+    let searchTimeout;
+    actionValue.addEventListener('input', () => {
+        const query = actionValue.value;
+        const type = actionType.value;
+
+        if (type !== 'movie' && type !== 'series') {
+            searchResults.classList.add('hidden');
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        if (query.length < 2) {
+            searchResults.classList.add('hidden');
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`{{ route('admin.notifications.search') }}?q=${query}&type=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        searchResults.innerHTML = '';
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'p-3 flex items-center gap-3 hover:bg-neutral-800 cursor-pointer transition border-b border-neutral-800/50';
+                            div.innerHTML = `
+                                <img src="${item.poster || 'https://via.placeholder.com/40x60'}" class="w-10 h-14 object-cover rounded shadow">
+                                <div class="flex-1">
+                                    <div class="text-white text-sm font-bold">${item.title}</div>
+                                    <div class="text-neutral-500 text-[10px]">ID: ${item.id}</div>
+                                </div>
+                            `;
+                            div.onclick = () => {
+                                // O app geralmente usa ID ou Slug, vamos usar o ID por segurança ou slug se planejado
+                                // Aqui vou usar o ID, mas se o app esperar slug, pode ser item.slug
+                                actionValue.value = item.id;
+                                searchResults.classList.add('hidden');
+                            };
+                            searchResults.appendChild(div);
+                        });
+                        searchResults.classList.remove('hidden');
+                    } else {
+                        searchResults.classList.add('hidden');
+                    }
+                });
+        }, 300);
+    });
+
+    // Close search on click outside
+    document.addEventListener('click', (e) => {
+        if (!searchResults.contains(e.target) && e.target !== actionValue) {
+            searchResults.classList.add('hidden');
+        }
+    });
 </script>
 @endsection

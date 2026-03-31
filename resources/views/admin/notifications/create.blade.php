@@ -111,7 +111,28 @@
                 </div>
             </div>
 
-            <div class="border-t border-neutral-800 pt-6 flex flex-col md:flex-row gap-8 items-center justify-end">
+            {{-- Delivery Options --}}
+            <div class="border-t border-neutral-800 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-center gap-3 bg-black/40 border border-neutral-800 p-4 rounded-xl">
+                    <input type="checkbox" name="send_push" id="send_push" value="1" checked
+                        class="w-5 h-5 accent-purple-600 cursor-pointer">
+                    <div>
+                        <label for="send_push" class="block text-xs font-bold text-white uppercase tracking-wider cursor-pointer">Enviar Push Notification</label>
+                        <p class="text-[9px] text-neutral-500">Alerta em tempo real no dispositivo.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 bg-black/40 border border-neutral-800 p-4 rounded-xl">
+                    <input type="checkbox" name="is_in_app" id="is_in_app" value="1" checked
+                        class="w-5 h-5 accent-purple-600 cursor-pointer">
+                    <div>
+                        <label for="is_in_app" class="block text-xs font-bold text-white uppercase tracking-wider cursor-pointer">Salvar no Histórico (In-App)</label>
+                        <p class="text-[9px] text-neutral-500">Exibirá o ícone do sininho no aplicativo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 flex flex-col md:flex-row gap-8 items-center justify-end">
                 <button type="submit" class="w-full md:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black px-12 py-4 rounded-xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-3">
                     <i class="fa-solid fa-paper-plane"></i> ENVIAR NOTIFICAÇÃO
                 </button>

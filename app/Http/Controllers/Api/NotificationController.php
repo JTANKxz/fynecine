@@ -18,6 +18,7 @@ class NotificationController extends Controller
         $user = Auth::user();
 
         $notifications = Notification::active()
+            ->where('is_in_app', true)
             ->where(function ($q) use ($user) {
                 $q->where('is_global', true);
                 if ($user) {

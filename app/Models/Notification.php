@@ -18,10 +18,12 @@ class Notification extends Model
         'expires_at',
         'push_status',
         'segment',
+        'is_in_app',
     ];
 
     protected $casts = [
         'is_global' => 'boolean',
+        'is_in_app' => 'boolean',
         'expires_at' => 'datetime',
     ];
 

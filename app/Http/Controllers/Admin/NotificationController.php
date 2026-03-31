@@ -55,13 +55,16 @@ class NotificationController extends Controller
             'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
             'segment' => $request->input('segment'),
             'expires_at' => $request->input('expires_at'),
+            'is_in_app' => $request->boolean('is_in_app', true),
             'push_status' => 'pending',
         ]);
 
-        // Trigger Push Notification logic
-        $this->sendPush($notification);
+        // Only trigger Push Notification if requested
+        if ($request->boolean('send_push')) {
+            $this->sendPush($notification);
+        }
 
-        return redirect()->route('admin.notifications.index')->with('success', 'Notificação criada e enviada para processamento!');
+        return redirect()->route('admin.notifications.index')->with('success', 'Notificação processada com sucesso!');
     }
 
     protected function sendPush(Notification $notification)

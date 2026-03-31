@@ -18,6 +18,7 @@ class WatchProgress extends Model
         'duration',
         'season_id',
         'episode_id',
+        'series_id',
         'link_id',
         'link_type',
     ];
@@ -187,6 +188,7 @@ class WatchProgress extends Model
         ?string $guestId = null,
         ?int $seasonId = null,
         ?int $episodeId = null,
+        ?int $seriesId = null,
         ?string $linkId = null,
         ?string $linkType = null
     ): ?self {
@@ -223,6 +225,7 @@ class WatchProgress extends Model
                 'duration' => $duration,
                 'season_id' => $seasonId,
                 'episode_id' => $episodeId,
+                'series_id' => $seriesId,
                 'link_id' => $linkId,
                 'link_type' => $linkType,
                 'updated_at' => now(),
@@ -255,12 +258,18 @@ class WatchProgress extends Model
         ?int $userId = null,
         ?string $guestId = null,
         int $limit = 20
-    ): \Illuminate\Database\Eloquent\Collection {
-        return self::when($userId, fn($q) => $q->where('user_id', $userId))
+    ): \Illuminate\Support\Collection {
+        $results = self::when($userId, fn($q) => $q->where('user_id', $userId))
             ->when($guestId, fn($q) => $q->where('guest_id', $guestId))
             ->latest('updated_at')
-            ->limit($limit)
             ->get();
+
+        // Agrupa por série para mostrar apenas o último episódio assistido de cada série
+        return $results->groupBy(function ($item) {
+            return $item->series_id ? 'series_' . $item->series_id : 'content_' . $item->content_type . '_' . $item->content_id;
+        })->map(function ($group) {
+            return $group->first();
+        })->values()->take($limit);
     }
 
     /**

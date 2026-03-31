@@ -17,11 +17,12 @@ class WatchProgressController extends Controller
     {
         $validated = $request->validate([
             'content_id' => ['required', 'string'],
-            'content_type' => ['required', 'in:movie,episode'],
+            'content_type' => ['required', 'in:movie,episode,series'],
             'progress' => ['required', 'integer', 'min:0'],
             'duration' => ['required', 'integer', 'min:0'],
             'season_id' => ['nullable', 'integer'],
             'episode_id' => ['nullable', 'integer'],
+            'series_id' => ['nullable', 'integer'],
             'link_id' => ['nullable', 'string'],
             'link_type' => ['nullable', 'string'],
             'guest_id' => ['nullable', 'string'],
@@ -29,15 +30,19 @@ class WatchProgressController extends Controller
 
         $user = auth('sanctum')->user();
         
+        $contentType = $validated['content_type'];
+        if ($contentType === 'series') $contentType = 'episode';
+
         $progress = WatchProgress::saveProgress(
             contentId: $validated['content_id'],
             progress: $validated['progress'],
             duration: $validated['duration'],
-            contentType: $validated['content_type'],
+            contentType: $contentType,
             userId: $user?->id,
             guestId: $validated['guest_id'] ?? null,
             seasonId: $validated['season_id'] ?? null,
             episodeId: $validated['episode_id'] ?? null,
+            seriesId: $validated['series_id'] ?? null,
             linkId: $validated['link_id'] ?? null,
             linkType: $validated['link_type'] ?? null,
         );
@@ -96,15 +101,18 @@ class WatchProgressController extends Controller
     public function show(string $contentId, Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'content_type' => ['required', 'in:movie,episode'],
+            'content_type' => ['required', 'in:movie,episode,series'],
             'guest_id' => ['nullable', 'string'],
         ]);
+
+        $contentType = $validated['content_type'];
+        if ($contentType === 'series') $contentType = 'episode';
 
         $user = auth('sanctum')->user();
 
         $progress = WatchProgress::getProgress(
             contentId: $contentId,
-            contentType: $validated['content_type'],
+            contentType: $contentType,
             userId: $user?->id,
             guestId: $validated['guest_id'] ?? null,
         );
@@ -139,15 +147,18 @@ class WatchProgressController extends Controller
     public function destroy(string $contentId, Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'content_type' => ['required', 'in:movie,episode'],
+            'content_type' => ['required', 'in:movie,episode,series'],
             'guest_id' => ['nullable', 'string'],
         ]);
+
+        $contentType = $validated['content_type'];
+        if ($contentType === 'series') $contentType = 'episode';
 
         $user = auth('sanctum')->user();
 
         $deleted = WatchProgress::removeProgress(
             contentId: $contentId,
-            contentType: $validated['content_type'],
+            contentType: $contentType,
             userId: $user?->id,
             guestId: $validated['guest_id'] ?? null,
         );

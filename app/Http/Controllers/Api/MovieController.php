@@ -124,7 +124,11 @@ class MovieController extends Controller
                         'url' => $link->url,
                         'type' => $link->type,
                         'quality' => $link->quality,
-                        'player_sub' => $link->player_sub
+                        'player_sub' => $link->player_sub,
+                        'skip_intro_start' => $link->skip_intro_start,
+                        'skip_intro_end' => $link->skip_intro_end,
+                        'skip_ending_start' => $link->skip_ending_start,
+                        'skip_ending_end' => $link->skip_ending_end,
                     ]);
                 }
             }

@@ -61,8 +61,9 @@ class HomeController extends Controller
             ->get()
             ->map(function ($section) {
                 return [
+                    'id' => $section->id,
                     'title' => $section->title,
-                    'type' => $section->type, // 'custom', 'genre', 'trending', 'network', 'recently_added'
+                    'type' => $section->type, // 'custom', 'genre', 'trending', 'network', 'networks', 'recently_added'
                     'content_type' => $section->content_type, // 'movie', 'series', 'both'
                     'slug' => ($section->type === 'genre' && $section->genre) ? $section->genre->slug : null,
                     'items' => $section->resolveItems()

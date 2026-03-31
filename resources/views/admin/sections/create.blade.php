@@ -31,7 +31,8 @@
                     <option value="custom" {{ old('type') == 'custom' ? 'selected' : '' }}>Custom (Escolher itens manualmente)</option>
                     <option value="genre" {{ old('type') == 'genre' ? 'selected' : '' }}>Por Gênero</option>
                     <option value="trending" {{ old('type') == 'trending' ? 'selected' : '' }}>Trending (Mais Assistidos)</option>
-                    <option value="network" {{ old('type') == 'network' ? 'selected' : '' }}>Por Network</option>
+                    <option value="network" {{ old('type') == 'network' ? 'selected' : '' }}>Itens de uma Network</option>
+                    <option value="networks" {{ old('type') == 'networks' ? 'selected' : '' }}>Lista de Networks (Cards Quadrados)</option>
                     <option value="recently_added" {{ old('type') == 'recently_added' ? 'selected' : '' }}>Recém Adicionados</option>
                 </select>
             </div>

@@ -33,7 +33,7 @@ class HomeSectionController extends Controller
     {
         $validated = $request->validate([
             'title'           => 'required|string|max:255',
-            'type'            => 'required|in:custom,genre,trending,network,recently_added',
+            'type'            => 'required|in:custom,genre,trending,network,networks,recently_added',
             'content_type'    => 'required|in:movie,series,both',
             'genre_id'        => 'nullable|exists:genres,id',
             'network_id'      => 'nullable|exists:networks,id',
@@ -61,7 +61,7 @@ class HomeSectionController extends Controller
     {
         $validated = $request->validate([
             'title'           => 'required|string|max:255',
-            'type'            => 'required|in:custom,genre,trending,network,recently_added',
+            'type'            => 'required|in:custom,genre,trending,network,networks,recently_added',
             'content_type'    => 'required|in:movie,series,both',
             'genre_id'        => 'nullable|exists:genres,id',
             'network_id'      => 'nullable|exists:networks,id',

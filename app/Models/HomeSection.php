@@ -61,6 +61,9 @@ class HomeSection extends Model
             case 'network':
                 return $this->resolveNetwork($limit);
 
+            case 'networks':
+                return $this->resolveNetworksList($limit);
+
             case 'recently_added':
                 return $this->resolveRecentlyAdded($limit);
 
@@ -70,6 +73,11 @@ class HomeSection extends Model
             default:
                 return collect();
         }
+    }
+
+    private function resolveNetworksList($limit)
+    {
+        return Network::orderBy('name')->limit($limit)->get();
     }
 
     private function resolveEvents($limit)

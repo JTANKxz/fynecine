@@ -31,7 +31,8 @@
                     <option value="custom" {{ old('type', $section->type) == 'custom' ? 'selected' : '' }}>Custom</option>
                     <option value="genre" {{ old('type', $section->type) == 'genre' ? 'selected' : '' }}>Por Gênero</option>
                     <option value="trending" {{ old('type', $section->type) == 'trending' ? 'selected' : '' }}>Trending</option>
-                    <option value="network" {{ old('type', $section->type) == 'network' ? 'selected' : '' }}>Por Network</option>
+                    <option value="network" {{ old('type', $section->type) == 'network' ? 'selected' : '' }}>Itens de uma Network</option>
+                    <option value="networks" {{ old('type', $section->type) == 'networks' ? 'selected' : '' }}>Lista de Networks (Cards Quadrados)</option>
                     <option value="recently_added" {{ old('type', $section->type) == 'recently_added' ? 'selected' : '' }}>Recém Adicionados</option>
                 </select>
             </div>

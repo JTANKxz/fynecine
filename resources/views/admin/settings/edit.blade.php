@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.settings.update') }}" method="POST" class="space-y-8">
+    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
         @csrf
         @method('PUT')
 
@@ -385,6 +385,173 @@
                     <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Política de Privacidade</label>
                     <textarea name="privacy_policy" rows="7" placeholder="Insira como os dados serão armazenados..."
                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-3 focus:ring-2 focus:ring-netflix outline-none text-xs leading-relaxed">{{ old('privacy_policy', $config->privacy_policy) }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANÚNCIOS (ADS) -->
+        <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-8 mt-8">
+            <h3 class="text-white font-bold flex items-center gap-2">
+                <i class="fa-solid fa-rectangle-ad text-yellow-500"></i> Gerenciamento de Anúncios
+            </h3>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- AdMob Config -->
+                <div class="space-y-6">
+                    <h4 class="text-xs font-bold text-neutral-500 uppercase flex items-center gap-2">
+                        <i class="fa-brands fa-google text-blue-400"></i> Configurações AdMob
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-400 mb-1">AdMob App ID (Android)</label>
+                            <input type="text" name="admob_app_id" value="{{ $config->admob_app_id }}" placeholder="ca-app-pub-..." 
+                                   class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-yellow-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-400 mb-1">Banner Unit ID</label>
+                                <input type="text" name="admob_banner_id" value="{{ $config->admob_banner_id }}" 
+                                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-400 mb-1">Interstitial Unit ID</label>
+                                <input type="text" name="admob_interstitial_id" value="{{ $config->admob_interstitial_id }}" 
+                                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 text-xs outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-400 mb-1">Native Unit ID</label>
+                                <input type="text" name="admob_native_id" value="{{ $config->admob_native_id }}" 
+                                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-neutral-400 mb-1">Rewarded (Premiado) ID</label>
+                                <input type="text" name="admob_rewarded_id" value="{{ $config->admob_rewarded_id }}" 
+                                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 text-xs outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Ads Control -->
+                <div class="space-y-6">
+                    <h4 class="text-xs font-bold text-neutral-500 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-toggle-on text-green-500"></i> Status e Controle
+                    </h4>
+
+                    <div class="bg-neutral-800/50 p-4 rounded-lg space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="block text-sm font-bold text-white">Banner Ativo</span>
+                                <select name="ads_banner_type" class="bg-transparent text-[10px] text-neutral-500 outline-none">
+                                    <option value="admob" {{ $config->ads_banner_type == 'admob' ? 'selected' : '' }}>ADMOB</option>
+                                    <option value="custom" {{ $config->ads_banner_type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
+                                </select>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="ads_banner_status" value="1" {{ $config->ads_banner_status ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-700 rounded-full peer peer-checked:bg-yellow-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-neutral-700 pt-4">
+                            <div>
+                                <span class="block text-sm font-bold text-white">Interstitial Ativo</span>
+                                <div class="flex items-center gap-2">
+                                    <select name="ads_interstitial_type" class="bg-transparent text-[10px] text-neutral-500 outline-none">
+                                        <option value="admob" {{ $config->ads_interstitial_type == 'admob' ? 'selected' : '' }}>ADMOB</option>
+                                        <option value="custom" {{ $config->ads_interstitial_type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
+                                    </select>
+                                    <span class="text-[10px] text-neutral-600">|</span>
+                                    <span class="text-[10px] text-neutral-500">Intervalo:</span>
+                                    <input type="number" name="interstitial_interval" value="{{ $config->interstitial_interval }}" min="1" max="20" class="bg-transparent text-[10px] text-white w-8 outline-none">
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="ads_interstitial_status" value="1" {{ $config->ads_interstitial_status ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-700 rounded-full peer peer-checked:bg-yellow-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Ads Media -->
+            <div class="border-t border-neutral-800 pt-8 grid lg:grid-cols-2 gap-8">
+                <!-- Custom Banner -->
+                <div class="bg-neutral-800/20 p-5 rounded-xl border border-neutral-800/50">
+                    <h5 class="text-white text-sm font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-image text-neutral-500"></i> Banner Customizado
+                    </h5>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-neutral-500 uppercase mb-1">Upload Imagem</label>
+                                <input type="file" name="custom_banner_image_file" class="w-full text-[10px] text-neutral-400 file:bg-neutral-700 file:border-0 file:text-white file:px-2 file:py-1 file:rounded file:mr-2">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-neutral-500 uppercase mb-1">Ou URL Externa</label>
+                                <input type="text" name="custom_banner_image_url" value="{{ $config->custom_banner_image && filter_var($config->custom_banner_image, FILTER_VALIDATE_URL) ? $config->custom_banner_image : '' }}" 
+                                       class="w-full bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-neutral-500 uppercase mb-1">Link de Referência (Ao clicar)</label>
+                            <input type="text" name="custom_banner_link" value="{{ $config->custom_banner_link }}" placeholder="https://..." 
+                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1 outline-none">
+                        </div>
+
+                        @if($config->custom_banner_image)
+                            <div class="mt-2">
+                                <span class="text-[10px] text-neutral-500 block mb-1">Visualização:</span>
+                                <img src="{{ !filter_var($config->custom_banner_image, FILTER_VALIDATE_URL) ? asset('storage/' . $config->custom_banner_image) : $config->custom_banner_image }}" class="h-12 rounded border border-neutral-700">
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Custom Interstitial -->
+                <div class="bg-neutral-800/20 p-5 rounded-xl border border-neutral-800/50">
+                    <h5 class="text-white text-sm font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-clapperboard text-neutral-500"></i> Interstitial Customizado
+                    </h5>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 mb-2">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="custom_interstitial_type" value="image" {{ $config->custom_interstitial_type == 'image' ? 'checked' : '' }} class="accent-yellow-500">
+                                <span class="text-[10px] text-white uppercase font-bold">Imagem</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="custom_interstitial_type" value="video" {{ $config->custom_interstitial_type == 'video' ? 'checked' : '' }} class="accent-yellow-500">
+                                <span class="text-[10px] text-white uppercase font-bold">Vídeo (.mp4)</span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-neutral-500 uppercase mb-1">Upload Mídia</label>
+                                <input type="file" name="custom_interstitial_media_file" class="w-full text-[10px] text-neutral-400 file:bg-neutral-700 file:border-0 file:text-white file:px-2 file:py-1 file:rounded file:mr-2">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-neutral-500 uppercase mb-1">Ou URL Externa</label>
+                                <input type="text" name="custom_interstitial_media_url" value="{{ $config->custom_interstitial_media && filter_var($config->custom_interstitial_media, FILTER_VALIDATE_URL) ? $config->custom_interstitial_media : '' }}" 
+                                       class="w-full bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-neutral-500 uppercase mb-1">Link de Referência (Ao clicar)</label>
+                            <input type="text" name="custom_interstitial_link" value="{{ $config->custom_interstitial_link }}" placeholder="https://..." 
+                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1 outline-none">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

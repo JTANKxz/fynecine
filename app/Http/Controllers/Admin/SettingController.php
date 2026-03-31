@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AppConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -75,6 +76,25 @@ class SettingController extends Controller
             'comments_auto_approve' => ['nullable', 'boolean'],
             'block_vpn' => ['nullable', 'boolean'],
             'block_dns' => ['nullable', 'boolean'],
+
+            // Ads
+            'admob_app_id' => ['nullable', 'string'],
+            'admob_banner_id' => ['nullable', 'string'],
+            'admob_interstitial_id' => ['nullable', 'string'],
+            'admob_native_id' => ['nullable', 'string'],
+            'admob_rewarded_id' => ['nullable', 'string'],
+            'ads_banner_status' => ['nullable', 'boolean'],
+            'ads_banner_type' => ['nullable', 'in:admob,custom'],
+            'ads_interstitial_status' => ['nullable', 'boolean'],
+            'ads_interstitial_type' => ['nullable', 'in:admob,custom'],
+            'custom_banner_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'custom_banner_image_url' => ['nullable', 'string'],
+            'custom_banner_link' => ['nullable', 'string'],
+            'custom_interstitial_type' => ['nullable', 'in:image,video'],
+            'custom_interstitial_media_file' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,svg,mp4', 'max:10240'],
+            'custom_interstitial_media_url' => ['nullable', 'string'],
+            'custom_interstitial_link' => ['nullable', 'string'],
+            'interstitial_interval' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -96,6 +116,8 @@ class SettingController extends Controller
         $config->comments_auto_approve = $request->has('comments_auto_approve');
         $config->block_vpn = $request->has('block_vpn');
         $config->block_dns = $request->has('block_dns');
+        $config->ads_banner_status = $request->has('ads_banner_status');
+        $config->ads_interstitial_status = $request->has('ads_interstitial_status');
 
         // Inputs text/enums
         $config->app_name = $request->app_name;
@@ -132,6 +154,44 @@ class SettingController extends Controller
         
         $config->terms_of_use = $request->terms_of_use;
         $config->privacy_policy = $request->privacy_policy;
+
+        // AdMob IDs
+        $config->admob_app_id = $request->admob_app_id;
+        $config->admob_banner_id = $request->admob_banner_id;
+        $config->admob_interstitial_id = $request->admob_interstitial_id;
+        $config->admob_native_id = $request->admob_native_id;
+        $config->admob_rewarded_id = $request->admob_rewarded_id;
+        
+        $config->ads_banner_type = $request->ads_banner_type ?? 'admob';
+        $config->ads_interstitial_type = $request->ads_interstitial_type ?? 'admob';
+        $config->custom_interstitial_type = $request->custom_interstitial_type ?? 'image';
+        $config->interstitial_interval = $request->interstitial_interval ?? 3;
+
+        // Custom Banner Handling
+        if ($request->hasFile('custom_banner_image_file')) {
+            if ($config->custom_banner_image && !filter_var($config->custom_banner_image, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($config->custom_banner_image);
+            }
+            $file = $request->file('custom_banner_image_file');
+            $filename = time() . '_banner_' . $file->getClientOriginalName();
+            $config->custom_banner_image = $file->storeAs('ads', $filename, 'public');
+        } elseif ($request->custom_banner_image_url) {
+            $config->custom_banner_image = $request->custom_banner_image_url;
+        }
+        $config->custom_banner_link = $request->custom_banner_link;
+
+        // Custom Interstitial Handling
+        if ($request->hasFile('custom_interstitial_media_file')) {
+            if ($config->custom_interstitial_media && !filter_var($config->custom_interstitial_media, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($config->custom_interstitial_media);
+            }
+            $file = $request->file('custom_interstitial_media_file');
+            $filename = time() . '_interstitial_' . $file->getClientOriginalName();
+            $config->custom_interstitial_media = $file->storeAs('ads', $filename, 'public');
+        } elseif ($request->custom_interstitial_media_url) {
+            $config->custom_interstitial_media = $request->custom_interstitial_media_url;
+        }
+        $config->custom_interstitial_link = $request->custom_interstitial_link;
 
         $config->save();
 

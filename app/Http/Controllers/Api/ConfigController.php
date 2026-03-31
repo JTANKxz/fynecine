@@ -60,6 +60,28 @@ class ConfigController extends Controller
             'contact_email' => $config->contact_email,
             'autoembed_movie_sources' => $config->autoembed_movie_sources ?? [],
             'autoembed_serie_sources' => $config->autoembed_serie_sources ?? [],
+
+            // Ads Settings
+            'ads_banner_status' => (bool) $config->ads_banner_status,
+            'ads_banner_type' => $config->ads_banner_type,
+            'ads_interstitial_status' => (bool) $config->ads_interstitial_status,
+            'ads_interstitial_type' => $config->ads_interstitial_type,
+            
+            'admob_app_id' => $config->admob_app_id,
+            'admob_banner_id' => $config->admob_banner_id,
+            'admob_interstitial_id' => $config->admob_interstitial_id,
+            'admob_native_id' => $config->admob_native_id,
+            'admob_rewarded_id' => $config->admob_rewarded_id,
+
+            'custom_banner_image' => $config->custom_banner_image ? 
+                (filter_var($config->custom_banner_image, FILTER_VALIDATE_URL) ? $config->custom_banner_image : asset('storage/' . $config->custom_banner_image)) : null,
+            'custom_banner_link' => $config->custom_banner_link,
+            
+            'custom_interstitial_type' => $config->custom_interstitial_type,
+            'custom_interstitial_media' => $config->custom_interstitial_media ? 
+                (filter_var($config->custom_interstitial_media, FILTER_VALIDATE_URL) ? $config->custom_interstitial_media : asset('storage/' . $config->custom_interstitial_media)) : null,
+            'custom_interstitial_link' => $config->custom_interstitial_link,
+            'interstitial_interval' => (int) $config->interstitial_interval,
         ]);
     }
 }

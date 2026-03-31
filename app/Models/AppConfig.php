@@ -46,6 +46,23 @@ class AppConfig extends Model
         'contact_email',
         'autoembed_movie_sources',
         'autoembed_serie_sources',
+
+        // Ads
+        'admob_app_id',
+        'admob_banner_id',
+        'admob_interstitial_id',
+        'admob_native_id',
+        'admob_rewarded_id',
+        'ads_banner_status',
+        'ads_banner_type',
+        'ads_interstitial_status',
+        'ads_interstitial_type',
+        'custom_banner_image',
+        'custom_banner_link',
+        'custom_interstitial_type',
+        'custom_interstitial_media',
+        'custom_interstitial_link',
+        'interstitial_interval',
     ];
 
     protected $casts = [
@@ -67,6 +84,9 @@ class AppConfig extends Model
         'block_dns' => 'boolean',
         'autoembed_movie_sources' => 'array',
         'autoembed_serie_sources' => 'array',
+        'ads_banner_status' => 'boolean',
+        'ads_interstitial_status' => 'boolean',
+        'interstitial_interval' => 'integer',
     ];
 
     /**

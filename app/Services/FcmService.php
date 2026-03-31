@@ -52,29 +52,22 @@ class FcmService
             $payload = [
                 'message' => [
                     'token' => $token,
-                    'notification' => [
-                        'title' => $notificationData['title'],
-                        'body' => $notificationData['body'],
-                    ],
                     'data' => [
-                        'title' => $notificationData['title'],
-                        'message' => $notificationData['body'],
-                        'image_url' => $notificationData['image_url'] ?? '',
-                        'big_picture_url' => $notificationData['big_picture_url'] ?? '',
-                        'action_type' => $notificationData['action_type'] ?? 'none',
-                        'action_value' => $notificationData['action_value'] ?? '',
+                        'title' => (string) $notificationData['title'],
+                        'message' => (string) $notificationData['body'],
+                        'image_url' => (string) ($notificationData['image_url'] ?? ''),
+                        'big_picture_url' => (string) ($notificationData['big_picture_url'] ?? ''),
+                        'action_type' => (string) ($notificationData['action_type'] ?? 'none'),
+                        'action_value' => (string) ($notificationData['action_value'] ?? ''),
                     ],
                 ],
             ];
 
-            // Android specific customizations (Big Picture support via notification field if needed)
-            if (!empty($notificationData['big_picture_url'])) {
-                $payload['message']['android'] = [
-                    'notification' => [
-                        'image' => $notificationData['big_picture_url'],
-                    ],
-                ];
-            }
+            // For Android, we keep it data-only to trigger onMessageReceived
+            // We can add android specific high priority here
+            $payload['message']['android'] = [
+                'priority' => 'high',
+            ];
 
             try {
                 $response = Http::withToken($accessToken)

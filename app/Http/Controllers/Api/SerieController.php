@@ -136,6 +136,7 @@ class SerieController extends Controller
         return response()->json([
 
             'id' => $serie->id,
+            'tmdb_id' => $serie->tmdb_id,
             'name' => $serie->name,
             'slug' => $serie->slug,
             'year' => $serie->first_air_year,

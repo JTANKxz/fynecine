@@ -164,6 +164,7 @@ class MovieController extends Controller
         return response()->json([
 
             'id' => $movie->id,
+            'tmdb_id' => $movie->tmdb_id,
             'title' => $movie->title,
             'slug' => $movie->slug,
             'year' => $movie->release_year,

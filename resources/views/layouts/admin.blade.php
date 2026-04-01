@@ -223,11 +223,11 @@
             {{-- Usuários --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('usuariosSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.comments.*') ? 'text-netflix' : '' }}">
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.comments.*') || request()->routeIs('admin.in-app-notifications.*') || request()->routeIs('admin.push-notifications.*') ? 'text-netflix' : '' }}">
                     <span><i class="fa-solid fa-users mr-2"></i> Comunidade</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-usuariosSubmenu"></i>
                 </button>
-                <div id="usuariosSubmenu" class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.comments.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                <div id="usuariosSubmenu" class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.comments.*') || request()->routeIs('admin.in-app-notifications.*') || request()->routeIs('admin.push-notifications.*') ? '' : 'hidden' }} pl-8 space-y-1">
                     <a href="{{ route('admin.users.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.users.index') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Usuários
@@ -240,9 +240,13 @@
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.requests.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-hand-holding-heart w-4 mr-1"></i> Pedidos (Requests)
                     </a>
-                    <a href="{{ route('admin.notifications.index') }}"
-                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.notifications.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                    <a href="{{ route('admin.in-app-notifications.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.in-app-notifications.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-bell w-4 mr-1"></i> Notificações In-App
+                    </a>
+                    <a href="{{ route('admin.push-notifications.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.push-notifications.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-paper-plane w-4 mr-1"></i> Notificações Push
                     </a>
                 </div>
             </div>

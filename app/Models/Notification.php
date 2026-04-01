@@ -45,4 +45,15 @@ class Notification extends Model
             $q->whereNull('expires_at')
               ->orWhere('expires_at', '>', now());
         });
-    }}
+    }
+
+    public function scopeInApp($query)
+    {
+        return $query->where('is_in_app', true);
+    }
+
+    public function scopePush($query)
+    {
+        return $query->whereNotNull('push_status')->where('push_status', '!=', 'none');
+    }
+}

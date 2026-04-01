@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
 use App\Models\FcmDevice;
-use App\Models\Movie;
-use App\Models\Serie;
 use App\Services\FcmService;
 use Illuminate\Http\Request;
 
-class NotificationController extends Controller
+class PushNotificationController extends Controller
 {
     protected $fcmService;
 
@@ -22,22 +20,30 @@ class NotificationController extends Controller
 
     public function index(Request $request)
     {
-        $query = Notification::query()->orderBy('created_at', 'desc');
+        $query = Notification::push();
 
-        $type = $request->query('type');
-        if ($type === 'push') {
-            $query->whereNotNull('push_status')->where('push_status', '!=', 'none');
-        } elseif ($type === 'in_app') {
-            $query->where('is_in_app', true);
+        if ($request->filled('segment')) {
+            $query->where('segment', $request->segment);
         }
 
-        $notifications = $query->paginate(20)->withQueryString();
-        return view('admin.notifications.index', compact('notifications'));
+        if ($request->filled('action')) {
+            $query->where('action_type', $request->action);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('push_status', $request->status);
+        }
+
+        $notifications = $query->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.push-notifications.index', compact('notifications'));
     }
 
     public function create()
     {
-        return view('admin.notifications.create');
+        return view('admin.push-notifications.create');
     }
 
     public function store(Request $request)
@@ -50,7 +56,6 @@ class NotificationController extends Controller
             'user_id' => 'required_if:segment,individual|nullable|exists:users,id',
             'image_url' => 'nullable|url',
             'big_picture_url' => 'nullable|url',
-            'expires_at' => 'nullable|date|after:now',
         ]);
 
         $notification = Notification::create([
@@ -63,17 +68,13 @@ class NotificationController extends Controller
             'is_global' => $request->input('segment') !== 'individual',
             'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
             'segment' => $request->input('segment'),
-            'expires_at' => $request->input('expires_at'),
             'is_in_app' => $request->boolean('is_in_app', true),
             'push_status' => 'pending',
         ]);
 
-        // Only trigger Push Notification if requested
-        if ($request->boolean('send_push')) {
-            $this->sendPush($notification);
-        }
+        $this->sendPush($notification);
 
-        return redirect()->route('admin.notifications.index')->with('success', 'Notificação processada com sucesso!');
+        return redirect()->route('admin.push-notifications.index')->with('success', 'Disparo Push realizado com sucesso!');
     }
 
     protected function sendPush(Notification $notification)
@@ -97,7 +98,6 @@ class NotificationController extends Controller
                 break;
             case 'all':
             default:
-                // No extra filter
                 break;
         }
 
@@ -113,47 +113,14 @@ class NotificationController extends Controller
                 'action_value' => $notification->action_value,
             ];
 
-            $results = $this->fcmService->sendPush($tokens, $data);
-            
+            $this->fcmService->sendPush($tokens, $data);
             $notification->update(['push_status' => 'sent']);
-            return $results;
         }
-
-        return [];
-    }
-
-    public function searchContent(Request $request)
-    {
-        $search = $request->query('q');
-        $type = $request->query('type');
-
-        if (strlen($search) < 2) return response()->json([]);
-
-        if ($type === 'movie') {
-            $results = Movie::where('title', 'like', "%{$search}%")->limit(10)->get(['id', 'title', 'poster']);
-        } else {
-            $results = Serie::where('title', 'like', "%{$search}%")->limit(10)->get(['id', 'title', 'poster']);
-        }
-
-        return response()->json($results);
-    }
-
-    public function searchUser(Request $request)
-    {
-        $search = $request->query('q');
-        if (strlen($search) < 2) return response()->json([]);
-
-        $users = User::where('name', 'like', "%{$search}%")
-            ->orWhere('email', 'like', "%{$search}%")
-            ->limit(10)
-            ->get(['id', 'name', 'email', 'avatar']);
-
-        return response()->json($users);
     }
 
     public function destroy(Notification $notification)
     {
         $notification->delete();
-        return redirect()->route('admin.notifications.index')->with('success', 'Notificação excluída!');
+        return redirect()->route('admin.push-notifications.index')->with('success', 'Histórico de Push removido!');
     }
 }

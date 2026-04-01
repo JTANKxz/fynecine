@@ -145,6 +145,7 @@ class User extends Authenticatable
     {
         // Pega as notificações que o usuário ainda não leu (não estão na tabela pivô)
         return Notification::active()
+            ->where('is_in_app', true)
             ->where(function ($q) {
                 $q->where('is_global', true)
                   ->orWhere('user_id', $this->id);

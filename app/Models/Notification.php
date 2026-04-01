@@ -52,7 +52,7 @@ class Notification extends Model
         return $query->where('is_in_app', true);
     }
 
-    public function scopePush($query)
+    public function scopeByPush($query)
     {
         return $query->whereNotNull('push_status')->where('push_status', '!=', 'none');
     }

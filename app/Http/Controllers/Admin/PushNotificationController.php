@@ -20,7 +20,7 @@ class PushNotificationController extends Controller
 
     public function index(Request $request)
     {
-        $query = Notification::push();
+        $query = Notification::byPush();
 
         if ($request->filled('segment')) {
             $query->where('segment', $request->segment);

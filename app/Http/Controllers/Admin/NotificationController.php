@@ -310,19 +310,28 @@ class NotificationController extends Controller
         return response()->json($users);
     }
 
-    public function destroy(Notification $notification)
+    public function destroy($notification)
     {
+        // Buscar a notificação diretamente
+        $notif = Notification::findOrFail($notification);
+        
         try {
-            // Primeiro deletar os readers (pivot)
-            $notification->readers()->detach();
+            // Deletar os readers (pivot)
+            \DB::table('notification_user')
+                ->where('notification_id', $notif->id)
+                ->delete();
             
-            // Depois deletar a notificação
-            $notification->forceDelete();
+            // Deletar a notificação
+            \DB::table('notifications')
+                ->where('id', $notif->id)
+                ->delete();
             
-            return redirect()->route('admin.notifications.index')->with('success', 'Notificação excluída do histórico permanentemente!');
+            return redirect()->route('admin.notifications.index')
+                ->with('success', 'Notificação deletada permanentemente do histórico!');
         } catch (\Exception $e) {
             \Log::error('Erro ao deletar notificação: ' . $e->getMessage());
-            return redirect()->route('admin.notifications.index')->with('error', 'Erro ao excluir: ' . $e->getMessage());
+            return redirect()->route('admin.notifications.index')
+                ->with('error', 'Erro ao excluir: ' . $e->getMessage());
         }
     }
 }

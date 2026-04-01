@@ -66,19 +66,28 @@ class InAppNotificationController extends Controller
         return redirect()->route('admin.in-app-notifications.index')->with('success', 'Notificação In-App criada com sucesso!');
     }
 
-    public function destroy(Notification $notification)
+    public function destroy($notification)
     {
+        // Buscar a notificação diretamente
+        $notif = Notification::where('is_in_app', true)->findOrFail($notification);
+        
         try {
-            // Primeiro deletar os readers (pivot)
-            $notification->readers()->detach();
+            // Deletar os readers (pivot)
+            \DB::table('notification_user')
+                ->where('notification_id', $notif->id)
+                ->delete();
             
-            // Depois deletar a notificação
-            $notification->forceDelete();
+            // Deletar a notificação mesmo que haja soft delete
+            \DB::table('notifications')
+                ->where('id', $notif->id)
+                ->delete();
             
-            return redirect()->route('admin.in-app-notifications.index')->with('success', 'Notificação removida do histórico!');
+            return redirect()->route('admin.in-app-notifications.index')
+                ->with('success', 'Notificação In-App deletada permanentemente!');
         } catch (\Exception $e) {
             \Log::error('Erro ao deletar notificação in-app: ' . $e->getMessage());
-            return redirect()->route('admin.in-app-notifications.index')->with('error', 'Erro ao excluir: ' . $e->getMessage());
+            return redirect()->route('admin.in-app-notifications.index')
+                ->with('error', 'Erro ao excluir: ' . $e->getMessage());
         }
     }
 }

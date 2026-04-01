@@ -142,19 +142,30 @@ class PushNotificationController extends Controller
         }
     }
 
-    public function destroy(Notification $notification)
+    public function destroy($notification)
     {
+        // Buscar a notificação diretamente
+        $notif = Notification::whereNotNull('push_status')
+            ->where('push_status', '!=', 'none')
+            ->findOrFail($notification);
+        
         try {
-            // Primeiro deletar os readers (pivot)
-            $notification->readers()->detach();
+            // Deletar os readers (pivot)
+            \DB::table('notification_user')
+                ->where('notification_id', $notif->id)
+                ->delete();
             
-            // Depois deletar a notificação
-            $notification->forceDelete();
+            // Deletar a notificação
+            \DB::table('notifications')
+                ->where('id', $notif->id)
+                ->delete();
             
-            return redirect()->route('admin.push-notifications.index')->with('success', 'Histórico de Push removido permanentemente!');
+            return redirect()->route('admin.push-notifications.index')
+                ->with('success', 'Histórico de Push deletado permanentemente!');
         } catch (\Exception $e) {
             \Log::error('Erro ao deletar notificação push: ' . $e->getMessage());
-            return redirect()->route('admin.push-notifications.index')->with('error', 'Erro ao excluir: ' . $e->getMessage());
+            return redirect()->route('admin.push-notifications.index')
+                ->with('error', 'Erro ao excluir: ' . $e->getMessage());
         }
     }
 }

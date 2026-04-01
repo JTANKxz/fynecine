@@ -120,14 +120,14 @@ class User extends Authenticatable
     public function maxProfilesCount(): int
     {
         if ($this->isPremium()) {
-            return 5;
+            return 6; // Main + 4 normal + 1 kids
         }
 
         if ($this->isBasic()) {
-            return 2;
+            return 3; // Main + 2 normal
         }
 
-        return 1; // Free
+        return 2; // Free: Main + 1 normal
     }
     public function notifications()
     {
@@ -143,11 +143,20 @@ class User extends Authenticatable
 
     public function unreadNotifications()
     {
+        $segments = ['all'];
+        if ($this->isPremium()) {
+            $segments[] = 'premium';
+        } elseif ($this->isBasic()) {
+            $segments[] = 'basic';
+        } else {
+            $segments[] = 'free';
+        }
+
         // Pega as notificações que o usuário ainda não leu (não estão na tabela pivô)
         return Notification::active()
             ->where('is_in_app', true)
-            ->where(function ($q) {
-                $q->where('is_global', true)
+            ->where(function ($q) use ($segments) {
+                $q->whereIn('segment', $segments)
                   ->orWhere('user_id', $this->id);
             })
             ->whereNotExists(function ($query) {

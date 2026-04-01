@@ -15,14 +15,27 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        $user = auth('sanctum')->user();
 
         $notifications = Notification::active()
             ->where('is_in_app', true)
             ->where(function ($q) use ($user) {
-                $q->where('is_global', true);
                 if ($user) {
-                    $q->orWhere('user_id', $user->id);
+                    // Logged in user segments
+                    $segments = ['all'];
+                    if ($user->isPremium()) {
+                        $segments[] = 'premium';
+                    } elseif ($user->isBasic()) {
+                        $segments[] = 'basic';
+                    } else {
+                        $segments[] = 'free';
+                    }
+
+                    $q->whereIn('segment', $segments)
+                      ->orWhere('user_id', $user->id);
+                } else {
+                    // Guest user segments
+                    $q->whereIn('segment', ['all', 'guest']);
                 }
             })
             ->orderBy('created_at', 'desc')
@@ -33,19 +46,22 @@ class NotificationController extends Controller
 
         $data = $notifications->map(function ($n) use ($readIds) {
             return [
-                'id' => $n->id,
-                'title' => $n->title,
-                'content' => $n->content,
-                'image_url' => $n->image_url,
-                'action_type' => $n->action_type,
+                'id'           => $n->id,
+                'title'        => $n->title,
+                'content'      => $n->content,
+                'image_url'    => $n->image_url,
+                'action_type'  => $n->action_type,
                 'action_value' => $n->action_value,
-                'created_at' => $n->created_at,
-                'is_read' => in_array($n->id, $readIds),
+                'created_at'   => $n->created_at ? $n->created_at->toIso8601String() : null,
+                'is_read'      => in_array($n->id, $readIds),
             ];
         });
 
+        // unread_count consistent with filtering
+        $unreadCount = $user ? $user->unreadNotificationsCount() : $notifications->count();
+
         return response()->json([
-            'unread_count' => $user ? $user->unreadNotificationsCount() : $notifications->count(),
+            'unread_count'  => $unreadCount,
             'notifications' => $data
         ]);
     }

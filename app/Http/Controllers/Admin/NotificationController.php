@@ -100,7 +100,7 @@ class NotificationController extends Controller
         $request->validate([
             'content_type' => 'required|in:movie,serie',
             'content_id' => 'required|integer',
-            'segment' => 'required|in:all,premium,basic,free,guest',
+            'segment' => 'required|in:all,premium,basic,free,guest,expired',
             'send_push' => 'boolean',
             'send_in_app' => 'boolean',
         ]);
@@ -185,7 +185,7 @@ class NotificationController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'action_type' => 'required|in:none,url,movie,series,plans',
-            'segment' => 'required|in:all,premium,basic,free,guest,individual',
+            'segment' => 'required|in:all,premium,basic,free,guest,individual,expired',
             'user_id' => 'required_if:segment,individual|nullable|exists:users,id',
             'image_url' => 'nullable|url',
             'big_picture_url' => 'nullable|url',
@@ -246,6 +246,17 @@ class NotificationController extends Controller
             case 'free':
                 $query->whereHas('user', function($q) use ($notification) {
                     $q->where('plan_type', $notification->segment);
+                    // Filter by active status for specific plan types
+                    $q->where(function($sq) {
+                        $sq->whereNull('plan_expires_at')
+                           ->orWhere('plan_expires_at', '>', now());
+                    });
+                });
+                break;
+            case 'expired':
+                $query->whereHas('user', function($q) {
+                    $q->whereNotNull('plan_expires_at')
+                       ->where('plan_expires_at', '<', now());
                 });
                 break;
             case 'guest':

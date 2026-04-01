@@ -33,6 +33,7 @@ class User extends Authenticatable
     protected $appends = [
         'has_plan',
         'max_profiles',
+        'plan_status',
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -65,9 +66,22 @@ class User extends Authenticatable
         return $this->maxProfilesCount();
     }
 
-    public function getHasPlanAttribute()
+    public function getHasPlanAttribute(): bool
     {
         return $this->hasPlan();
+    }
+
+    public function getPlanStatusAttribute(): string
+    {
+        if ($this->plan_type === 'free') {
+            return 'none';
+        }
+
+        if ($this->plan_expires_at && $this->plan_expires_at->isPast()) {
+            return 'expired';
+        }
+
+        return 'active';
     }
 
     public function isAdmin(): bool
@@ -145,10 +159,11 @@ class User extends Authenticatable
     public function unreadNotifications()
     {
         $segments = ['all'];
-        if ($this->isPremium()) {
-            $segments[] = 'premium';
-        } elseif ($this->isBasic()) {
-            $segments[] = 'basic';
+        $status = $this->getPlanStatusAttribute();
+        if ($status === 'active') {
+            $segments[] = $this->plan_type ?: 'free';
+        } elseif ($status === 'expired') {
+            $segments[] = 'expired';
         } else {
             $segments[] = 'free';
         }

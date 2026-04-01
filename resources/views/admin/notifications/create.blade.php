@@ -93,6 +93,7 @@
                         <option value="basic">Apenas Usuários Basic</option>
                         <option value="free">Apenas Usuários Free</option>
                         <option value="guest">Apenas Visitantes (Não Logados)</option>
+                        <option value="expired">Apenas Usuários Expirados</option>
                         <option value="individual">Usuário Individual (ID Específico)</option>
                     </select>
                 </div>

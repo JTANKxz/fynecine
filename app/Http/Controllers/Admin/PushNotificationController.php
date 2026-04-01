@@ -144,7 +144,17 @@ class PushNotificationController extends Controller
 
     public function destroy(Notification $notification)
     {
-        $notification->delete();
-        return redirect()->route('admin.push-notifications.index')->with('success', 'Histórico de Push removido!');
+        try {
+            // Primeiro deletar os readers (pivot)
+            $notification->readers()->detach();
+            
+            // Depois deletar a notificação
+            $notification->forceDelete();
+            
+            return redirect()->route('admin.push-notifications.index')->with('success', 'Histórico de Push removido permanentemente!');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao deletar notificação push: ' . $e->getMessage());
+            return redirect()->route('admin.push-notifications.index')->with('error', 'Erro ao excluir: ' . $e->getMessage());
+        }
     }
 }

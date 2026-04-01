@@ -312,7 +312,17 @@ class NotificationController extends Controller
 
     public function destroy(Notification $notification)
     {
-        $notification->delete();
-        return redirect()->route('admin.notifications.index')->with('success', 'Notificação excluída!');
+        try {
+            // Primeiro deletar os readers (pivot)
+            $notification->readers()->detach();
+            
+            // Depois deletar a notificação
+            $notification->forceDelete();
+            
+            return redirect()->route('admin.notifications.index')->with('success', 'Notificação excluída do histórico permanentemente!');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao deletar notificação: ' . $e->getMessage());
+            return redirect()->route('admin.notifications.index')->with('error', 'Erro ao excluir: ' . $e->getMessage());
+        }
     }
 }

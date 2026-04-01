@@ -37,6 +37,12 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-6 bg-red-900/20 border border-red-600 text-red-400 px-4 py-3 rounded text-sm">
+            <i class="fa-solid fa-circle-exclamation mr-2"></i> {{ session('error') }}
+        </div>
+    @endif
+
     <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">

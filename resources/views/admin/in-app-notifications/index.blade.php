@@ -60,6 +60,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-6 bg-red-900/20 border border-red-600 text-red-400 px-5 py-4 rounded-xl text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="bg-neutral-950 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">

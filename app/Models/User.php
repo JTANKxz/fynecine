@@ -30,13 +30,9 @@ class User extends Authenticatable
         'features',
     ];
 
-    /**
-     * The attributes that should be appends for serialization.
-     *
-     * @var array<string, string>
-     */
     protected $appends = [
         'has_plan',
+        'max_profiles',
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -62,6 +58,11 @@ class User extends Authenticatable
             'plan_expires_at' => 'datetime',
             'features' => 'array',
         ];
+    }
+
+    public function getMaxProfilesAttribute(): int
+    {
+        return $this->maxProfilesCount();
     }
 
     public function getHasPlanAttribute()

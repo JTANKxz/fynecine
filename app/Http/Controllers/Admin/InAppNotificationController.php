@@ -55,7 +55,7 @@ class InAppNotificationController extends Controller
             'big_picture_url' => $request->input('big_picture_url'),
             'action_type' => $request->input('action_type'),
             'action_value' => $request->input('action_value'),
-            'is_global' => $request->input('segment') !== 'individual',
+            'is_global' => $request->input('segment') === 'all',  // Só é global se for 'all'
             'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
             'segment' => $request->input('segment'),
             'expires_at' => $request->input('expires_at'),

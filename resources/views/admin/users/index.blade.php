@@ -88,6 +88,10 @@
                             </td>
                             <td class="p-4 text-right">
                                 <div class="flex items-center justify-end gap-3">
+                                    <button type="button" onclick="openUserNotificationModal({{ $user->id }}, '{{ $user->name }}')" class="text-purple-500 hover:text-purple-400 transition" title="Enviar Notificação">
+                                        <i class="fa-solid fa-bell"></i>
+                                    </button>
+
                                     <a href="{{ route('admin.users.edit', $user->id) }}" class="text-neutral-400 hover:text-white transition">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
@@ -133,4 +137,82 @@
         {{ $users->links() }}
     </div>
 </section>
+
+{{-- Modal de Notificação para Usuário --}}
+<div id="userNotificationModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 rounded-lg p-6 max-w-md w-full border border-neutral-800">
+        <h3 class="text-lg font-bold text-white mb-4">
+            <i class="fa-solid fa-bell mr-2"></i> Enviar Notificação
+        </h3>
+
+        <form action="{{ route('admin.notifications.send-user') }}" method="POST" onsubmit="return validateUserNotification()">
+            @csrf
+
+            <input type="hidden" id="userId" name="user_id">
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-white mb-2">Usuário</label>
+                <input type="text" id="userNameDisplay" class="w-full px-3 py-2 bg-neutral-800 text-white rounded border border-neutral-700 cursor-not-allowed" readonly>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-white mb-2">Título</label>
+                <input type="text" name="title" class="w-full px-3 py-2 bg-neutral-800 text-white rounded border border-neutral-700 focus:border-purple-500 focus:outline-none" placeholder="Ex: Promoção Especial" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-white mb-2">Mensagem</label>
+                <textarea name="content" rows="3" class="w-full px-3 py-2 bg-neutral-800 text-white rounded border border-neutral-700 focus:border-purple-500 focus:outline-none" placeholder="Digite a mensagem..." required></textarea>
+            </div>
+
+            <div class="mb-4 space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="send_in_app" value="1" class="rounded" checked>
+                    <span class="text-sm text-neutral-400"><i class="fa-solid fa-inbox mr-1"></i> Salvar no Histórico (In-App)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="send_push" value="1" class="rounded">
+                    <span class="text-sm text-neutral-400"><i class="fa-solid fa-mobile-screen mr-1"></i> Enviar Push</span>
+                </label>
+            </div>
+
+            <div class="flex gap-2 mt-6">
+                <button type="button" onclick="closeUserNotificationModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition font-bold">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openUserNotificationModal(userId, userName) {
+        document.getElementById('userId').value = userId;
+        document.getElementById('userNameDisplay').value = userName;
+        document.getElementById('userNotificationModal').classList.remove('hidden');
+    }
+
+    function closeUserNotificationModal() {
+        document.getElementById('userNotificationModal').classList.add('hidden');
+    }
+
+    function validateUserNotification() {
+        const inApp = document.querySelector('input[name="send_in_app"]').checked;
+        const push = document.querySelector('input[name="send_push"]').checked;
+
+        if (!inApp && !push) {
+            alert('Selecione pelo menos uma opção: In-App ou Push');
+            return false;
+        }
+        return true;
+    }
+
+    // Fechar ao clicar fora
+    document.getElementById('userNotificationModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeUserNotificationModal();
+    });
+</script>
 @endsection

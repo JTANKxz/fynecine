@@ -44,6 +44,10 @@
                             <td class="p-4 font-medium">{{ $movie->title }}</td>
                             <td class="p-4">{{ $movie->release_year }}</td>
                             <td class="p-4">
+                                <button type="button" onclick="openContentNotificationModal('movie', {{ $movie->id }}, '{{ addslashes($movie->title) }}', '{{ $movie->poster_path }}')" class="text-purple-500 hover:text-purple-400 mr-2" title="Enviar Notificação">
+                                    <i class="fa-solid fa-bell"></i>
+                                </button>
+
                                 <button class="text-blue-500 hover:text-blue-400 mr-2">
                                     <i class="fa-solid fa-edit"></i>
                                 </button>
@@ -77,4 +81,91 @@
 
     <x-swal />
 </section>
+
+{{-- Modal de Notificação para Conteúdo (Filme/Série) --}}
+<div id="contentNotificationModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 rounded-lg p-6 max-w-md w-full border border-neutral-800">
+        <h3 class="text-lg font-bold text-white mb-4">
+            <i class="fa-solid fa-bell mr-2"></i> Enviar Notificação
+        </h3>
+
+        <form action="{{ route('admin.notifications.send-content') }}" method="POST" onsubmit="return validateContentNotification()">
+            @csrf
+
+            <input type="hidden" id="contentType" name="content_type">
+            <input type="hidden" id="contentId" name="content_id">
+
+            <div class="mb-4">
+                <div class="flex items-center gap-3 p-3 bg-neutral-800 rounded border border-neutral-700">
+                    <img id="contentPoster" src="" class="w-12 h-16 rounded object-cover">
+                    <div class="flex-1">
+                        <p class="text-xs text-neutral-500">Conteúdo:</p>
+                        <p id="contentTitle" class="font-bold text-white text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-white mb-2">Alvo (Segmentação)</label>
+                <select name="segment" class="w-full px-3 py-2 bg-neutral-800 text-white rounded border border-neutral-700 focus:border-purple-500 focus:outline-none" required>
+                    <option value="all">🌍 Global (Todos)</option>
+                    <option value="premium">💰 Piano Premium</option>
+                    <option value="basic">📦 Plano Basic</option>
+                    <option value="free">🆓 Plano Free</option>
+                    <option value="guest">👻 Convidados</option>
+                </select>
+            </div>
+
+            <div class="mb-4 space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="send_in_app" value="1" class="rounded" checked>
+                    <span class="text-sm text-neutral-400"><i class="fa-solid fa-inbox mr-1"></i> Salvar no Histórico</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="send_push" value="1" class="rounded">
+                    <span class="text-sm text-neutral-400"><i class="fa-solid fa-mobile-screen mr-1"></i> Enviar Push</span>
+                </label>
+            </div>
+
+            <div class="flex gap-2 mt-6">
+                <button type="button" onclick="closeContentNotificationModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition font-bold">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openContentNotificationModal(type, id, title, poster) {
+        document.getElementById('contentType').value = type;
+        document.getElementById('contentId').value = id;
+        document.getElementById('contentTitle').textContent = title;
+        document.getElementById('contentPoster').src = '/storage/' + poster;
+        document.getElementById('contentNotificationModal').classList.remove('hidden');
+    }
+
+    function closeContentNotificationModal() {
+        document.getElementById('contentNotificationModal').classList.add('hidden');
+    }
+
+    function validateContentNotification() {
+        const inApp = document.querySelector('#contentNotificationModal input[name="send_in_app"]').checked;
+        const push = document.querySelector('#contentNotificationModal input[name="send_push"]').checked;
+
+        if (!inApp && !push) {
+            alert('Selecione pelo menos uma opção: In-App ou Push');
+            return false;
+        }
+        return true;
+    }
+
+    // Fechar ao clicar fora
+    document.getElementById('contentNotificationModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeContentNotificationModal();
+    });
+</script>
 @endsection

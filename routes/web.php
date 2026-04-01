@@ -215,7 +215,9 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     Route::get('notifications/search-users', [\App\Http\Controllers\Admin\NotificationController::class, 'searchUser'])->name('notifications.search-users');
     Route::resource('in-app-notifications', InAppNotificationController::class)->names('in-app-notifications');
     Route::resource('push-notifications', PushNotificationController::class)->names('push-notifications');
-    // Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
+    Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
+    Route::post('notifications/user/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToUser'])->name('notifications.send-user');
+    Route::post('notifications/content/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToContent'])->name('notifications.send-content');
 
     // ========== EVENTOS AO VIVO ==========
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');

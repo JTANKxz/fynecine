@@ -58,23 +58,43 @@ class PushNotificationController extends Controller
             'big_picture_url' => 'nullable|url',
         ]);
 
-        $notification = Notification::create([
-            'title' => $request->input('title'),
-            'content' => $request->input('content'),
-            'image_url' => $request->input('image_url'),
-            'big_picture_url' => $request->input('big_picture_url'),
-            'action_type' => $request->input('action_type'),
-            'action_value' => $request->input('action_value'),
-            'is_global' => $request->input('segment') !== 'individual',
-            'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
-            'segment' => $request->input('segment'),
-            'is_in_app' => $request->boolean('is_in_app', true),
-            'push_status' => 'pending',
-        ]);
+        $isInApp = $request->boolean('is_in_app', false);
+
+        // Só salva no histórico se tiver in-app junto
+        // Push puro apenas envia sem registrar
+        if ($isInApp) {
+            $notification = Notification::create([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+                'image_url' => $request->input('image_url'),
+                'big_picture_url' => $request->input('big_picture_url'),
+                'action_type' => $request->input('action_type'),
+                'action_value' => $request->input('action_value'),
+                'is_global' => $request->input('segment') === 'all',  // Só é global se for 'all'
+                'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
+                'segment' => $request->input('segment'),
+                'is_in_app' => true,
+                'push_status' => 'pending',
+            ]);
+        } else {
+            // Push puro: criar objeto temporário apenas para enviar
+            $notification = new Notification([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+                'image_url' => $request->input('image_url'),
+                'big_picture_url' => $request->input('big_picture_url'),
+                'action_type' => $request->input('action_type'),
+                'action_value' => $request->input('action_value'),
+                'segment' => $request->input('segment'),
+                'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
+                'is_in_app' => false,
+            ]);
+        }
 
         $this->sendPush($notification);
 
-        return redirect()->route('admin.push-notifications.index')->with('success', 'Disparo Push realizado com sucesso!');
+        $message = $isInApp ? 'Push + In-App enviado com sucesso!' : 'Push enviado com sucesso (sem histórico)!';
+        return redirect()->route('admin.push-notifications.index')->with('success', $message);
     }
 
     protected function sendPush(Notification $notification)
@@ -114,7 +134,11 @@ class PushNotificationController extends Controller
             ];
 
             $this->fcmService->sendPush($tokens, $data);
-            $notification->update(['push_status' => 'sent']);
+            
+            // Só atualiza status se a notificação foi salva (is_in_app = true)
+            if ($notification->id) {
+                $notification->update(['push_status' => 'sent']);
+            }
         }
     }
 

@@ -74,13 +74,25 @@
                                 </div>
                             </td>
                             <td class="p-4">
-                                @if($n->is_global)
+                                @if($n->segment === 'all')
                                     <span class="bg-blue-900/20 text-blue-400 text-[10px] font-bold px-2 py-0.5 rounded border border-blue-900/30">
                                         <i class="fa-solid fa-earth-americas mr-1"></i> GLOBAL
                                     </span>
-                                @else
+                                @elseif($n->segment === 'individual')
                                     <span class="bg-purple-900/20 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-900/30">
-                                        USER ID: {{ $n->user_id }}
+                                        <i class="fa-solid fa-user mr-1"></i> USER ID {{ $n->user_id }}
+                                    </span>
+                                @elseif(in_array($n->segment, ['free', 'basic', 'premium']))
+                                    <span class="bg-yellow-900/20 text-yellow-400 text-[10px] font-bold px-2 py-0.5 rounded border border-yellow-900/30">
+                                        <i class="fa-solid fa-tag mr-1"></i> PLANO: {{ strtoupper($n->segment) }}
+                                    </span>
+                                @elseif($n->segment === 'guest')
+                                    <span class="bg-orange-900/20 text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded border border-orange-900/30">
+                                        <i class="fa-solid fa-user-slash mr-1"></i> GUESTS
+                                    </span>
+                                @else
+                                    <span class="bg-neutral-900/20 text-neutral-400 text-[10px] font-bold px-2 py-0.5 rounded border border-neutral-900/30">
+                                        {{ strtoupper($n->segment) }}
                                     </span>
                                 @endif
                             </td>

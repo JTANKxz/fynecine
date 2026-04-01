@@ -40,6 +40,145 @@ class NotificationController extends Controller
         return view('admin.notifications.create');
     }
 
+    /**
+     * Enviar notificação para usuário específico
+     */
+    public function sendToUser(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'send_push' => 'boolean',
+            'send_in_app' => 'boolean',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $isInApp = $request->boolean('send_in_app', true);
+        $isPush = $request->boolean('send_push', false);
+
+        // Salvar notificação se for in-app
+        if ($isInApp) {
+            $notification = Notification::create([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+                'image_url' => null,
+                'big_picture_url' => null,
+                'action_type' => 'none',
+                'action_value' => null,
+                'is_global' => false,
+                'user_id' => $user->id,
+                'segment' => 'individual',
+                'is_in_app' => true,
+                'push_status' => $isPush ? 'pending' : 'none',
+            ]);
+        } else {
+            // Push puro sem histórico
+            $notification = new Notification([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+                'segment' => 'individual',
+                'user_id' => $user->id,
+                'is_in_app' => false,
+            ]);
+        }
+
+        // Enviar push se solicitado
+        if ($isPush) {
+            $this->sendPushToUser($notification, $user);
+        }
+
+        $message = $isPush && !$isInApp ? 'Push enviado com sucesso!' : 'Notificação enviada com sucesso!';
+        return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Enviar notificação para conteúdo (filme/série)
+     */
+    public function sendToContent(Request $request)
+    {
+        $request->validate([
+            'content_type' => 'required|in:movie,serie',
+            'content_id' => 'required|integer',
+            'segment' => 'required|in:all,premium,basic,free,guest',
+            'send_push' => 'boolean',
+            'send_in_app' => 'boolean',
+        ]);
+
+        $contentType = $request->input('content_type');
+        $contentId = $request->input('content_id');
+
+        // Buscar conteúdo
+        if ($contentType === 'movie') {
+            $content = Movie::findOrFail($contentId);
+            $title = $content->title;
+            $image = $content->poster_path;
+            $actionType = 'movie';
+        } else {
+            $content = Serie::findOrFail($contentId);
+            $title = $content->name;
+            $image = $content->poster_path;
+            $actionType = 'series';
+        }
+
+        $isInApp = $request->boolean('send_in_app', true);
+        $isPush = $request->boolean('send_push', false);
+
+        // Criar notificação
+        $notificationData = [
+            'title' => "Novo $contentType disponível: $title",
+            'content' => "Assista agora!",
+            'image_url' => $image,
+            'big_picture_url' => $image,
+            'action_type' => $actionType,
+            'action_value' => (string)$contentId,
+            'is_global' => $request->input('segment') === 'all',
+            'user_id' => null,
+            'segment' => $request->input('segment'),
+            'is_in_app' => $isInApp,
+            'push_status' => $isPush ? 'pending' : 'none',
+        ];
+
+        if ($isInApp) {
+            $notification = Notification::create($notificationData);
+        } else {
+            // Push puro
+            $notification = new Notification($notificationData);
+        }
+
+        // Enviar push se solicitado
+        if ($isPush) {
+            $this->sendPush($notification);
+        }
+
+        $message = $isPush && !$isInApp ? 'Push enviado com sucesso!' : 'Notificação enviada com sucesso!';
+        return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Enviar push para usuário específico
+     */
+    protected function sendPushToUser(Notification $notification, User $user)
+    {
+        $devices = FcmDevice::where('user_id', $user->id)->pluck('device_token')->toArray();
+
+        if (count($devices) > 0) {
+            $data = [
+                'title' => $notification->title,
+                'body' => $notification->content,
+                'image_url' => $notification->image_url,
+                'action_type' => $notification->action_type,
+                'action_value' => $notification->action_value,
+            ];
+
+            $this->fcmService->sendPush($devices, $data);
+
+            if ($notification->id) {
+                $notification->update(['push_status' => 'sent']);
+            }
+        }
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -53,27 +192,47 @@ class NotificationController extends Controller
             'expires_at' => 'nullable|date|after:now',
         ]);
 
-        $notification = Notification::create([
-            'title' => $request->input('title'),
-            'content' => $request->input('content'),
-            'image_url' => $request->input('image_url'),
-            'big_picture_url' => $request->input('big_picture_url'),
-            'action_type' => $request->input('action_type'),
-            'action_value' => $request->input('action_value'),
-            'is_global' => $request->input('segment') !== 'individual',
-            'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
-            'segment' => $request->input('segment'),
-            'expires_at' => $request->input('expires_at'),
-            'is_in_app' => $request->boolean('is_in_app', true),
-            'push_status' => 'pending',
-        ]);
+        $isSendPush = $request->boolean('send_push', false);
+        $isInApp = $request->boolean('is_in_app', true);
 
-        // Only trigger Push Notification if requested
-        if ($request->boolean('send_push')) {
+        // Só salva no histórico se for in-app
+        // Push puro apenas envia sem registrar no histórico
+        if (!$isSendPush || $isInApp) {
+            $notification = Notification::create([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+                'image_url' => $request->input('image_url'),
+                'big_picture_url' => $request->input('big_picture_url'),
+                'action_type' => $request->input('action_type'),
+                'action_value' => $request->input('action_value'),
+                'is_global' => $request->input('segment') === 'all',  // Só é global se for 'all'
+                'user_id' => $request->input('segment') === 'individual' ? $request->input('user_id') : null,
+                'segment' => $request->input('segment'),
+                'expires_at' => $request->input('expires_at'),
+                'is_in_app' => $isInApp,
+                'push_status' => $isSendPush ? 'pending' : 'none',
+            ]);
+        } else {
+            // Push puro: criar objeto temporário apenas para enviar push
+            $notification = new Notification([
+                'title' => $request->input('title'),
+                'content' => $request->input('content'),
+                'image_url' => $request->input('image_url'),
+                'big_picture_url' => $request->input('big_picture_url'),
+                'action_type' => $request->input('action_type'),
+                'action_value' => $request->input('action_value'),
+                'segment' => $request->input('segment'),
+                'is_in_app' => false,
+            ]);
+        }
+
+        // Enviar push se solicitado
+        if ($isSendPush) {
             $this->sendPush($notification);
         }
 
-        return redirect()->route('admin.notifications.index')->with('success', 'Notificação processada com sucesso!');
+        $message = $isSendPush && !$isInApp ? 'Push enviado com sucesso!' : 'Notificação processada com sucesso!';
+        return redirect()->route('admin.notifications.index')->with('success', $message);
     }
 
     protected function sendPush(Notification $notification)

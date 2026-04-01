@@ -211,13 +211,18 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // ========== AVATARES ==========
     Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
     Route::resource('avatars', AvatarController::class)->names('avatars');
+    
+    // Rotas específicas de notificações ANTES do resource genérico
     Route::get('notifications/search-content', [\App\Http\Controllers\Admin\NotificationController::class, 'searchContent'])->name('notifications.search');
     Route::get('notifications/search-users', [\App\Http\Controllers\Admin\NotificationController::class, 'searchUser'])->name('notifications.search-users');
-    Route::resource('in-app-notifications', InAppNotificationController::class)->names('in-app-notifications');
-    Route::resource('push-notifications', PushNotificationController::class)->names('push-notifications');
-    Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
     Route::post('notifications/user/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToUser'])->name('notifications.send-user');
     Route::post('notifications/content/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToContent'])->name('notifications.send-content');
+    
+    // Resource genérico por ÚLTIMO
+    Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
+    
+    Route::resource('in-app-notifications', InAppNotificationController::class)->names('in-app-notifications');
+    Route::resource('push-notifications', PushNotificationController::class)->names('push-notifications');
 
     // ========== EVENTOS AO VIVO ==========
     Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');

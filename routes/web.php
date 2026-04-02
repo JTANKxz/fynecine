@@ -231,7 +231,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // ========== AVATARES ==========
     Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
     Route::resource('avatars', AvatarController::class)->names('avatars');
-    Route::resource('content-categories', ContentCategoryController::class)->names('categories');
+    Route::resource('content-categories', ContentCategoryController::class)->names('categories')->parameters(['content-categories' => 'category']);
     
     // Rotas específicas de notificações ANTES do resource genérico
     Route::get('notifications/search-content', [\App\Http\Controllers\Admin\NotificationController::class, 'searchContent'])->name('notifications.search');

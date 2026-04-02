@@ -4,14 +4,30 @@
 
 @section('content')
 <section>
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <h2 class="text-xl font-bold">Seções da Home</h2>
-            <p class="text-xs text-neutral-500">Arraste para reordenar. As seções ativas aparecem na API /home.</p>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Seções da Home e Categorias</h1>
+            <p class="text-neutral-400 mt-1">Configure as linhas de conteúdo de cada página do aplicativo.</p>
         </div>
-        <a href="{{ route('admin.sections.create') }}" class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm">
-            <i class="fa-solid fa-plus mr-2"></i>Nova Seção
+        <a href="{{ route('admin.sections.create') }}" 
+           class="bg-netflix hover:bg-netflix/90 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-netflix/20 transition-all active:scale-95 flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            Nova Seção
         </a>
+    </div>
+
+    {{-- Filtros de Categoria --}}
+    <div class="mb-8 flex items-center gap-3 overflow-x-auto pb-2">
+        <a href="{{ route('admin.sections.index') }}" 
+           class="px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ !request('category_id') ? 'bg-netflix text-white shadow-lg shadow-netflix/20' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700' }}">
+            Home (Geral)
+        </a>
+        @foreach($categories as $cat)
+            <a href="{{ route('admin.sections.index', ['category_id' => $cat->id]) }}" 
+               class="px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ request('category_id') == $cat->id ? 'bg-netflix text-white shadow-lg shadow-netflix/20' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700' }}">
+                {{ $cat->name }}
+            </a>
+        @endforeach
     </div>
 
     @if (session('success'))

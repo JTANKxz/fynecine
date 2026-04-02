@@ -17,7 +17,13 @@ class HomeSection extends Model
         'order',
         'is_active',
         'limit',
+        'content_category_id'
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(ContentCategory::class, 'content_category_id');
+    }
 
     protected $casts = [
         'is_active' => 'boolean',

@@ -11,36 +11,48 @@ use Illuminate\Http\Request;
 class SliderController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $sliders = Slider::orderBy('position')
-            ->paginate(10);
+        $categoryId = $request->query('category_id');
+        
+        $query = Slider::orderBy('position');
+        
+        if ($categoryId) {
+            $query->where('content_category_id', $categoryId);
+        } else {
+            $query->whereNull('content_category_id');
+        }
 
-        return view('admin.sliders.index', compact('sliders'));
+        $sliders = $query->paginate(20);
+        $categories = \App\Models\ContentCategory::orderBy('order')->get();
+
+        return view('admin.sliders.index', compact('sliders', 'categories'));
     }
 
     public function create()
     {
-        return view('admin.sliders.create');
+        $categories = \App\Models\ContentCategory::orderBy('order')->get();
+        return view('admin.sliders.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
-
         $validated = $request->validate([
             'content_id' => 'required|integer',
             'content_type' => 'required|in:movie,series',
             'position' => 'nullable|integer',
+            'content_category_id' => 'nullable|exists:content_categories,id'
         ]);
 
         Slider::create([
             'content_id' => $validated['content_id'],
             'content_type' => $validated['content_type'],
             'position' => $validated['position'] ?? 0,
+            'content_category_id' => $validated['content_category_id'],
             'active' => true
         ]);
 
-        return redirect()->route('admin.sliders.index')
+        return redirect()->route('admin.sliders.index', ['category_id' => $validated['content_category_id']])
             ->with('success', 'Item adicionado ao slider!');
     }
 

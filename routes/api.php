@@ -32,6 +32,8 @@ Route::post('/fcm/register', [\App\Http\Controllers\Api\FcmDeviceController::cla
 Route::get('/teste', [TestController::class, 'index']);
 
 Route::get('/home', [HomeController::class, 'index']);
+Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
+Route::get('/sections/page/{slug}', [HomeController::class, 'categoryPage']);
 Route::get('/series', [SerieController::class, 'index']);
 Route::get('/series/{idOrSlug}', [SerieController::class, 'show']);
 Route::get('/movies', [MovieController::class, 'index']);

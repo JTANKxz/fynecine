@@ -11,7 +11,7 @@
 
             @csrf
 
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid md:grid-cols-4 gap-4">
 
                 {{-- Buscar conteúdo --}}
                 <div class="md:col-span-2">
@@ -23,10 +23,23 @@
                         class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
                 </div>
 
+                {{-- Categoria --}}
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">
+                        Exibir em:
+                    </label>
+                    <select name="content_category_id" class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
+                        <option value="">Home (Geral)</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- posição --}}
                 <div>
                     <label class="block text-sm text-neutral-400 mb-1">
-                        Posição no Slider
+                        Posição
                     </label>
 
                     <input type="number" name="position" value="0"

@@ -13,40 +13,52 @@ use Illuminate\Http\Request;
 
 class HomeSectionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sections = HomeSection::with(['genre', 'network'])
-            ->orderBy('order')
-            ->get();
+        $categoryId = $request->query('category_id');
+        
+        $query = HomeSection::with(['genre', 'network'])
+            ->orderBy('order');
 
-        return view('admin.sections.index', compact('sections'));
+        if ($categoryId) {
+            $query->where('content_category_id', $categoryId);
+        } else {
+            $query->whereNull('content_category_id');
+        }
+
+        $sections = $query->get();
+        $categories = \App\Models\ContentCategory::orderBy('order')->get();
+
+        return view('admin.sections.index', compact('sections', 'categories'));
     }
 
     public function create()
     {
         $genres = Genre::orderBy('name')->get();
         $networks = Network::orderBy('name')->get();
-        return view('admin.sections.create', compact('genres', 'networks'));
+        $categories = \App\Models\ContentCategory::orderBy('order')->get();
+        return view('admin.sections.create', compact('genres', 'networks', 'categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'           => 'required|string|max:255',
-            'type'            => 'required|in:custom,genre,trending,network,networks,recently_added',
-            'content_type'    => 'required|in:movie,series,both',
-            'genre_id'        => 'nullable|exists:genres,id',
-            'network_id'      => 'nullable|exists:networks,id',
-            'trending_period' => 'nullable|in:today,week,all_time',
-            'limit'           => 'nullable|integer|min:1|max:50',
+            'title'               => 'required|string|max:255',
+            'type'                => 'required|in:custom,genre,trending,network,networks,recently_added,events',
+            'content_type'        => 'required|in:movie,series,both',
+            'genre_id'            => 'nullable|exists:genres,id',
+            'network_id'          => 'nullable|exists:networks,id',
+            'trending_period'     => 'nullable|in:today,week,all_time',
+            'limit'               => 'nullable|integer|min:1|max:50',
+            'content_category_id' => 'nullable|exists:content_categories,id',
         ]);
 
-        $validated['order'] = HomeSection::max('order') + 1;
+        $validated['order'] = HomeSection::where('content_category_id', $validated['content_category_id'])->max('order') + 1;
         $validated['is_active'] = $request->boolean('is_active');
 
         HomeSection::create($validated);
 
-        return redirect()->route('admin.sections.index')
+        return redirect()->route('admin.sections.index', ['category_id' => $validated['content_category_id']])
             ->with('success', 'Seção criada com sucesso!');
     }
 
@@ -54,26 +66,28 @@ class HomeSectionController extends Controller
     {
         $genres = Genre::orderBy('name')->get();
         $networks = Network::orderBy('name')->get();
-        return view('admin.sections.edit', compact('section', 'genres', 'networks'));
+        $categories = \App\Models\ContentCategory::orderBy('order')->get();
+        return view('admin.sections.edit', compact('section', 'genres', 'networks', 'categories'));
     }
 
     public function update(Request $request, HomeSection $section)
     {
         $validated = $request->validate([
-            'title'           => 'required|string|max:255',
-            'type'            => 'required|in:custom,genre,trending,network,networks,recently_added',
-            'content_type'    => 'required|in:movie,series,both',
-            'genre_id'        => 'nullable|exists:genres,id',
-            'network_id'      => 'nullable|exists:networks,id',
-            'trending_period' => 'nullable|in:today,week,all_time',
-            'limit'           => 'nullable|integer|min:1|max:50',
+            'title'               => 'required|string|max:255',
+            'type'                => 'required|in:custom,genre,trending,network,networks,recently_added,events',
+            'content_type'        => 'required|in:movie,series,both',
+            'genre_id'            => 'nullable|exists:genres,id',
+            'network_id'          => 'nullable|exists:networks,id',
+            'trending_period'     => 'nullable|in:today,week,all_time',
+            'limit'               => 'nullable|integer|min:1|max:50',
+            'content_category_id' => 'nullable|exists:content_categories,id',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
 
         $section->update($validated);
 
-        return redirect()->route('admin.sections.index')
+        return redirect()->route('admin.sections.index', ['category_id' => $validated['content_category_id']])
             ->with('success', 'Seção atualizada!');
     }
 

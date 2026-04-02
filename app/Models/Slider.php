@@ -10,8 +10,14 @@ class Slider extends Model
         'content_id',
         'content_type',
         'position',
-        'active'
+        'active',
+        'content_category_id'
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(ContentCategory::class, 'content_category_id');
+    }
 
     public function movie()
     {

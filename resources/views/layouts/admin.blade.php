@@ -278,6 +278,14 @@
                 </a>
             </div>
 
+            {{-- Categorias --}}
+            <div>
+                <a href="{{ route('admin.categories.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.categories.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-folder-tree w-5"></i> Categorias
+                </a>
+            </div>
+
             {{-- Configurações Gerais --}}
             <div>
                 <a href="{{ route('admin.settings.edit') }}"

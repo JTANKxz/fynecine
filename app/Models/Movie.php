@@ -20,8 +20,14 @@ class Movie extends Model
         'trailer_key',
         'trailer_url',
         'content_type',
-        'age_rating'
+        'age_rating',
+        'content_category_id'
     ];
+
+    public function contentCategory()
+    {
+        return $this->belongsTo(ContentCategory::class);
+    }
     
     protected $appends = ['type'];
 

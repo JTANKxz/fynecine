@@ -64,10 +64,18 @@
                 <option value="tv">Séries</option>
             </select>
 
+            <select id="importCategory" class="p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none border border-netflix/30">
+                <option value="">Sem Categoria (Geral)</option>
+                @php $categories = \App\Models\ContentCategory::active()->orderBy('order')->get(); @endphp
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                @endforeach
+            </select>
+
             <div class="flex items-center gap-2">
-                <label class="flex items-center gap-2">
-                    <input type="checkbox" id="adult" class="rounded accent-netflix">
-                    <span>Incluir conteúdo adulto</span>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="adult" class="rounded accent-netflix w-5 h-5">
+                    <span class="text-sm">Incluir conteúdo adulto</span>
                 </label>
             </div>
 
@@ -243,6 +251,8 @@
 
         try {
 
+            const categoryId = document.getElementById("importCategory").value;
+
             const response = await fetch('/dashzin/tmdb/import', {
                 method: 'POST',
                 headers: {
@@ -252,7 +262,8 @@
                 body: JSON.stringify({
                     tmdb_id: id,
                     type: type,
-                    mode: mode
+                    mode: mode,
+                    category_id: categoryId
                 })
             });
 

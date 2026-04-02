@@ -57,7 +57,7 @@ trait ImportableContent
         return null;
     }
 
-    public function performMovieImport($tmdbId)
+    public function performMovieImport($tmdbId, $categoryId = null)
     {
         try {
             $response = $this->fetchTMDB("movie/$tmdbId", [
@@ -110,7 +110,8 @@ trait ImportableContent
                 'trailer_key' => $trailerKey,
                 'trailer_url' => $trailerKey ? "https://www.youtube.com/watch?v=" . $trailerKey : null,
                 'content_type' => 'movie',
-                'age_rating' => $this->getAgeRating('movie', $tmdbId)
+                'age_rating' => $this->getAgeRating('movie', $tmdbId),
+                'content_category_id' => $categoryId
             ]);
 
             // SALVAR GENEROS
@@ -160,7 +161,7 @@ trait ImportableContent
         }
     }
 
-    public function performSeriesImport($tmdbId, $fullImport = false)
+    public function performSeriesImport($tmdbId, $fullImport = false, $categoryId = null)
     {
         try {
             $response = $this->fetchTMDB("tv/$tmdbId", [
@@ -214,7 +215,8 @@ trait ImportableContent
                 'trailer_key' => $trailerKey,
                 'trailer_url' => $trailerKey ? "https://www.youtube.com/watch?v=" . $trailerKey : null,
                 'content_type' => 'series',
-                'age_rating' => $this->getAgeRating('tv', $tmdbId)
+                'age_rating' => $this->getAgeRating('tv', $tmdbId),
+                'content_category_id' => $categoryId
             ]);
 
             // SALVAR GENEROS

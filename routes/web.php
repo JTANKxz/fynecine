@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\AvatarCategoryController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\InAppNotificationController;
 use App\Http\Controllers\Admin\PushNotificationController;
+use App\Http\Controllers\Admin\ContentCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TMDBController;
@@ -230,6 +231,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // ========== AVATARES ==========
     Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
     Route::resource('avatars', AvatarController::class)->names('avatars');
+    Route::resource('content-categories', ContentCategoryController::class)->names('categories');
     
     // Rotas específicas de notificações ANTES do resource genérico
     Route::get('notifications/search-content', [\App\Http\Controllers\Admin\NotificationController::class, 'searchContent'])->name('notifications.search');

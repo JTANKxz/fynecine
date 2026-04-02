@@ -112,10 +112,11 @@ class TMDBController extends Controller
         $tmdbId = $request->tmdb_id;
         $type = $request->type;
         $mode = $request->mode;
+        $categoryId = $request->category_id;
 
         if ($type === 'tv') {
             $fullImport = ($mode === 'full');
-            $result = $this->performSeriesImport($tmdbId, $fullImport);
+            $result = $this->performSeriesImport($tmdbId, $fullImport, $categoryId);
             
             if (!$result['success']) {
                 return response()->json(['error' => $result['error']], 404);
@@ -123,12 +124,12 @@ class TMDBController extends Controller
             return response()->json($result);
         }
 
-        return $this->importMovie($tmdbId);
+        return $this->importMovie($tmdbId, $categoryId);
     }
     
-    public function importMovie($tmdbId)
+    public function importMovie($tmdbId, $categoryId = null)
     {
-        $result = $this->performMovieImport($tmdbId);
+        $result = $this->performMovieImport($tmdbId, $categoryId);
         
         if (!$result['success']) {
             return response()->json(['error' => $result['error']], 404);

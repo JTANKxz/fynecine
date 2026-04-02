@@ -38,7 +38,16 @@
             </div>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-4">
+        <div class="grid md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm text-neutral-400 mb-1">Página (Categoria)</label>
+                <select name="content_category_id" class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
+                    <option value="">Home (Geral)</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ old('content_category_id', $section->content_category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div>
                 <label class="block text-sm text-neutral-400 mb-1">Tipo de Conteúdo</label>
                 <select name="content_type" class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">

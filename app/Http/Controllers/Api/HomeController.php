@@ -11,12 +11,29 @@ class HomeController extends Controller
 {
     public function index()
     {
+        return $this->getHomeData(null);
+    }
+
+    public function categoryPage($slug)
+    {
+        $category = \App\Models\ContentCategory::where('slug', $slug)->first();
+
+        if (!$category) {
+            return response()->json(['error' => 'Categoria não encontrada'], 404);
+        }
+
+        return $this->getHomeData($category->id);
+    }
+
+    private function getHomeData($categoryId = null)
+    {
         /*
         ==================
         SLIDERS
         ==================
         */
         $sliders = Slider::where('active', true)
+            ->where('content_category_id', $categoryId)
             ->orderBy('position')
             ->get()
             ->map(function ($slider) {
@@ -57,6 +74,7 @@ class HomeController extends Controller
         ==================
         */
         $sections = HomeSection::where('is_active', true)
+            ->where('content_category_id', $categoryId)
             ->orderBy('order')
             ->get()
             ->map(function ($section) {

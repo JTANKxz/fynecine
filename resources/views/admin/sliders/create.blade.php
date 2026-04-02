@@ -31,7 +31,7 @@
                     <select name="content_category_id" class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
                         <option value="">Home (Geral)</option>
                         @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}" {{ old('content_category_id', request('category_id')) == $cat->id ? 'selected' : 'active' }}>{{ $cat->name }}</option>
                         @endforeach
                     </select>
                 </div>

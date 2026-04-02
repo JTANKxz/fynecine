@@ -16,7 +16,12 @@ class HomeSectionController extends Controller
     public function index(Request $request)
     {
         $categoryId = $request->query('category_id');
+        $currentCategory = null;
         
+        if ($categoryId) {
+            $currentCategory = \App\Models\ContentCategory::find($categoryId);
+        }
+
         $query = HomeSection::with(['genre', 'network'])
             ->orderBy('order');
 
@@ -28,8 +33,13 @@ class HomeSectionController extends Controller
 
         $sections = $query->get();
         $categories = \App\Models\ContentCategory::orderBy('order')->get();
+        
+        // Buscar sliders desta página/categoria
+        $sliders = \App\Models\Slider::where('content_category_id', $categoryId)
+            ->orderBy('position')
+            ->get();
 
-        return view('admin.sections.index', compact('sections', 'categories'));
+        return view('admin.sections.index', compact('sections', 'categories', 'currentCategory', 'sliders'));
     }
 
     public function create()

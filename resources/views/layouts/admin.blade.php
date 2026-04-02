@@ -201,21 +201,39 @@
                 </div>
             </div>
 
-            {{-- Organização da Home --}}
+            {{-- Customização de Páginas --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('pagesSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.sections.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Páginas Customizadas</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-pagesSubmenu"></i>
+                </button>
+                <div id="pagesSubmenu" class="{{ request()->routeIs('admin.sections.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.sections.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.sections.index') && !request()->has('category_id') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-house w-4 mr-1"></i> Página Inicial (Geral)
+                    </a>
+                    @php $navCategories = \App\Models\ContentCategory::active()->orderBy('order')->get(); @endphp
+                    @foreach($navCategories as $navCat)
+                        <a href="{{ route('admin.sections.index', ['category_id' => $navCat->id]) }}"
+                           class="block p-2 rounded text-sm {{ request()->get('category_id') == $navCat->id ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                            <i class="fa-solid fa-layer-group w-4 mr-1"></i> Home: {{ $navCat->name }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Organização Geral --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('homeSubmenu')"
-                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.sections.*') || request()->routeIs('admin.networks.*') ? 'text-netflix' : '' }}">
-                    <span><i class="fa-solid fa-layer-group mr-2"></i> Página Inicial</span>
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.networks.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-gears mr-2"></i> Organização Geral</span>
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-homeSubmenu"></i>
                 </button>
-                <div id="homeSubmenu" class="{{ request()->routeIs('admin.sections.*') || request()->routeIs('admin.networks.*') ? '' : 'hidden' }} pl-8 space-y-1">
-                    <a href="{{ route('admin.sections.index') }}"
-                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.sections.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-bars-staggered w-4 mr-1"></i> Seções da Home
-                    </a>
+                <div id="homeSubmenu" class="{{ request()->routeIs('admin.networks.*') ? '' : 'hidden' }} pl-8 space-y-1">
                     <a href="{{ route('admin.networks.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.networks.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-tower-broadcast w-4 mr-1"></i> Networks
+                        <i class="fa-solid fa-tower-broadcast w-4 mr-1"></i> Networks (Plataformas)
                     </a>
                 </div>
             </div>

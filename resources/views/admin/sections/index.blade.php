@@ -6,40 +6,102 @@
 <section>
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-3xl font-extrabold text-white tracking-tight">Seções da Home e Categorias</h1>
-            <p class="text-neutral-400 mt-1">Configure as linhas de conteúdo de cada página do aplicativo.</p>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">
+                @if($currentCategory)
+                    Customizando Página: <span class="text-netflix">{{ $currentCategory->name }}</span>
+                @else
+                    Customizando Página: <span class="text-netflix">Página Inicial (Geral)</span>
+                @endif
+            </h1>
+            <p class="text-neutral-400 mt-1">Configure o topo (Sliders) e as fileiras de conteúdo desta página.</p>
         </div>
-        <a href="{{ route('admin.sections.create') }}" 
-           class="bg-netflix hover:bg-netflix/90 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-netflix/20 transition-all active:scale-95 flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i>
-            Nova Seção
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.sliders.create', ['category_id' => request('category_id')]) }}" 
+               class="bg-neutral-800 hover:bg-neutral-700 text-white px-5 py-3 rounded-xl font-bold transition-all active:scale-95 flex items-center gap-2 border border-neutral-700">
+                <i class="fa-solid fa-images"></i>
+                Novo Slider
+            </a>
+            <a href="{{ route('admin.sections.create', ['category_id' => request('category_id')]) }}" 
+               class="bg-netflix hover:bg-netflix/90 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-netflix/20 transition-all active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i>
+                Nova Seção
+            </a>
+        </div>
     </div>
 
-    {{-- Filtros de Categoria --}}
-    <div class="mb-8 flex items-center gap-3 overflow-x-auto pb-2">
+    {{-- Filtros de Página --}}
+    <div class="mb-10 flex items-center gap-3 overflow-x-auto pb-2">
         <a href="{{ route('admin.sections.index') }}" 
-           class="px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ !request('category_id') ? 'bg-netflix text-white shadow-lg shadow-netflix/20' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700' }}">
+           class="px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ !request('category_id') ? 'bg-netflix text-white shadow-lg shadow-netflix/20' : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:bg-neutral-800' }}">
             Home (Geral)
         </a>
         @foreach($categories as $cat)
             <a href="{{ route('admin.sections.index', ['category_id' => $cat->id]) }}" 
-               class="px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ request('category_id') == $cat->id ? 'bg-netflix text-white shadow-lg shadow-netflix/20' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700' }}">
+               class="px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ request('category_id') == $cat->id ? 'bg-netflix text-white shadow-lg shadow-netflix/20' : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:bg-neutral-800' }}">
                 {{ $cat->name }}
             </a>
         @endforeach
     </div>
 
     @if (session('success'))
-        <div class="mb-4 bg-green-900 border border-green-600 text-green-100 px-4 py-2 rounded text-sm">
+        <div class="mb-6 bg-green-900/30 border border-green-600/50 text-green-100 px-4 py-3 rounded-xl text-sm flex items-center gap-3">
+            <i class="fa-solid fa-check-circle text-green-400"></i>
             {{ session('success') }}
         </div>
     @endif
 
-    <div id="sections-list" class="space-y-2">
-        @forelse ($sections as $section)
-            <div class="section-item bg-neutral-900 border border-neutral-800 rounded-lg p-4 flex items-center gap-4 cursor-grab active:cursor-grabbing hover:border-neutral-700 transition {{ !$section->is_active ? 'opacity-50' : '' }}"
-                 data-id="{{ $section->id }}">
+    {{-- BLOCO DE SLIDERS --}}
+    <div class="mb-12">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-images text-netflix text-xl"></i>
+            <h2 class="text-xl font-bold text-white uppercase tracking-wider">Sliders (Destaques do Topo)</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @forelse ($sliders as $slider)
+                <div class="group relative bg-neutral-950 border border-neutral-900 rounded-2xl overflow-hidden hover:border-netflix/50 transition-all duration-300">
+                    <img src="{{ $slider->image_url }}" alt="Slider" class="w-full aspect-video object-cover opacity-60 group-hover:opacity-100 transition-opacity">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                    
+                    <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-netflix uppercase">Posição {{ $slider->position }}</span>
+                            <h4 class="text-white font-bold truncate">{{ $slider->title ?? 'Sem Título' }}</h4>
+                        </div>
+                        <div class="flex items-center gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
+                            <a href="{{ route('admin.sliders.edit', $slider->id) }}" class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition shadow-lg">
+                                <i class="fa-solid fa-edit text-xs"></i>
+                            </a>
+                            <form action="{{ route('admin.sliders.destroy', $slider->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition shadow-lg">
+                                    <i class="fa-solid fa-trash text-xs text-white"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full border-2 border-dashed border-neutral-800 rounded-2xl p-8 text-center text-neutral-500">
+                    <p>Nenhum slider configurado para esta página.</p>
+                    <a href="{{ route('admin.sliders.create', ['category_id' => request('category_id')]) }}" class="text-netflix hover:underline text-sm font-bold mt-2 inline-block">Adicionar primeiro destaque</a>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- BLOCO DE SEÇÕES --}}
+    <div>
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-bars-staggered text-netflix text-xl"></i>
+            <h2 class="text-xl font-bold text-white uppercase tracking-wider">Fileiras de Conteúdo (Seções)</h2>
+        </div>
+        
+        <div id="sections-list" class="space-y-3">
+            @forelse ($sections as $section)
+                <div class="section-item bg-neutral-900 border border-neutral-800 rounded-xl p-5 flex items-center gap-4 cursor-grab active:cursor-grabbing hover:border-neutral-700 transition-all {{ !$section->is_active ? 'opacity-40 grayscale' : '' }}"
+                     data-id="{{ $section->id }}">
 
                 {{-- Drag handle --}}
                 <div class="text-neutral-600 hover:text-white">

@@ -109,6 +109,10 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
 
     Route::prefix('series')->name('series.')->group(function () {
         Route::get('/', [SerieController::class, 'index'])->name('index');
+        Route::get('/bulk', [SerieController::class, 'bulkImport'])->name('bulk');
+        Route::get('/bulk/ids', [SerieController::class, 'getBulkIds'])->name('bulk.ids');
+        Route::post('/bulk/import', [SerieController::class, 'processImport'])->name('bulk.import');
+
         Route::delete('/{serie}', [SerieController::class, 'destroy'])->name('delete');
         Route::get('/{serie}/seasons', [SerieController::class, 'seasons'])->name('seasons');
         Route::get('/seasons/{season}/episodes', [SerieController::class, 'episodes'])->name('episodes');

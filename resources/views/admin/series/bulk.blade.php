@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Importação em Massa de Filmes')
+@section('title', 'Importação em Massa de Séries')
 
 @section('content')
 <section class="max-w-4xl mx-auto">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold flex items-center gap-2">
-            <i class="fa-solid fa-film text-netflix"></i> Importação em Massa: Filmes
+            <i class="fa-solid fa-tv text-netflix"></i> Importação em Massa: Séries
         </h2>
-        <a href="{{ route('admin.movies.index') }}" class="text-sm bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded transition">
+        <a href="{{ route('admin.series.index') }}" class="text-sm bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded transition">
             <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
         </a>
     </div>
@@ -21,19 +21,24 @@
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Iniciar de (Pular X itens)</label>
                 <input type="number" id="importSkip" value="0" min="0" 
                        class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-netflix focus:outline-none transition">
-                <p class="text-xs text-neutral-500 mt-1">Ex: Se já importou 500, coloque 500.</p>
+                <p class="text-xs text-neutral-500 mt-1">Ex: Se já importou 300, coloque 300.</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Quantidade a Importar</label>
-                <input type="number" id="importQuantity" value="50" min="1" max="1000" 
+                <input type="number" id="importQuantity" value="30" min="1" max="500" 
                        class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-netflix focus:outline-none transition">
-                <p class="text-xs text-neutral-500 mt-1">Sugestão: 50~100 por lote.</p>
+                <p class="text-xs text-neutral-500 mt-1">Para séries, 30 por lote é mais seguro.</p>
             </div>
             <div class="flex items-end">
                 <button id="btnFetchIds" onclick="prepareImport()" class="w-full bg-netflix hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center justify-center gap-2 h-[42px]">
-                    <i class="fa-solid fa-sync"></i> Iniciar Processo
+                    <i class="fa-solid fa-sync"></i> Iniciar Lote
                 </button>
             </div>
+        </div>
+        <div class="mt-4 p-3 bg-neutral-800/50 rounded border border-neutral-700">
+            <p class="text-[10px] text-neutral-400 leading-relaxed uppercase tracking-tighter">
+                <i class="fa-solid fa-circle-info mr-1 text-netflix"></i> ATENÇÃO: A importação de séries é mais lenta pois processa temporadas e episódios.
+            </p>
         </div>
     </div>
 
@@ -41,30 +46,30 @@
     <div id="statusSection" class="hidden space-y-6">
         <!-- Dashboard de Progresso -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center">
-                <span class="block text-xs text-neutral-500 uppercase font-bold mb-1">Total no Lote</span>
+            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center shadow-lg">
+                <span class="block text-xs text-neutral-500 uppercase font-bold mb-1">Planejado</span>
                 <span id="statTotal" class="text-2xl font-bold">0</span>
             </div>
-            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center">
-                <span class="block text-xs text-green-500 uppercase font-bold mb-1">Sucesso</span>
+            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center shadow-lg">
+                <span class="block text-xs text-green-500 uppercase font-bold mb-1">Importadas</span>
                 <span id="statSuccess" class="text-2xl font-bold text-green-500">0</span>
             </div>
-            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center">
-                <span class="block text-xs text-yellow-500 uppercase font-bold mb-1">Pulados</span>
+            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center shadow-lg">
+                <span class="block text-xs text-yellow-500 uppercase font-bold mb-1">Existentes</span>
                 <span id="statExists" class="text-2xl font-bold text-yellow-500">0</span>
             </div>
-            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center">
-                <span class="block text-xs text-red-500 uppercase font-bold mb-1">Falhas</span>
+            <div class="bg-neutral-900 border border-neutral-800 p-4 rounded-xl text-center shadow-lg">
+                <span class="block text-xs text-red-500 uppercase font-bold mb-1">Erros</span>
                 <span id="statErrors" class="text-2xl font-bold text-red-500">0</span>
             </div>
         </div>
 
         <!-- Barra de Progresso -->
-        <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl relative overflow-hidden">
+        <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl relative overflow-hidden shadow-2xl">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-3">
                     <div id="loaderSpinner" class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-netflix"></div>
-                    <span id="progressText" class="text-sm font-medium">Processando: 0%</span>
+                    <span id="progressText" class="text-sm font-medium">Sincronizando: 0%</span>
                 </div>
                 <div class="flex gap-2">
                     <button id="btnPause" onclick="pauseImport()" class="bg-yellow-600 hover:bg-yellow-700 text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-1">
@@ -74,23 +79,23 @@
                         <i class="fa-solid fa-play"></i> Retomar
                     </button>
                     <button id="btnCancel" onclick="cancelImport()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-1">
-                        <i class="fa-solid fa-stop"></i> Cancelar
+                        <i class="fa-solid fa-stop"></i> Parar
                     </button>
                 </div>
             </div>
             <div class="w-full bg-neutral-800 rounded-full h-4">
-                <div id="progressBar" class="bg-netflix h-4 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(139,47,255,0.5)]" style="width: 0%"></div>
+                <div id="progressBar" class="bg-netflix h-4 rounded-full transition-all duration-300 shadow-[0_0_12px_rgba(139,47,255,0.6)]" style="width: 0%"></div>
             </div>
         </div>
 
         <!-- Logs -->
         <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-2xl">
             <div class="bg-neutral-800 px-4 py-2 border-b border-neutral-700 flex justify-between items-center">
-                <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Fluxo de Importação</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-neutral-400">Terminal de Sincronização</span>
                 <button onclick="clearLogs()" class="text-[10px] text-neutral-500 hover:text-white underline uppercase">Limpar Console</button>
             </div>
-            <div id="importLogs" class="h-80 overflow-y-auto p-4 font-mono text-xs space-y-1 bg-black/40">
-                <div class="text-neutral-500 italic">Aguardando sinal...</div>
+            <div id="importLogs" class="h-80 overflow-y-auto p-4 font-mono text-[11px] space-y-1 bg-black/50">
+                <div class="text-neutral-500 italic">Aguardando sinal para iniciar...</div>
             </div>
         </div>
     </div>
@@ -98,16 +103,16 @@
 
 <style>
     #importLogs::-webkit-scrollbar { width: 4px; }
-    #importLogs::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
-    .log-success { color: #10b981; border-left: 2px solid #10b981; padding-left: 8px; }
-    .log-exists { color: #f59e0b; border-left: 2px solid #f59e0b; padding-left: 8px; }
-    .log-error { color: #ef4444; border-left: 2px solid #ef4444; padding-left: 8px; }
-    .log-info { color: #8b2fff; background: rgba(139,47,255,0.1); padding: 2px 8px; border-radius: 4px; }
+    #importLogs::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+    .log-success { color: #10b981; border-left: 3px solid #10b981; padding-left: 8px; }
+    .log-exists { color: #f59e0b; border-left: 3px solid #f59e0b; padding-left: 8px; }
+    .log-error { color: #ef4444; border-left: 3px solid #ef4444; padding-left: 8px; }
+    .log-info { color: #8b2fff; background: rgba(139,47,255,0.05); padding: 2px 8px; border-radius: 4px; }
 </style>
 
 @push('scripts')
 <script>
-    let movieQueue = [];
+    let seriesQueue = [];
     let isPaused = false;
     let isCancelled = false;
     let stats = { total: 0, success: 0, exists: 0, errors: 0, processed: 0 };
@@ -115,44 +120,41 @@
 
     async function prepareImport() {
         const skip = parseInt(document.getElementById('importSkip').value) || 0;
-        const qty = parseInt(document.getElementById('importQuantity').value) || 50;
+        const qty = parseInt(document.getElementById('importQuantity').value) || 30;
         const btnFetch = document.getElementById('btnFetchIds');
         
         btnFetch.disabled = true;
         btnFetch.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Sincronizando...';
 
-        addLog(`Conectando à API externa para buscar lista de filmes...`, 'info');
+        addLog(`Buscando lista completa de séries na API externa...`, 'info');
 
         try {
-            const response = await fetch('{{ route("admin.movies.bulk.ids") }}');
+            const response = await fetch('{{ route("admin.series.bulk.ids") }}');
             const data = await response.json();
 
             if (data.success) {
-                const allMovies = data.movies || [];
-                addLog(`Total de filmes na API: ${allMovies.length}`, 'info');
+                const allSeries = data.series || [];
+                addLog(`Total de séries encontradas: ${allSeries.length}`, 'info');
                 
-                if (skip >= allMovies.length) {
-                    Swal.fire('Aviso', 'O valor de "Pular" é maior ou igual ao total de filmes disponíveis.', 'warning');
+                if (skip >= allSeries.length) {
+                    Swal.fire('Aviso', 'O valor de "Pular" é maior que o total de séries.', 'warning');
                     resetBtn();
                     return;
                 }
 
-                movieQueue = allMovies.slice(skip, skip + qty);
-                stats.total = movieQueue.length;
-                stats.processed = 0;
-                stats.success = 0;
-                stats.exists = 0;
-                stats.errors = 0;
+                seriesQueue = allSeries.slice(skip, skip + qty);
+                stats.total = seriesQueue.length;
+                stats.processed = 0; stats.success = 0; stats.exists = 0; stats.errors = 0;
                 currentTaskIndex = 0;
                 
                 document.getElementById('setupSection').classList.add('hidden');
                 document.getElementById('statusSection').classList.remove('hidden');
                 document.getElementById('statTotal').innerText = stats.total;
                 
-                addLog(`Iniciando lote: Pulando ${skip} e processando ${movieQueue.length} itens.`);
+                addLog(`Iniciando Batch: Pulando ${skip} e processando ${seriesQueue.length} séries.`);
                 startImport();
             } else {
-                Swal.fire('Erro', data.error || 'Erro ao buscar IDs', 'error');
+                Swal.fire('Erro', data.error || 'Erro ao buscar dados', 'error');
                 resetBtn();
             }
         } catch (error) {
@@ -164,7 +166,7 @@
     function resetBtn() {
         const btnFetch = document.getElementById('btnFetchIds');
         btnFetch.disabled = false;
-        btnFetch.innerHTML = '<i class="fa-solid fa-sync"></i> Iniciar Processo';
+        btnFetch.innerHTML = '<i class="fa-solid fa-sync"></i> Iniciar Lote';
     }
 
     async function startImport() {
@@ -174,20 +176,18 @@
     }
 
     async function processNext() {
-        if (isPaused || isCancelled || currentTaskIndex >= movieQueue.length) {
-            if (currentTaskIndex >= movieQueue.length) {
-                finishImport();
-            }
+        if (isPaused || isCancelled || currentTaskIndex >= seriesQueue.length) {
+            if (currentTaskIndex >= seriesQueue.length) finishImport();
             return;
         }
 
-        const movie = movieQueue[currentTaskIndex];
-        const tmdbId = movie.tmdb_id;
+        const serie = seriesQueue[currentTaskIndex];
+        const tmdbId = serie.tmdb_id;
         
-        addLog(`Item ${currentTaskIndex + 1}/${movieQueue.length} | TMDB ID: ${tmdbId}`, 'info');
+        addLog(`[${currentTaskIndex + 1}/${seriesQueue.length}] Analisando TMDB ID: ${tmdbId}...`, 'info');
 
         try {
-            const response = await fetch('{{ route("admin.movies.bulk.import") }}', {
+            const response = await fetch('{{ route("admin.series.bulk.import") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -201,14 +201,14 @@
             if (result.success) {
                 if (result.status === 'imported') {
                     stats.success++;
-                    addLog(`[IMPORTADO] ${result.movie.title}`, 'success');
+                    addLog(`[OK] ${result.series.name} - Sincronizada com temporadas/episódios.`, 'success');
                 } else if (result.status === 'exists') {
                     stats.exists++;
-                    addLog(`[PULADO] ${result.message}`, 'exists');
+                    addLog(`[PULO] ${result.message}`, 'exists');
                 }
             } else {
                 stats.errors++;
-                addLog(`[FALHA] TMDB ${tmdbId}: ${result.error}`, 'error');
+                addLog(`[ERRO] TMDB ${tmdbId}: ${result.error}`, 'error');
             }
         } catch (error) {
             stats.errors++;
@@ -219,14 +219,14 @@
         updateUI();
         currentTaskIndex++;
         
-        // Pequena pausa para evitar sobrecarga
-        setTimeout(processNext, 600);
+        // Séries demoram mais, delay de 1.2s para segurança
+        setTimeout(processNext, 1200);
     }
 
     function updateUI() {
         const percent = Math.round((stats.processed / stats.total) * 100);
         document.getElementById('progressBar').style.width = percent + '%';
-        document.getElementById('progressText').innerText = `Progresso: ${percent}% (${stats.processed}/${stats.total})`;
+        document.getElementById('progressText').innerText = `Sincronizando: ${percent}% (${stats.processed}/${stats.total})`;
         document.getElementById('statSuccess').innerText = stats.success;
         document.getElementById('statExists').innerText = stats.exists;
         document.getElementById('statErrors').innerText = stats.errors;
@@ -237,13 +237,13 @@
         const now = new Date().toLocaleTimeString();
         const logItem = document.createElement('div');
         logItem.className = type ? `log-${type}` : 'text-neutral-300';
-        logItem.innerHTML = `<span class="text-neutral-500 font-normal">[${now}]</span> ${message}`;
+        logItem.innerHTML = `<span class="text-neutral-600">[${now}]</span> ${message}`;
         logContainer.appendChild(logItem);
         logContainer.scrollTop = logContainer.scrollHeight;
     }
 
     function clearLogs() {
-        document.getElementById('importLogs').innerHTML = '<div class="text-neutral-500 italic text-[10px]">Console limpo em ' + new Date().toLocaleTimeString() + '</div>';
+        document.getElementById('importLogs').innerHTML = '<div class="text-neutral-500 italic">Console limpo.</div>';
     }
 
     function pauseImport() {
@@ -251,7 +251,7 @@
         document.getElementById('btnPause').classList.add('hidden');
         document.getElementById('btnResume').classList.remove('hidden');
         document.getElementById('loaderSpinner').classList.add('hidden');
-        addLog('PROCESSO PAUSADO.', 'exists');
+        addLog('PROCESSO PAUSADO PELO USUÁRIO.', 'exists');
     }
 
     function resumeImport() {
@@ -265,18 +265,18 @@
 
     function cancelImport() {
         Swal.fire({
-            title: 'Cancelar?',
-            text: "O progresso atual deste lote será perdido.",
+            title: 'Parar Sincronização?',
+            text: "O processo será interrompido permanentemente para este lote.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#8b2fff',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Interromper',
+            confirmButtonText: 'Parar Agora',
             cancelButtonText: 'Continuar'
         }).then((result) => {
             if (result.isConfirmed) {
                 isCancelled = true;
-                addLog('IMPORTAÇÃO CANCELADA.', 'error');
+                addLog('IMPORTAÇÃO ABORTADA.', 'error');
                 document.getElementById('loaderSpinner').classList.add('hidden');
                 document.getElementById('btnPause').disabled = true;
                 document.getElementById('btnResume').disabled = true;
@@ -290,11 +290,11 @@
         document.getElementById('btnPause').disabled = true;
         document.getElementById('btnResume').disabled = true;
         document.getElementById('btnCancel').disabled = true;
-        addLog('🏁 PROCESSO FINALIZADO!', 'info');
+        addLog('🏁 PROCESSO CONCLUÍDO!', 'info');
         
         Swal.fire({
-            title: 'Fim do Lote!',
-            html: `Sincronização concluída.<br><b>Sucesso:</b> ${stats.success}<br><b>Pulados:</b> ${stats.exists}<br><b>Erros:</b> ${stats.errors}`,
+            title: 'Batch Concluído!',
+            html: `Séries sincronizadas com sucesso.<br><br>Sucesso: ${stats.success}<br>Erros: ${stats.errors}`,
             icon: 'success',
             confirmButtonColor: '#8b2fff'
         });

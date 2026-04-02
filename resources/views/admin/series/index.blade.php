@@ -5,10 +5,15 @@
 @section('content')
     <section>
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold">Catálogo de Séries</h2>
-            <button class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm">
-                <i class="fa-solid fa-plus mr-2"></i>Adicionar Série
-            </button>
+            <h2 class="text-xl font-bold text-white">Catálogo de Séries</h2>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.series.bulk') }}" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition text-sm text-white font-medium">
+                    <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Bulk Import
+                </a>
+                <button class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm">
+                    <i class="fa-solid fa-plus mr-2"></i>Adicionar Série
+                </button>
+            </div>
         </div>
 
         <!-- Form de Pesquisa -->

@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 class SerieController extends Controller
 {
+    use \App\Traits\ImportableContent;
+
     public function index(Request $request)
     {
         // Inicia query
@@ -33,6 +35,66 @@ class SerieController extends Controller
 
         // Retorna view com os filmes
         return view('admin.series.index', compact('series'));
+    }
+
+    public function bulkImport()
+    {
+        return view('admin.series.bulk');
+    }
+
+    public function getBulkIds()
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::get('https://embedplayapi.site/api/all-ids?type=series');
+            
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Não foi possível buscar os IDs da API externa.'], 500);
+            }
+
+            $data = $response->json();
+            $series = $data['results']['series'] ?? [];
+
+            return response()->json([
+                'success' => true,
+                'series' => $series
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function processImport(Request $request)
+    {
+        $tmdbId = $request->tmdb_id;
+
+        if (!$tmdbId) {
+            return response()->json(['success' => false, 'error' => 'TMDB ID não fornecido.']);
+        }
+
+        // Verificar se já existe
+        if (Serie::where('tmdb_id', $tmdbId)->exists()) {
+            return response()->json([
+                'success' => true, 
+                'status' => 'exists',
+                'message' => "Série (TMDB: $tmdbId) já existe no banco. Pulando..."
+            ]);
+        }
+
+        $result = $this->performSeriesImport($tmdbId, true); // true para importar tudo (temporadas/episódios)
+
+        if ($result['success']) {
+            return response()->json([
+                'success' => true,
+                'status' => 'imported',
+                'series' => $result['series']
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'status' => 'error',
+            'error' => $result['error']
+        ]);
     }
 
     public function seasons(Serie $serie)

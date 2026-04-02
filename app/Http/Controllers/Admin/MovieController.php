@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
-    use \App\Traits\ImportableMovie;
+    use \App\Traits\ImportableContent;
 
     public function index(Request $request)
     {
@@ -94,7 +94,6 @@ class MovieController extends Controller
             'error' => $result['error']
         ]);
     }
-
 
     public function links(Movie $movie)
     {

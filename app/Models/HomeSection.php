@@ -103,6 +103,14 @@ class HomeSection extends Model
         })->filter()->take($limit)->values();
     }
 
+    private function applyCategoryFilter($query)
+    {
+        if ($this->content_category_id) {
+            $query->where('content_category_id', $this->content_category_id);
+        }
+        return $query;
+    }
+
     private function resolveGenre($limit)
     {
         if (!$this->genre_id) return collect();
@@ -110,14 +118,16 @@ class HomeSection extends Model
         $results = collect();
 
         if (in_array($this->content_type, ['movie', 'both'])) {
-            $movies = Movie::whereHas('genres', fn($q) => $q->where('genres.id', $this->genre_id))
-                ->latest()->limit($limit)->get();
+            $query = Movie::whereHas('genres', fn($q) => $q->where('genres.id', $this->genre_id));
+            $this->applyCategoryFilter($query);
+            $movies = $query->latest()->limit($limit)->get();
             $results = $results->merge($movies);
         }
 
         if (in_array($this->content_type, ['series', 'both'])) {
-            $series = Serie::whereHas('genres', fn($q) => $q->where('genres.id', $this->genre_id))
-                ->latest()->limit($limit)->get();
+            $query = Serie::whereHas('genres', fn($q) => $q->where('genres.id', $this->genre_id));
+            $this->applyCategoryFilter($query);
+            $series = $query->latest()->limit($limit)->get();
             $results = $results->merge($series);
         }
 
@@ -149,10 +159,14 @@ class HomeSection extends Model
 
         return $trending->map(function ($item) {
             if ($item->content_type === 'movie') {
-                $content = Movie::find($item->content_id);
+                $query = Movie::where('id', $item->content_id);
             } else {
-                $content = Serie::find($item->content_id);
+                $query = Serie::where('id', $item->content_id);
             }
+            
+            $this->applyCategoryFilter($query);
+            $content = $query->first();
+            
             if ($content) {
                 $content->views_count = $item->views_count;
             }
@@ -174,7 +188,10 @@ class HomeSection extends Model
                 ->where('network_id', $this->network_id)
                 ->where('content_type', 'movie')
                 ->pluck('content_id');
-            $results = $results->merge(Movie::whereIn('id', $movieIds)->latest()->limit($limit)->get());
+            
+            $query = Movie::whereIn('id', $movieIds);
+            $this->applyCategoryFilter($query);
+            $results = $results->merge($query->latest()->limit($limit)->get());
         }
 
         if (in_array($this->content_type, ['series', 'both'])) {
@@ -182,7 +199,10 @@ class HomeSection extends Model
                 ->where('network_id', $this->network_id)
                 ->where('content_type', 'series')
                 ->pluck('content_id');
-            $results = $results->merge(Serie::whereIn('id', $serieIds)->latest()->limit($limit)->get());
+            
+            $query = Serie::whereIn('id', $serieIds);
+            $this->applyCategoryFilter($query);
+            $results = $results->merge($query->latest()->limit($limit)->get());
         }
 
         return $results->take($limit)->values();
@@ -193,11 +213,15 @@ class HomeSection extends Model
         $results = collect();
 
         if (in_array($this->content_type, ['movie', 'both'])) {
-            $results = $results->merge(Movie::latest()->limit($limit)->get());
+            $query = Movie::query();
+            $this->applyCategoryFilter($query);
+            $results = $results->merge($query->latest()->limit($limit)->get());
         }
 
         if (in_array($this->content_type, ['series', 'both'])) {
-            $results = $results->merge(Serie::latest()->limit($limit)->get());
+            $query = Serie::query();
+            $this->applyCategoryFilter($query);
+            $results = $results->merge($query->latest()->limit($limit)->get());
         }
 
         return $results->sortByDesc('created_at')->take($limit)->values();

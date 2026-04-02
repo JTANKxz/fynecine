@@ -106,9 +106,14 @@
                                 {{-- ações --}}
                                 <td class="p-4 flex items-center gap-2">
 
-                                    {{-- deletar --}}
-                                    <form action="{{ route('admin.sliders.delete', $slider->id) }}" method="POST"
-                                        class="inline-block">
+                                        {{-- editar --}}
+                                        <a href="{{ route('admin.sliders.edit', $slider->id) }}" class="text-blue-500 hover:text-blue-400">
+                                            <i class="fa-solid fa-edit"></i>
+                                        </a>
+
+                                        {{-- deletar --}}
+                                        <form action="{{ route('admin.sliders.delete', $slider->id) }}" method="POST"
+                                            class="inline-block">
 
                                         @csrf
                                         @method('DELETE')

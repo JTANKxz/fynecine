@@ -68,6 +68,8 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::get('/', [SliderController::class, 'index'])->name('index');
         Route::get('/create', [SliderController::class, 'create'])->name('create');
         Route::post('/store', [SliderController::class, 'store'])->name('store');
+        Route::get('/{slider}/edit', [SliderController::class, 'edit'])->name('edit');
+        Route::put('/{slider}', [SliderController::class, 'update'])->name('update');
         Route::delete('/{slider}', [SliderController::class, 'destroy'])->name('delete');
         Route::get('/search', [SliderController::class, 'search'])->name('search');
     });

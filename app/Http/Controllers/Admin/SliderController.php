@@ -56,6 +56,28 @@ class SliderController extends Controller
             ->with('success', 'Item adicionado ao slider!');
     }
 
+    public function edit(Slider $slider)
+    {
+        $categories = \App\Models\ContentCategory::orderBy('order')->get();
+        return view('admin.sliders.edit', compact('slider', 'categories'));
+    }
+
+    public function update(Request $request, Slider $slider)
+    {
+        $validated = $request->validate([
+            'position' => 'nullable|integer',
+            'content_category_id' => 'nullable|exists:content_categories,id'
+        ]);
+
+        $slider->update([
+            'position' => $validated['position'] ?? 0,
+            'content_category_id' => $validated['content_category_id'],
+        ]);
+
+        return redirect()->route('admin.sliders.index', ['category_id' => $validated['content_category_id']])
+            ->with('success', 'Slider atualizado!');
+    }
+
     public function destroy(Slider $slider)
     {
         $slider->delete();

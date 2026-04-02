@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
+    use \App\Traits\ImportableMovie;
+
     public function index(Request $request)
     {
         // Inicia query
@@ -32,6 +34,67 @@ class MovieController extends Controller
         // Retorna view com os filmes
         return view('admin.movies.index', compact('movies'));
     }
+
+    public function bulkImport()
+    {
+        return view('admin.movies.bulk');
+    }
+
+    public function getBulkIds()
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::get('https://embedplayapi.site/api/all-ids?type=movie');
+            
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Não foi possível buscar os IDs da API externa.'], 500);
+            }
+
+            $data = $response->json();
+            $movies = $data['results']['movies'] ?? [];
+
+            return response()->json([
+                'success' => true,
+                'movies' => $movies
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function processImport(Request $request)
+    {
+        $tmdbId = $request->tmdb_id;
+
+        if (!$tmdbId) {
+            return response()->json(['success' => false, 'error' => 'TMDB ID não fornecido.']);
+        }
+
+        // Verificar se já existe
+        if (Movie::where('tmdb_id', $tmdbId)->exists()) {
+            return response()->json([
+                'success' => true, 
+                'status' => 'exists',
+                'message' => "Filme (TMDB: $tmdbId) já existe no banco. Pulando..."
+            ]);
+        }
+
+        $result = $this->performMovieImport($tmdbId);
+
+        if ($result['success']) {
+            return response()->json([
+                'success' => true,
+                'status' => 'imported',
+                'movie' => $result['movie']
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'status' => 'error',
+            'error' => $result['error']
+        ]);
+    }
+
 
     public function links(Movie $movie)
     {

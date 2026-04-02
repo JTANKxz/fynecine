@@ -20,11 +20,22 @@ use App\Http\Controllers\Admin\AvatarCategoryController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\InAppNotificationController;
 use App\Http\Controllers\Admin\PushNotificationController;
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TMDBController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\FrontendController;
+
+// Rotas Frontend (Públicas)
+Route::controller(FrontendController::class)->group(function() {
+    Route::get('/', 'index')->name('home');
+    Route::get('/movie/{slug}', 'movie')->name('frontend.movie');
+    Route::get('/series/{slug}', 'serie')->name('frontend.serie');
+    Route::get('/series/{slug}/season/{season}/episode/{episode}', 'episode')->name('frontend.episode');
+    Route::get('/search', 'search')->name('frontend.search');
+    Route::get('/genre/{slug}', 'genre')->name('frontend.genre');
+    Route::get('/network/{slug}', 'network')->name('frontend.network');
+});
 
 // Rotas Públicas (Legal)
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
@@ -82,6 +93,10 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
 
     Route::prefix('movies')->name('movies.')->group(function () {
         Route::get('/', [MovieController::class, 'index'])->name('index');
+        Route::get('/bulk', [MovieController::class, 'bulkImport'])->name('bulk');
+        Route::get('/bulk/ids', [MovieController::class, 'getBulkIds'])->name('bulk.ids');
+        Route::post('/bulk/import', [MovieController::class, 'processImport'])->name('bulk.import');
+
         Route::delete('/{movie}', [MovieController::class, 'destroy'])->name('delete');
 
         Route::get('/{movie}/links', [MovieController::class, 'links'])->name('links');

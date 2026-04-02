@@ -6,9 +6,14 @@
 <section>
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Catálogo de Filmes</h2>
-        <button class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm">
-            <i class="fa-solid fa-plus mr-2"></i>Adicionar Filme
-        </button>
+        <div class="flex gap-2">
+            <a href="{{ route('admin.movies.bulk') }}" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition text-sm">
+                <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Bulk Import
+            </a>
+            <button class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm">
+                <i class="fa-solid fa-plus mr-2"></i>Adicionar Filme
+            </button>
+        </div>
     </div>
 
     <!-- Form de Pesquisa -->

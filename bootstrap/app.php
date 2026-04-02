@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin'=>App\Http\Middleware\AdminMiddleware::class,
         ]);
         $middleware->api(append: [
+            \App\Http\Middleware\CheckApiToken::class,
             \App\Http\Middleware\CheckBanned::class,
             \App\Http\Middleware\SetActiveProfile::class,
         ]);

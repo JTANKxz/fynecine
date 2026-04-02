@@ -133,7 +133,25 @@ class NetworkController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Conteúdo vinculado!');
+        // Buscar detalhes do conteúdo para retorno AJAX
+        if ($validated['content_type'] === 'movie') {
+            $item = Movie::find($validated['content_id']);
+            $name = $item->title;
+        } else {
+            $item = Serie::find($validated['content_id']);
+            $name = $item->name;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conteúdo vinculado!',
+            'item'    => [
+                'id'           => $item->id,
+                'name'         => $name,
+                'poster_path'  => $item->poster_path,
+                'content_type' => $validated['content_type']
+            ]
+        ]);
     }
 
     public function removeContent(Request $request, Network $network)
@@ -149,6 +167,9 @@ class NetworkController extends Controller
             ->where('content_type', $validated['content_type'])
             ->delete();
 
-        return back()->with('success', 'Conteúdo removido da network!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Conteúdo removido da network!'
+        ]);
     }
 }

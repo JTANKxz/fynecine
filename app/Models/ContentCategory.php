@@ -14,6 +14,11 @@ class ContentCategory extends Model
         'is_active',
         'is_nav_visible'
     ];
+    
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 
     public function movies()
     {

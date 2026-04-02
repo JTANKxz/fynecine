@@ -270,6 +270,14 @@
                 </div>
             </div>
 
+            {{-- Anotações --}}
+            <div>
+                <a href="{{ route('admin.notes.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.notes.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-note-sticky w-5"></i> Anotações
+                </a>
+            </div>
+
             {{-- Configurações Gerais --}}
             <div>
                 <a href="{{ route('admin.settings.edit') }}"

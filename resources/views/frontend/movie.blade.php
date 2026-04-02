@@ -18,7 +18,7 @@
         <div class="hero-overlay"></div>
         
         <!-- Center Play Button -->
-        <div class="hero-play-trigger" onclick="openPlayer('{{ $autoEmbedUrl ?? ($movie->playLinks->first()->link ?? '') }}')">
+        <div class="hero-play-trigger" onclick="openPlayer('{{ $autoEmbedUrl ?? ($movie->playLinks->first()->url ?? '') }}')">
             <div class="play-icon-circle">
                 <i class="fas fa-play"></i>
             </div>
@@ -79,7 +79,7 @@
                 @endif
 
                 @foreach($movie->playLinks as $link)
-                    <button class="server-btn {{ !$autoEmbedUrl && $loop->first ? 'active' : '' }}" onclick="changeModalServer('{{ $link->link }}', this)">
+                    <button class="server-btn {{ !$autoEmbedUrl && $loop->first ? 'active' : '' }}" onclick="changeModalServer('{{ $link->url }}', this)">
                         {{ $link->name ?? 'Servidor ' . ($loop->index + 1) }}
                     </button>
                 @endforeach

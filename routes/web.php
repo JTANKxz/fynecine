@@ -252,6 +252,15 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     Route::put('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'updateLink'])->name('events.links.update');
     Route::delete('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'deleteLink'])->name('events.links.destroy');
 
+    // ========== ANOTAÇÕES ==========
+    Route::prefix('notes')->name('notes.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminNoteController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminNoteController::class, 'store'])->name('store');
+        Route::put('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'update'])->name('update');
+        Route::delete('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'destroy'])->name('destroy');
+        Route::patch('/{note}/pin', [\App\Http\Controllers\Admin\AdminNoteController::class, 'togglePin'])->name('pin');
+    });
+
 });
 
 

@@ -57,10 +57,37 @@
                         class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:border-netflix focus:ring-1 focus:ring-netflix outline-none transition-all placeholder:text-neutral-700">
                 </div>
 
-                <div class="space-y-2">
+                <div class="space-y-4 p-1 bg-black/40 rounded-xl flex">
+                    <label class="flex-1 cursor-pointer group">
+                        <input type="radio" name="type" value="note" checked onchange="toggleFormType(this.value)" class="hidden peer">
+                        <div class="py-2 text-center rounded-lg text-sm font-bold transition-all peer-checked:bg-netflix peer-checked:text-white text-neutral-500 hover:text-neutral-300">
+                            <i class="fa-solid fa-file-lines mr-2"></i>Texto
+                        </div>
+                    </label>
+                    <label class="flex-1 cursor-pointer group">
+                        <input type="radio" name="type" value="tasks" onchange="toggleFormType(this.value)" class="hidden peer">
+                        <div class="py-2 text-center rounded-lg text-sm font-bold transition-all peer-checked:bg-netflix peer-checked:text-white text-neutral-500 hover:text-neutral-300">
+                            <i class="fa-solid fa-list-check mr-2"></i>Tarefas
+                        </div>
+                    </label>
+                </div>
+
+                <div id="type-note-area" class="space-y-2">
                     <label class="text-sm font-medium text-neutral-400">Conteúdo</label>
-                    <textarea id="form-content" name="content" rows="4" required placeholder="O que você está pensando?"
+                    <textarea id="form-content" name="content" rows="4" placeholder="O que você está pensando?"
                         class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:border-netflix focus:ring-1 focus:ring-netflix outline-none transition-all placeholder:text-neutral-700 resize-none"></textarea>
+                </div>
+
+                <div id="type-tasks-area" class="space-y-2 hidden">
+                    <label class="text-sm font-medium text-neutral-400 flex justify-between">
+                        Lista de Tarefas
+                        <button type="button" onclick="addTaskRow()" class="text-netflix hover:text-white transition-colors text-xs font-bold uppercase tracking-wider">
+                            <i class="fa-solid fa-plus mr-1"></i>Adicionar
+                        </button>
+                    </label>
+                    <div id="tasks-container" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                        <!-- Tasks will be added here -->
+                    </div>
                 </div>
 
                 <div class="space-y-2">
@@ -119,13 +146,62 @@
     const modalContent = document.getElementById('modal-content');
     const noteForm = document.getElementById('note-form');
     
+    function toggleFormType(type) {
+        if (type === 'note') {
+            document.getElementById('type-note-area').classList.remove('hidden');
+            document.getElementById('type-tasks-area').classList.add('hidden');
+            document.getElementById('form-content').required = true;
+        } else {
+            document.getElementById('type-note-area').classList.add('hidden');
+            document.getElementById('type-tasks-area').classList.remove('hidden');
+            document.getElementById('form-content').required = false;
+            
+            // Add initial task if empty
+            if (document.getElementById('tasks-container').children.length === 0) {
+                addTaskRow();
+            }
+        }
+    }
+
+    function addTaskRow(text = '', done = false) {
+        const container = document.getElementById('tasks-container');
+        const row = document.createElement('div');
+        row.className = 'task-row group flex items-center gap-3 bg-black/60 p-2 rounded-xl border border-neutral-800 focus-within:border-netflix transition-all';
+        row.innerHTML = `
+            <input type="checkbox" name="tasks[][done]" ${done ? 'checked' : ''} value="1" 
+                class="w-5 h-5 rounded accent-emerald-500 bg-neutral-900 border-neutral-700">
+            <input type="text" name="tasks[][text]" value="${text}" placeholder="Nova tarefa..."
+                class="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder:text-neutral-700">
+            <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                <i class="fa-solid fa-trash-can text-sm"></i>
+            </button>
+        `;
+        container.appendChild(row);
+        row.querySelector('input[type="text"]').focus();
+    }
+
     function openNoteModal(editData = null) {
         if (editData) {
             document.getElementById('modal-title').innerText = 'Editar Anotação';
             document.getElementById('note-id').value = editData.id;
             document.getElementById('form-title').value = editData.title || '';
-            document.getElementById('form-content').value = editData.content;
+            document.getElementById('form-content').value = editData.content || '';
             document.getElementById('form-pinned').checked = editData.is_pinned;
+            
+            // Set type
+            const typeValue = editData.type || 'note';
+            const typeRadio = document.querySelector(`input[name="type"][value="${typeValue}"]`);
+            if (typeRadio) {
+                typeRadio.checked = true;
+                toggleFormType(typeValue);
+            }
+
+            // Set tasks
+            const tasksContainer = document.getElementById('tasks-container');
+            tasksContainer.innerHTML = '';
+            if (editData.tasks && editData.tasks.length > 0) {
+                editData.tasks.forEach(task => addTaskRow(task.text, task.done));
+            }
             
             // Set color radio
             const colorRadios = document.querySelectorAll('input[name="color"]');
@@ -138,8 +214,11 @@
             document.getElementById('modal-title').innerText = 'Nova Anotação';
             noteForm.reset();
             document.getElementById('note-id').value = '';
+            document.getElementById('tasks-container').innerHTML = '';
             document.getElementById('submit-btn').innerText = 'Salvar Nota';
             document.querySelector('input[name="color"][value="purple"]').checked = true;
+            document.querySelector('input[name="type"][value="note"]').checked = true;
+            toggleFormType('note');
         }
         
         modal.classList.remove('hidden');
@@ -161,7 +240,27 @@
 
     async function saveNote(e) {
         e.preventDefault();
+        
+        // Prepare tasks
+        const type = document.querySelector('input[name="type"]:checked').value;
         const formData = new FormData(noteForm);
+        
+        if (type === 'tasks') {
+            // Limpar tasks antigas e remontar corretamente para o backend
+            formData.delete('tasks[][text]');
+            formData.delete('tasks[][done]');
+            
+            const taskRows = document.querySelectorAll('.task-row');
+            taskRows.forEach((row, index) => {
+                const text = row.querySelector('input[type="text"]').value;
+                const done = row.querySelector('input[type="checkbox"]').checked;
+                if (text.trim()) {
+                    formData.append(`tasks[${index}][text]`, text);
+                    formData.append(`tasks[${index}][done]`, done ? 1 : 0);
+                }
+            });
+        }
+
         const id = formData.get('id');
         const url = id ? `{{ url('dashzin/notes') }}/${id}` : `{{ route('admin.notes.store') }}`;
         const method = id ? 'PUT' : 'POST';
@@ -271,11 +370,65 @@
         }
     }
 
+    async function toggleTask(noteId, index) {
+        const check = document.getElementById(`task-${noteId}-${index}-check`);
+        const text = document.getElementById(`task-${noteId}-${index}-text`);
+        
+        // Optimistic UI
+        const isDone = text.classList.contains('line-through');
+        
+        if (isDone) {
+            check.classList.remove('bg-emerald-500', 'border-emerald-500');
+            check.classList.add('bg-white/5');
+            check.innerHTML = '';
+            text.classList.remove('text-white/30', 'line-through');
+            text.classList.add('text-white/80');
+        } else {
+            check.classList.remove('bg-white/5');
+            check.classList.add('bg-emerald-500', 'border-emerald-500');
+            check.innerHTML = '<i class="fa-solid fa-check text-[10px] text-white"></i>';
+            text.classList.remove('text-white/80');
+            text.classList.add('text-white/30', 'line-through');
+        }
+
+        try {
+            const response = await fetch(`{{ url('dashzin/notes') }}/${noteId}/task`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ index })
+            });
+
+            const data = await response.json();
+            if (!data.success) throw new Error();
+        } catch (error) {
+            // Fallback en caso de error? Podríamos recargar, pero es más suave así
+            console.error('Erro ao alternar tarefa');
+        }
+    }
+
     function editNote(id) {
         const card = document.getElementById(`note-${id}`);
+        const type = card.querySelector('.task-list') ? 'tasks' : 'note';
         const title = card.querySelector('.note-title')?.innerText || '';
-        const content = card.querySelector('.note-content').innerText;
         const isPinned = card.querySelector('.absolute.-top-2') !== null;
+        
+        let content = '';
+        let tasks = [];
+
+        if (type === 'note') {
+            content = card.querySelector('.note-content').innerText;
+        } else {
+            const taskRows = card.querySelectorAll('.task-list > div');
+            taskRows.forEach(row => {
+                const taskText = row.querySelector('span').innerText;
+                const taskDone = row.querySelector('.bg-emerald-500') !== null;
+                tasks.push({ text: taskText, done: taskDone });
+            });
+        }
         
         // Find color
         let color = 'purple';
@@ -286,7 +439,7 @@
         else if (innerCard.classList.contains('bg-blue-600/10')) color = 'blue';
         else if (innerCard.classList.contains('bg-neutral-900')) color = 'neutral';
 
-        openNoteModal({ id, title, content, is_pinned: isPinned, color });
+        openNoteModal({ id, title, content, type, tasks, is_pinned: isPinned, color });
     }
 
     // Filtros

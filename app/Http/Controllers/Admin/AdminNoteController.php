@@ -22,15 +22,19 @@ class AdminNoteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'content' => 'required|string',
+            'type' => 'required|string|in:note,tasks',
+            'content' => 'required_if:type,note|nullable|string',
+            'tasks' => 'required_if:type,tasks|nullable|array',
             'title' => 'nullable|string|max:255',
             'color' => 'nullable|string|in:purple,emerald,amber,rose,blue,neutral'
         ]);
 
         $note = AdminNote::create([
             'user_id' => Auth::id(),
+            'type' => $request->type,
             'title' => $request->title,
-            'content' => $request->content,
+            'content' => $request->content ?? '',
+            'tasks' => $request->tasks,
             'color' => $request->color ?? 'purple',
             'is_pinned' => $request->has('is_pinned')
         ]);
@@ -46,12 +50,14 @@ class AdminNoteController extends Controller
     public function update(Request $request, AdminNote $note)
     {
         $request->validate([
-            'content' => 'required|string',
+            'type' => 'required|string|in:note,tasks',
+            'content' => 'required_if:type,note|nullable|string',
+            'tasks' => 'required_if:type,tasks|nullable|array',
             'title' => 'nullable|string|max:255',
             'color' => 'nullable|string|in:purple,emerald,amber,rose,blue,neutral'
         ]);
 
-        $note->update($request->only(['title', 'content', 'color']));
+        $note->update($request->only(['title', 'content', 'tasks', 'color', 'type']));
 
         return response()->json([
             'success' => true,
@@ -79,6 +85,23 @@ class AdminNoteController extends Controller
             'success' => true,
             'message' => $note->is_pinned ? 'Nota fixada!' : 'Nota desafixada!',
             'is_pinned' => $note->is_pinned
+        ]);
+    }
+
+    public function toggleTask(AdminNote $note, Request $request)
+    {
+        $index = $request->index;
+        $tasks = $note->tasks;
+
+        if (isset($tasks[$index])) {
+            $tasks[$index]['done'] = !$tasks[$index]['done'];
+            $note->tasks = $tasks;
+            $note->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'tasks' => $note->tasks
         ]);
     }
 }

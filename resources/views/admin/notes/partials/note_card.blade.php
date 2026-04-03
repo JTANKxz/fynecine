@@ -25,7 +25,25 @@
             </div>
         </div>
 
-        <div class="text-white/80 text-sm whitespace-pre-wrap flex-1 note-content">{{ $note->content }}</div>
+        <div class="text-white/80 text-sm whitespace-pre-wrap flex-1 note-content @if($note->type == 'tasks') hidden @endif">{{ $note->content }}</div>
+
+        @if($note->type == 'tasks')
+            <div class="flex-1 space-y-2 mt-1 task-list">
+                @foreach($note->tasks ?? [] as $index => $task)
+                    <div class="flex items-center gap-3 group/task cursor-pointer" onclick="toggleTask({{ $note->id }}, {{ $index }})">
+                        <div class="w-5 h-5 rounded border border-white/10 flex items-center justify-center transition-all 
+                            @if($task['done'] ?? false) bg-emerald-500 border-emerald-500 @else bg-white/5 @endif" id="task-{{ $note->id }}-{{ $index }}-check">
+                            @if($task['done'] ?? false)
+                                <i class="fa-solid fa-check text-[10px] text-white"></i>
+                            @endif
+                        </div>
+                        <span class="text-sm transition-all @if($task['done'] ?? false) text-white/30 line-through @else text-white/80 @endif" id="task-{{ $note->id }}-{{ $index }}-text">
+                            {{ $task['text'] }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
 
         @if($note->is_pinned)
             <div class="absolute -top-2 -right-2 bg-amber-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg ring-2 ring-black">

@@ -267,6 +267,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::put('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'update'])->name('update');
         Route::delete('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'destroy'])->name('destroy');
         Route::patch('/{note}/pin', [\App\Http\Controllers\Admin\AdminNoteController::class, 'togglePin'])->name('pin');
+        Route::patch('/{note}/task', [\App\Http\Controllers\Admin\AdminNoteController::class, 'toggleTask'])->name('toggle-task');
     });
 
 });

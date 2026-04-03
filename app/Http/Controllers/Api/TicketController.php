@@ -46,7 +46,7 @@ class TicketController extends Controller
         $request->validate([
             'topic' => 'required|string|max:100',
             'subtopic' => 'nullable|string|max:100',
-            'message' => 'required|string|max:1000'
+            'message' => 'nullable|string|max:1000'
         ]);
 
         $user = $request->user();

@@ -95,6 +95,8 @@ class SettingController extends Controller
             'custom_interstitial_media_url' => ['nullable', 'string'],
             'custom_interstitial_link' => ['nullable', 'string'],
             'interstitial_interval' => ['nullable', 'integer', 'min:0'],
+            'ads_native_status' => ['nullable', 'boolean'],
+            'ads_rewarded_status' => ['nullable', 'boolean'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -118,6 +120,8 @@ class SettingController extends Controller
         $config->block_dns = $request->has('block_dns');
         $config->ads_banner_status = $request->has('ads_banner_status');
         $config->ads_interstitial_status = $request->has('ads_interstitial_status');
+        $config->ads_native_status = $request->has('ads_native_status');
+        $config->ads_rewarded_status = $request->has('ads_rewarded_status');
 
         // Inputs text/enums
         $config->app_name = $request->app_name;

@@ -63,6 +63,8 @@ class AppConfig extends Model
         'custom_interstitial_media',
         'custom_interstitial_link',
         'interstitial_interval',
+        'ads_native_status',
+        'ads_rewarded_status',
     ];
 
     protected $casts = [
@@ -86,6 +88,8 @@ class AppConfig extends Model
         'autoembed_serie_sources' => 'array',
         'ads_banner_status' => 'boolean',
         'ads_interstitial_status' => 'boolean',
+        'ads_native_status' => 'boolean',
+        'ads_rewarded_status' => 'boolean',
         'interstitial_interval' => 'integer',
     ];
 

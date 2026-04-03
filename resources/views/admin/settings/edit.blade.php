@@ -460,6 +460,28 @@
 
                         <div class="flex items-center justify-between border-t border-neutral-700 pt-4">
                             <div>
+                                <span class="block text-sm font-bold text-white">Nativo Ativo (AdMob)</span>
+                                <span class="text-[10px] text-neutral-500 block">Exibido em listas e home</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="ads_native_status" value="1" {{ $config->ads_native_status ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-700 rounded-full peer peer-checked:bg-yellow-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-neutral-700 pt-4">
+                            <div>
+                                <span class="block text-sm font-bold text-white">Vídeo Premiado (Rewarded)</span>
+                                <span class="text-[10px] text-neutral-500 block">Exibido ao abrir players</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer scale-75">
+                                <input type="checkbox" name="ads_rewarded_status" value="1" {{ $config->ads_rewarded_status ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 rounded-full peer peer-checked:bg-yellow-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-neutral-700 pt-4">
+                            <div>
                                 <span class="block text-sm font-bold text-white">Interstitial Ativo</span>
                                 <div class="flex items-center gap-2">
                                     <select name="ads_interstitial_type" class="bg-transparent text-[10px] text-neutral-500 outline-none">

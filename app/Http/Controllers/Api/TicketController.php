@@ -21,6 +21,11 @@ class TicketController extends Controller
                 'subtopics' => ['Sem áudio', 'Travando', 'Legenda fora de sincronia', 'Qualidade ruim']
             ],
             [
+                'id' => 'tv_issue',
+                'name' => 'Problema em Canais de TV',
+                'subtopics' => ['Canais offline', 'Travando', 'Imagem ruim']
+            ],
+            [
                 'id' => 'app_issue',
                 'name' => 'Bug no Aplicativo',
                 'subtopics' => ['App fechando sozinho', 'Erro de login', 'Lentidão']

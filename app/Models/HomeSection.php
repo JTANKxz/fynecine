@@ -106,7 +106,10 @@ class HomeSection extends Model
     private function applyCategoryFilter($query)
     {
         if ($this->content_category_id) {
-            $query->where('content_category_id', $this->content_category_id);
+            $query->where(function($q) {
+                $q->where('content_category_id', $this->content_category_id)
+                  ->orWhereNull('content_category_id');
+            });
         }
         return $query;
     }

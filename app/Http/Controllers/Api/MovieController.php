@@ -38,6 +38,22 @@ class MovieController extends Controller
 
         /*
         =========================
+        FILTRO POR CATEGORIA
+        =========================
+        */
+
+        if ($request->filled('category')) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        } else {
+            // Se não passar categoria, mostramos apenas os que não tem categoria (geral)
+            // exceto se for busca/filtro específico que o admin decida, mas seguindo a regra:
+            $query->whereNull('content_category_id');
+        }
+
+        /*
+        =========================
         ORDENAÇÃO
         =========================
         */

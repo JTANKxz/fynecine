@@ -106,10 +106,9 @@ class HomeSection extends Model
     private function applyCategoryFilter($query)
     {
         if ($this->content_category_id) {
-            $query->where(function($q) {
-                $q->where('content_category_id', $this->content_category_id)
-                  ->orWhereNull('content_category_id');
-            });
+            $query->where('content_category_id', $this->content_category_id);
+        } else {
+            $query->whereNull('content_category_id');
         }
         return $query;
     }
@@ -140,41 +139,71 @@ class HomeSection extends Model
     private function resolveTrending($limit)
     {
         $period = $this->trending_period ?? 'all_time';
+        $results = collect();
 
-        $query = ContentView::select('content_id', 'content_type')
-            ->selectRaw('COUNT(*) as views_count')
-            ->groupBy('content_id', 'content_type');
+        // 1. Movies Trending
+        if (in_array($this->content_type, ['movie', 'both'])) {
+            $query = ContentView::select('content_id')
+                ->selectRaw('COUNT(*) as views_count')
+                ->join('movies', 'content_views.content_id', '=', 'movies.id')
+                ->where('content_views.content_type', 'movie')
+                ->groupBy('content_id');
 
-        if ($period === 'today') {
-            $query->whereDate('viewed_at', today());
-        } elseif ($period === 'week') {
-            $query->where('viewed_at', '>=', now()->subWeek());
-        }
-
-        // Filtro por content_type
-        if ($this->content_type === 'movie') {
-            $query->where('content_type', 'movie');
-        } elseif ($this->content_type === 'series') {
-            $query->where('content_type', 'series');
-        }
-
-        $trending = $query->orderByDesc('views_count')->limit($limit)->get();
-
-        return $trending->map(function ($item) {
-            if ($item->content_type === 'movie') {
-                $query = Movie::where('id', $item->content_id);
+            if ($this->content_category_id) {
+                $query->where('movies.content_category_id', $this->content_category_id);
             } else {
-                $query = Serie::where('id', $item->content_id);
+                $query->whereNull('movies.content_category_id');
             }
-            
-            $this->applyCategoryFilter($query);
-            $content = $query->first();
-            
-            if ($content) {
-                $content->views_count = $item->views_count;
+
+            if ($period === 'today') {
+                $query->whereDate('viewed_at', today());
+            } elseif ($period === 'week') {
+                $query->where('viewed_at', '>=', now()->subWeek());
             }
-            return $content;
-        })->filter()->values();
+
+            $trendingMovies = $query->orderByDesc('views_count')->limit($limit)->get();
+            
+            foreach ($trendingMovies as $item) {
+                $movie = Movie::find($item->content_id);
+                if ($movie) {
+                    $movie->views_count = $item->views_count;
+                    $results->push($movie);
+                }
+            }
+        }
+
+        // 2. Series Trending
+        if (in_array($this->content_type, ['series', 'both'])) {
+            $query = ContentView::select('content_id')
+                ->selectRaw('COUNT(*) as views_count')
+                ->join('series', 'content_views.content_id', '=', 'series.id')
+                ->where('content_views.content_type', 'series')
+                ->groupBy('content_id');
+
+            if ($this->content_category_id) {
+                $query->where('series.content_category_id', $this->content_category_id);
+            } else {
+                $query->whereNull('series.content_category_id');
+            }
+
+            if ($period === 'today') {
+                $query->whereDate('viewed_at', today());
+            } elseif ($period === 'week') {
+                $query->where('viewed_at', '>=', now()->subWeek());
+            }
+
+            $trendingSeries = $query->orderByDesc('views_count')->limit($limit)->get();
+            
+            foreach ($trendingSeries as $item) {
+                $serie = Serie::find($item->content_id);
+                if ($serie) {
+                    $serie->views_count = $item->views_count;
+                    $results->push($serie);
+                }
+            }
+        }
+
+        return $results->sortByDesc('views_count')->take($limit)->values();
     }
 
     private function resolveNetwork($limit)

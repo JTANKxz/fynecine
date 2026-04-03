@@ -37,6 +37,20 @@ class SerieController extends Controller
 
         /*
         =========================
+        FILTRO POR CATEGORIA
+        =========================
+        */
+
+        if ($request->filled('category')) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        } else {
+            $query->whereNull('content_category_id');
+        }
+
+        /*
+        =========================
         ORDENAÇÃO
         =========================
         */

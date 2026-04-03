@@ -14,6 +14,12 @@ class ContentCategory extends Model
         'is_active',
         'is_nav_visible'
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_nav_visible' => 'boolean',
+        'order' => 'integer'
+    ];
     
     public function scopeActive($query)
     {

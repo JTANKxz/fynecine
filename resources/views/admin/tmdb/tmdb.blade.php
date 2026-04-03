@@ -64,13 +64,19 @@
                 <option value="tv">Séries</option>
             </select>
 
-            <select id="importCategory" class="p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none border border-netflix/30">
-                <option value="">Sem Categoria (Geral)</option>
-                @php $categories = \App\Models\ContentCategory::active()->orderBy('order')->get(); @endphp
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                @endforeach
-            </select>
+            <div class="flex items-center gap-6 p-2 bg-neutral-800 rounded-xl border border-neutral-700">
+                <label class="relative inline-flex items-center cursor-pointer group">
+                    <input type="checkbox" id="modeAnime" class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
+                    <span class="ml-3 text-sm font-bold text-neutral-400 group-hover:text-white transition-colors uppercase tracking-tighter">Modo Anime</span>
+                </label>
+
+                <label class="relative inline-flex items-center cursor-pointer group">
+                    <input type="checkbox" id="modeDorama" class="sr-only peer">
+                    <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    <span class="ml-3 text-sm font-bold text-neutral-400 group-hover:text-white transition-colors uppercase tracking-tighter">Modo Dorama</span>
+                </label>
+            </div>
 
             <div class="flex items-center gap-2">
                 <label class="flex items-center gap-2 cursor-pointer">
@@ -250,8 +256,15 @@
         }
 
         try {
+            const animeSwitch = document.getElementById("modeAnime");
+            const doramaSwitch = document.getElementById("modeDorama");
+            let categoryId = null;
 
-            const categoryId = document.getElementById("importCategory").value;
+            if (animeSwitch && animeSwitch.checked) {
+                categoryId = 1;
+            } else if (doramaSwitch && doramaSwitch.checked) {
+                categoryId = 4;
+            }
 
             const response = await fetch('/dashzin/tmdb/import', {
                 method: 'POST',
@@ -350,6 +363,21 @@
     function loadMore() {
         searchTMDB(currentPage + 1);
     }
+
+    // Mutex for Anime/Dorama modes
+    document.addEventListener('DOMContentLoaded', () => {
+        const modeAnime = document.getElementById('modeAnime');
+        const modeDorama = document.getElementById('modeDorama');
+        
+        if (modeAnime && modeDorama) {
+            modeAnime.addEventListener('change', () => {
+                if (modeAnime.checked) modeDorama.checked = false;
+            });
+            modeDorama.addEventListener('change', () => {
+                if (modeDorama.checked) modeAnime.checked = false;
+            });
+        }
+    });
 </script>
 <div id="importModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
 

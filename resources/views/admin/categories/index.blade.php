@@ -60,6 +60,10 @@
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href="{{ route('admin.sections.index', ['category_id' => $category->id]) }}" 
+                               class="p-2 bg-netflix/20 hover:bg-netflix text-netflix hover:text-white rounded-lg transition-all" title="Customizar Layout e Itens">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </a>
                             <a href="{{ route('admin.categories.edit', $category) }}" 
                                class="p-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors">
                                 <i class="fa-solid fa-pen-to-square"></i>

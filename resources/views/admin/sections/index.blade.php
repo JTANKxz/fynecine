@@ -55,6 +55,17 @@
         </div>
     @endif
 
+    {{-- DICA DE GESTÃO MANUAL --}}
+    <div class="mb-8 bg-purple-900/20 border border-purple-500/30 rounded-2xl p-5 flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+            <i class="fa-solid fa-hand-pointer text-xl"></i>
+        </div>
+        <div>
+            <h4 class="text-white font-bold">Gestão Manual de Conteúdo</h4>
+            <p class="text-neutral-400 text-sm mt-1">Para adicionar filmes ou séries manualmente a esta página, você deve criar uma seção do tipo <span class="text-purple-400 font-mono text-xs font-bold uppercase">CUSTOM</span> abaixo e clicar no ícone <i class="fa-solid fa-list-check mx-1"></i> para gerenciar seus itens.</p>
+        </div>
+    </div>
+
     {{-- BLOCO DE SLIDERS --}}
     <div class="mb-12">
         <div class="flex items-center gap-2 mb-4">

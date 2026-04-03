@@ -16,6 +16,11 @@
             <p class="text-neutral-400 mt-1">Configure o topo (Sliders) e as fileiras de conteúdo desta página.</p>
         </div>
         <div class="flex items-center gap-3">
+            <a href="{{ route('admin.categories.index') }}" 
+               class="bg-neutral-800 hover:bg-neutral-700 text-white px-5 py-3 rounded-xl font-bold transition-all active:scale-95 flex items-center gap-2 border border-neutral-700">
+                <i class="fa-solid fa-gears text-netflix"></i>
+                Gerenciar Páginas
+            </a>
             <a href="{{ route('admin.sliders.create', ['category_id' => request('category_id')]) }}" 
                class="bg-neutral-800 hover:bg-neutral-700 text-white px-5 py-3 rounded-xl font-bold transition-all active:scale-95 flex items-center gap-2 border border-neutral-700">
                 <i class="fa-solid fa-images"></i>

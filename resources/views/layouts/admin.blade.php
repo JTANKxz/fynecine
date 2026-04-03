@@ -220,6 +220,11 @@
                             <i class="fa-solid fa-layer-group w-4 mr-1"></i> Home: {{ $navCat->name }}
                         </a>
                     @endforeach
+                    <hr class="border-neutral-800 my-1">
+                    <a href="{{ route('admin.categories.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.categories.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800 text-neutral-400' }}">
+                        <i class="fa-solid fa-gears w-4 mr-1"></i> Gerenciar Páginas (Categorias)
+                    </a>
                 </div>
             </div>
 

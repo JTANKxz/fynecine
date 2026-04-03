@@ -1,18 +1,25 @@
 @extends('layouts.admin')
 
-@section('title', 'Gerenciar Categorias')
+@section('title', 'Gerenciar Páginas e Categorias')
 
 @section('content')
 <div class="flex items-center justify-between mb-8">
     <div>
-        <h1 class="text-3xl font-extrabold text-white tracking-tight">Categorias de Conteúdo</h1>
-        <p class="text-neutral-400 mt-1">Gerencie as divisões principais do seu aplicativo (Ex: Animes, Filmes).</p>
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">Gerenciar Páginas e Categorias</h1>
+        <p class="text-neutral-400 mt-1">Crie novas divisões principais para o seu aplicativo. Cada categoria ativa aparecerá como uma nova "Home" customizável.</p>
     </div>
-    <a href="{{ route('admin.categories.create') }}" 
-       class="bg-netflix hover:bg-netflix/90 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-netflix/20 transition-all active:scale-95 flex items-center gap-2">
-        <i class="fa-solid fa-plus"></i>
-        Nova Categoria
-    </a>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.sections.index') }}" 
+           class="bg-neutral-800 hover:bg-neutral-700 text-white px-5 py-3 rounded-xl font-bold transition-all active:scale-95 flex items-center gap-2 border border-neutral-700">
+            <i class="fa-solid fa-arrow-left"></i>
+            Voltar para Customização
+        </a>
+        <a href="{{ route('admin.categories.create') }}" 
+           class="bg-netflix hover:bg-netflix/90 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-netflix/20 transition-all active:scale-95 flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            Nova Página / Categoria
+        </a>
+    </div>
 </div>
 
 <div class="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden">

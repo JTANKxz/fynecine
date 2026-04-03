@@ -99,12 +99,10 @@ class GenreController extends Controller
 
             'data' => $paginated,
 
-            'pagination' => [
-                'current_page' => $page,
-                'per_page' => $perPage,
-                'total' => $content->count(),
-                'last_page' => (int) ceil($content->count() / $perPage)
-            ]
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'total' => $content->count(),
+            'last_page' => (int) ceil($content->count() / $perPage)
         ]);
     }
 }

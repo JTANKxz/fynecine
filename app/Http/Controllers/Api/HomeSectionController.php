@@ -14,7 +14,12 @@ class HomeSectionController extends Controller
 
         // Para seções de gênero ou network, também podemos carregar aqui diretamente para o "ver tudo"
         // Ou se preferir redirecionar, mas aqui garantimos uma resposta uniforme para o app.
-        $items = $section->resolveItems(100); 
+        $page = (int) $request->get('page', 1);
+        $perPage = 20;
+
+        // Resolve os itens com um limite alto para o "Ver Tudo"
+        $content = $section->resolveItems(5000); 
+        $paginated = $content->slice(($page - 1) * $perPage, $perPage)->values();
 
         return response()->json([
             'section' => [
@@ -23,7 +28,11 @@ class HomeSectionController extends Controller
                 'type' => $section->type,
                 'content_type' => $section->content_type ?? 'both',
             ],
-            'data' => $items
+            'data' => $paginated,
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'total' => $content->count(),
+            'last_page' => (int) ceil($content->count() / $perPage)
         ]);
     }
 }

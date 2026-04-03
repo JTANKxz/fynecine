@@ -87,12 +87,10 @@ class SerieController extends Controller
 
             }),
 
-            'pagination' => [
-                'current_page' => $series->currentPage(),
-                'last_page' => $series->lastPage(),
-                'per_page' => $series->perPage(),
-                'total' => $series->total()
-            ]
+            'current_page' => $series->currentPage(),
+            'last_page' => $series->lastPage(),
+            'per_page' => $series->perPage(),
+            'total' => $series->total()
         ]);
     }
 

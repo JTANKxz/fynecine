@@ -137,4 +137,103 @@ class TMDBController extends Controller
         
         return response()->json($result);
     }
+
+    public function fetchSeasonsForSync($tmdbId)
+    {
+        try {
+            $response = $this->fetchTMDB("tv/$tmdbId", ['language' => 'pt-BR']);
+            
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Série não encontrada no TMDB'], 404);
+            }
+
+            $data = $response->json();
+            $seasons = collect($data['seasons'] ?? [])->filter(function($season) {
+                return $season['season_number'] > 0;
+            })->values();
+
+            return response()->json(['seasons' => $seasons]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function fetchEpisodesForSync($tmdbId, $seasonNumber)
+    {
+        try {
+            $response = $this->fetchTMDB("tv/$tmdbId/season/$seasonNumber", ['language' => 'pt-BR']);
+            
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Temporada não encontrada no TMDB'], 404);
+            }
+
+            $data = $response->json();
+            return response()->json(['episodes' => $data['episodes'] ?? []]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function syncSeasons(Request $request)
+    {
+        $tmdbId = $request->tmdb_id;
+        $seriesId = $request->series_id;
+        $seasons = $request->seasons;
+
+        if (!$seasons || !is_array($seasons)) {
+            return response()->json(['error' => 'Nenhuma temporada selecionada'], 400);
+        }
+
+        try {
+            $results = [];
+            foreach ($seasons as $seasonNumber) {
+                $results[] = $this->importSeason($tmdbId, $seasonNumber, $seriesId);
+            }
+            return response()->json(['success' => true, 'results' => $results]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function syncEpisodes(Request $request)
+    {
+        $tmdbId = $request->tmdb_id;
+        $seriesId = $request->series_id;
+        $seasonId = $request->season_id;
+        $seasonNumber = $request->season_number;
+        $episodes = $request->episodes;
+
+        if (!$episodes || !is_array($episodes)) {
+            return response()->json(['error' => 'Nenhum episódio selecionado'], 400);
+        }
+
+        try {
+            $response = $this->fetchTMDB("tv/$tmdbId/season/$seasonNumber", ['language' => 'pt-BR']);
+            $seasonData = $response->json();
+
+            $imported = 0;
+            foreach ($seasonData['episodes'] as $episodeData) {
+                if (in_array($episodeData['episode_number'], $episodes)) {
+                    $baseImage = "https://image.tmdb.org/t/p/original";
+                    Episode::updateOrCreate(
+                        ['season_id' => $seasonId, 'episode_number' => $episodeData['episode_number']],
+                        [
+                            'series_id' => $seriesId,
+                            'tmdb_id' => $episodeData['id'],
+                            'name' => $episodeData['name'],
+                            'overview' => $episodeData['overview'] ?? '',
+                            'duration' => $episodeData['runtime'] ?? null,
+                            'still_path' => ($episodeData['still_path'] ?? null) ? $baseImage . $episodeData['still_path'] : null,
+                            'status' => 'active'
+                        ]
+                    );
+                    $imported++;
+                }
+            }
+
+            return response()->json(['success' => true, 'imported' => $imported]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

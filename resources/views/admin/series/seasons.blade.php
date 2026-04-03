@@ -6,18 +6,21 @@
 
     <section>
 
-        <div class="flex justify-between items-center mb-4">
-
+        <div class="flex justify-between items-center mb-4 gap-3">
             <h2 class="text-xl font-bold">
                 Temporadas - {{ $serie->name }}
             </h2>
 
-            <a href="{{ route('admin.series.index') }}" class="bg-neutral-700 px-4 py-2 rounded hover:bg-neutral-600 text-sm">
+            <div class="flex gap-3">
+                <button onclick="openSyncSeasonsModal()" 
+                    class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-sync"></i> Sincronizar TMDB
+                </button>
 
-                Voltar
-
-            </a>
-
+                <a href="{{ route('admin.series.index') }}" class="bg-neutral-700 px-4 py-2 rounded hover:bg-neutral-600 text-sm">
+                    Voltar
+                </a>
+            </div>
         </div>
 
         <div class="bg-neutral-900 rounded-lg overflow-hidden">
@@ -164,7 +167,133 @@
 
         </div>
 
+        <div id="syncModal" style="display:none" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div class="bg-neutral-900 rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
+                <div class="p-6 border-b border-neutral-800 flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Sincronizar Temporadas</h2>
+                    <button onclick="closeSyncModal()" class="text-neutral-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="syncModalContent" class="p-6 overflow-y-auto flex-1">
+                    <div class="flex justify-center p-8">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
+                    </div>
+                </div>
+
+                <div class="p-6 border-t border-neutral-800 flex justify-end gap-3">
+                    <button onclick="closeSyncModal()" class="bg-neutral-700 px-6 py-2 rounded hover:bg-neutral-600">
+                        Cancelar
+                    </button>
+                    <button id="btnConfirmSync" onclick="confirmSyncSeasons()" class="bg-blue-600 px-6 py-2 rounded hover:bg-blue-700 hidden">
+                        Sincronizar Selecionadas
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script>
+            let serieTmdbId = "{{ $serie->tmdb_id }}";
+            let serieId = "{{ $serie->id }}";
+
+            function openSyncSeasonsModal() {
+                const modal = document.getElementById('syncModal');
+                const content = document.getElementById('syncModalContent');
+                const btn = document.getElementById('btnConfirmSync');
+                
+                modal.style.display = "flex";
+                content.innerHTML = '<div class="flex justify-center p-8"><i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i></div>';
+                btn.classList.add('hidden');
+
+                fetch(`{{ route('admin.tmdb.seasons', ':tmdbId') }}`.replace(':tmdbId', serieTmdbId))
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) {
+                            content.innerHTML = `<div class="text-red-500 p-4">${data.error}</div>`;
+                            return;
+                        }
+
+                        let html = `
+                            <div class="mb-4 flex justify-between items-center">
+                                <span class="text-sm text-neutral-400">Selecione as temporadas para importar/atualizar:</span>
+                                <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                    <input type="checkbox" id="selectAllSync" checked onchange="toggleAllSync(this)"> Selecionar Todos
+                                </label>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                        `;
+
+                        data.seasons.forEach(season => {
+                            html += `
+                                <label class="flex items-center gap-3 p-3 bg-neutral-800 rounded hover:bg-neutral-700 cursor-pointer transition">
+                                    <input type="checkbox" name="sync_seasons" value="${season.season_number}" checked class="sync-checkbox">
+                                    <div>
+                                        <div class="font-bold">Temporada ${season.season_number}</div>
+                                        <div class="text-xs text-neutral-400">${season.episode_count} episódios</div>
+                                    </div>
+                                </label>
+                            `;
+                        });
+
+                        html += '</div>';
+                        content.innerHTML = html;
+                        btn.classList.remove('hidden');
+                    })
+                    .catch(err => {
+                        content.innerHTML = `<div class="text-red-500 p-4">Erro ao buscar dados: ${err.message}</div>`;
+                    });
+            }
+
+            function closeSyncModal() {
+                document.getElementById('syncModal').style.display = "none";
+            }
+
+            function toggleAllSync(el) {
+                document.querySelectorAll('.sync-checkbox').forEach(cb => cb.checked = el.checked);
+            }
+
+            function confirmSyncSeasons() {
+                const selected = Array.from(document.querySelectorAll('.sync-checkbox:checked')).map(cb => cb.value);
+                
+                if (selected.length === 0) {
+                    alert('Selecione pelo menos uma temporada');
+                    return;
+                }
+
+                const btn = document.getElementById('btnConfirmSync');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Sincronizando...';
+
+                fetch(`{{ route('admin.tmdb.sync-seasons') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        tmdb_id: serieTmdbId,
+                        series_id: serieId,
+                        seasons: selected
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao sincronizar: ' + data.error);
+                        btn.disabled = false;
+                        btn.innerHTML = 'Sincronizar Selecionadas';
+                    }
+                })
+                .catch(err => {
+                    alert('Erro na requisição: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Sincronizar Selecionadas';
+                });
+            }
+
             function openSeasonModal(id, status) {
 
                 const modal = document.getElementById('seasonModal');

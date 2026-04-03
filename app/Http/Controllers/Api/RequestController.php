@@ -86,22 +86,24 @@ class RequestController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'tmdb_id' => 'required|string',
+            'tmdb_id' => 'nullable|string',
             'type' => 'required|in:movie,tv',
             'title' => 'required|string',
-            'year' => 'nullable|string'
+            'year' => 'required|string'
         ]);
 
         $user = $request->user();
         
-        // Verifica Cota (Free=1, Basic=3, Premium=5)
+        // Verifica Cota (Free=1, Basic=3, Premium=6)
         $limit = 1; // Default
-        if ($user->hasPlan()) {
-            $limit = $user->plan_type === 'basic' ? 3 : 5;
+        if ($user->isPremium()) {
+            $limit = 6;
+        } elseif ($user->isBasic()) {
+            $limit = 3;
         }
 
         $requestsToday = ContentRequest::where('user_id', $user->id)
-            ->whereDate('created_at', today())
+            ->whereDate('created_at', now()->toDateString())
             ->count();
 
         if ($requestsToday >= $limit) {
@@ -111,8 +113,8 @@ class RequestController extends Controller
             ], 429);
         }
 
-        // Previne Duplicidades Pessoais
-        if (ContentRequest::where('user_id', $user->id)->where('tmdb_id', $request->tmdb_id)->exists()) {
+        // Previne Duplicidades Pessoais (apenas se tiver tmdb_id)
+        if ($request->tmdb_id && ContentRequest::where('user_id', $user->id)->where('tmdb_id', $request->tmdb_id)->exists()) {
             return response()->json(['message' => 'Você já pediu este título.'], 409);
         }
 

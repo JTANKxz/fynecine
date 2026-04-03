@@ -263,6 +263,10 @@
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.requests.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-hand-holding-heart w-4 mr-1"></i> Pedidos (Requests)
                     </a>
+                    <a href="{{ route('admin.tickets.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.tickets.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-headset w-4 mr-1"></i> Suporte e Tickets
+                    </a>
                     <a href="{{ route('admin.in-app-notifications.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.in-app-notifications.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-bell w-4 mr-1"></i> Notificações In-App

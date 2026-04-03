@@ -51,14 +51,21 @@ class TicketController extends Controller
 
         $user = $request->user();
 
-        // Evita spam criando bloqueio simples (1 ticket aberto por vez ou maximo 3 por dia)
-        $recentTickets = Ticket::where('user_id', $user->id)
-            ->where('status', 'open')
+        // Limites baseados no plano: Premium = 6, Basic = 3, Free = 1
+        $limit = 1;
+        if ($user->isPremium()) {
+            $limit = 6;
+        } elseif ($user->isBasic()) {
+            $limit = 3;
+        }
+
+        $todayTickets = Ticket::where('user_id', $user->id)
+            ->whereDate('created_at', now()->toDateString())
             ->count();
 
-        if ($recentTickets >= 2) {
+        if ($todayTickets >= $limit) {
             return response()->json([
-                'message' => 'Você já possui chamados em aberto. Aguarde o suporte responder.'
+                'message' => "Você atingiu seu limite diário de $limit tickets. Tente novamente amanhã."
             ], 429);
         }
 

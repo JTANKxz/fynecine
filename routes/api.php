@@ -122,6 +122,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/requests/search', [\App\Http\Controllers\Api\RequestController::class, 'search']);
     Route::post('/requests', [\App\Http\Controllers\Api\RequestController::class, 'store']);
 
+    // Suporte (Tickets) protegidos
+    Route::get('/tickets/topics', [\App\Http\Controllers\Api\TicketController::class, 'getTopics']);
+    Route::post('/tickets', [\App\Http\Controllers\Api\TicketController::class, 'store']);
+
     // Downloads — registro e controle de limite diário
     Route::post('/downloads/log', [\App\Http\Controllers\Api\DownloadController::class, 'log']);
     Route::get('/downloads/status', [\App\Http\Controllers\Api\DownloadController::class, 'status']);

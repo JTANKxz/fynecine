@@ -92,11 +92,18 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     Route::resource('comments', CommentController::class)->only(['index', 'destroy']);
     Route::put('comments/{comment}/toggle', [CommentController::class, 'toggleApproval'])->name('comments.toggle');
 
-    // Pedidos TMDB Moderação
     Route::get('requests', [RequestController::class, 'index'])->name('requests.index');
     Route::delete('requests/{request}', [RequestController::class, 'destroy'])->name('requests.destroy');
     Route::put('requests/{request}', [RequestController::class, 'updateStatus'])->name('requests.update');
     Route::post('requests/{request}/autoimport', [RequestController::class, 'autoImport'])->name('requests.autoimport');
+    Route::post('requests/{request}/respond', [RequestController::class, 'respond'])->name('requests.respond');
+
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/', [TicketController::class, 'index'])->name('index');
+        Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
+        Route::post('/{ticket}/respond', [TicketController::class, 'respond'])->name('respond');
+        Route::delete('/{ticket}', [TicketController::class, 'delete'])->name('delete');
+    });
 
     Route::prefix('movies')->name('movies.')->group(function () {
         Route::get('/', [MovieController::class, 'index'])->name('index');

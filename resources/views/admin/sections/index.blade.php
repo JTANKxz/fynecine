@@ -72,7 +72,7 @@
                             <a href="{{ route('admin.sliders.edit', $slider->id) }}" class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition shadow-lg">
                                 <i class="fa-solid fa-edit text-xs"></i>
                             </a>
-                            <form action="{{ route('admin.sliders.destroy', $slider->id) }}" method="POST">
+                            <form action="{{ route('admin.sliders.delete', $slider->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-500 transition shadow-lg">

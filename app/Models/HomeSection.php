@@ -105,9 +105,10 @@ class HomeSection extends Model
 
     private function applyCategoryFilter($query)
     {
-        if ($this->content_category_id) {
-            $query->where('content_category_id', $this->content_category_id);
-        } else {
+        // Only filter by content_category_id when sections belong to the main home (null category).
+        // For custom category pages, sections should show ALL matching content,
+        // not just content that also has the same content_category_id assigned.
+        if (!$this->content_category_id) {
             $query->whereNull('content_category_id');
         }
         return $query;
@@ -149,9 +150,7 @@ class HomeSection extends Model
                 ->where('content_views.content_type', 'movie')
                 ->groupBy('content_id');
 
-            if ($this->content_category_id) {
-                $query->where('movies.content_category_id', $this->content_category_id);
-            } else {
+            if (!$this->content_category_id) {
                 $query->whereNull('movies.content_category_id');
             }
 
@@ -180,9 +179,7 @@ class HomeSection extends Model
                 ->where('content_views.content_type', 'series')
                 ->groupBy('content_id');
 
-            if ($this->content_category_id) {
-                $query->where('series.content_category_id', $this->content_category_id);
-            } else {
+            if (!$this->content_category_id) {
                 $query->whereNull('series.content_category_id');
             }
 

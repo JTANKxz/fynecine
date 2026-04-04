@@ -77,9 +77,7 @@ class Event extends Model
     public function scopeVisible($query)
     {
         $now = now()->setTimezone('America/Sao_Paulo');
-        $soonThreshold = $now->copy()->addMinutes(30);
 
         return $query->where('is_active', true)
-            ->where('start_time', '<=', $soonThreshold)
             ->where('end_time', '>=', $now);
     }}

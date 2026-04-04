@@ -212,6 +212,14 @@
                 </div>
             </div>
 
+            {{-- Em Breve --}}
+            <div>
+                <a href="{{ route('admin.upcomings.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.upcomings.*') ? 'text-netflix font-bold' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-clock w-5 text-center"></i> Em Breve
+                </a>
+            </div>
+
             {{-- Customização de Páginas --}}
             <div class="space-y-1">
                 <button onclick="toggleSubmenu('pagesSubmenu')"

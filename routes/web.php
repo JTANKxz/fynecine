@@ -112,6 +112,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/bulk/import', [MovieController::class, 'processImport'])->name('bulk.import');
 
         Route::delete('/{movie}', [MovieController::class, 'destroy'])->name('delete');
+        Route::patch('/{movie}/category', [MovieController::class, 'updateCategory'])->name('category.update');
 
         Route::get('/{movie}/links', [MovieController::class, 'links'])->name('links');
         Route::get('/{movie}/links/create', [MovieController::class, 'createLink'])->name('links.create');
@@ -128,6 +129,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/bulk/import', [SerieController::class, 'processImport'])->name('bulk.import');
 
         Route::delete('/{serie}', [SerieController::class, 'destroy'])->name('delete');
+        Route::patch('/{serie}/category', [SerieController::class, 'updateCategory'])->name('category.update');
         Route::get('/{serie}/seasons', [SerieController::class, 'seasons'])->name('seasons');
         Route::get('/seasons/{season}/episodes', [SerieController::class, 'episodes'])->name('episodes');
         Route::put('/seasons/{season}', [SerieController::class, 'updateSeason'])
@@ -144,6 +146,13 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::put('/links/{link}', [SerieController::class, 'updateEpisodeLink'])->name('episodes.links.update');
         Route::delete('/links/{link}', [SerieController::class, 'deleteEpisodeLink'])->name('episodes.links.delete');
 
+    });
+
+    // ========== UPCOMINGS ==========
+    Route::prefix('upcomings')->name('upcomings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\UpcomingController::class, 'index'])->name('index');
+        Route::post('/import', [\App\Http\Controllers\Admin\UpcomingController::class, 'import'])->name('import');
+        Route::delete('/{upcoming}', [\App\Http\Controllers\Admin\UpcomingController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('links')->name('links.')->group(function () {

@@ -88,10 +88,14 @@ class TMDBController extends Controller
 
             $tmdbIds = collect($data['results'])->pluck('id');
 
-            if ($type === 'tv') {
-                $imported = Serie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+            if ($request->query('target') === 'upcoming') {
+                $imported = \App\Models\Upcoming::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
             } else {
-                $imported = Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+                if ($type === 'tv') {
+                    $imported = Serie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+                } else {
+                    $imported = Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+                }
             }
 
             foreach ($data['results'] as &$item) {

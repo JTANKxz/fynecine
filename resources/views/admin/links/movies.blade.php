@@ -47,6 +47,7 @@
                             <option value="embed">EMBED</option>
                             <option value="mp4">MP4</option>
                             <option value="m3u8">M3U8</option>
+                            <option value="custom">CUSTOM</option>
                         </select>
                         <select name="player_sub" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none text-yellow-500 font-bold">
                             <option value="free">FREE</option>
@@ -84,6 +85,7 @@
                                             <option value="embed" {{ $link->type == 'embed' ? 'selected' : '' }}>EMBED</option>
                                             <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
                                             <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
+                                            <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
                                         </select>
                                         <select name="player_sub" class="bg-transparent border-none text-[9px] p-0 outline-none {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-400' }}">
                                             <option value="free" {{ $link->player_sub == 'free' ? 'selected' : '' }}>FREE</option>

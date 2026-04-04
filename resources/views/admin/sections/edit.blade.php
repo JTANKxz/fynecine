@@ -35,6 +35,7 @@
                     <option value="networks" {{ old('type', $section->type) == 'networks' ? 'selected' : '' }}>Lista de Networks (Cards Quadrados)</option>
                     <option value="recently_added" {{ old('type', $section->type) == 'recently_added' ? 'selected' : '' }}>Recém Adicionados</option>
                     <option value="top_10" {{ old('type', $section->type) == 'top_10' ? 'selected' : '' }}>🏆 Top 10 (Netflix Style)</option>
+                    <option value="upcoming" {{ old('type', $section->type) == 'upcoming' ? 'selected' : '' }}>⏱️ Lançamentos (Em Breve)</option>
                 </select>
             </div>
         </div>

@@ -79,9 +79,20 @@ class HomeSection extends Model
             case 'top_10':
                 return $this->resolveTrending(10);
 
+            case 'upcoming':
+                return $this->resolveUpcoming($limit);
+
             default:
                 return collect();
         }
+    }
+
+    private function resolveUpcoming($limit)
+    {
+        // Exclui automaticamente os itens do banco se a data de lançamento já chegou
+        Upcoming::where('release_date', '<=', now()->toDateString())->delete();
+
+        return Upcoming::orderBy('release_date', 'asc')->limit($limit)->get();
     }
 
     private function resolveNetworksList($limit)

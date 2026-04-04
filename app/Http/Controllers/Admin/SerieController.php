@@ -34,7 +34,8 @@ class SerieController extends Controller
         }
 
         // Retorna view com os filmes
-        return view('admin.series.index', compact('series'));
+        $categories = \App\Models\ContentCategory::where('has_dedicated_content', true)->get();
+        return view('admin.series.index', compact('series', 'categories'));
     }
 
     public function bulkImport()
@@ -257,5 +258,11 @@ class SerieController extends Controller
 
         return redirect()->route('admin.series.index')
             ->with('success', 'Série deletado com sucesso!');
+    }
+
+    public function updateCategory(Request $request, Serie $serie)
+    {
+        $serie->update(['content_category_id' => $request->content_category_id ?: null]);
+        return back()->with('success', 'Categoria atualizada com sucesso!');
     }
 }

@@ -35,6 +35,7 @@
                         <th class="text-left p-4">ID</th>
                         <th class="text-left p-4">Título</th>
                         <th class="text-left p-4">Ano</th>
+                        <th class="text-left p-4">Categoria</th>
                         <th class="text-left p-4">Ações</th>
                     </tr>
                 </thead>
@@ -48,6 +49,18 @@
                             <td class="p-4">{{ $movie->id }}</td>
                             <td class="p-4 font-medium">{{ $movie->title }}</td>
                             <td class="p-4">{{ $movie->release_year }}</td>
+                            <td class="p-4">
+                                <form action="{{ route('admin.movies.category.update', $movie->id) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="content_category_id" onchange="this.form.submit()" class="bg-neutral-800 text-xs px-2 py-1 border border-neutral-700 rounded text-neutral-300 outline-none">
+                                        <option value="">Nenhuma</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ $movie->content_category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            </td>
                             <td class="p-4">
                                 <button type="button" onclick="openContentNotificationModal('movie', {{ $movie->id }}, '{{ addslashes($movie->title) }}', '{{ $movie->poster_path }}')" class="text-purple-500 hover:text-purple-400 mr-2" title="Enviar Notificação">
                                     <i class="fa-solid fa-bell"></i>

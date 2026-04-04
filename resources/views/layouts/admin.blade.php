@@ -174,12 +174,23 @@
                 </div>
             </div>
 
-            {{-- Eventos Ao Vivo --}}
-            <div>
-                <a href="{{ route('admin.events.index') }}"
-                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.events.*') || request()->routeIs('events.links.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
-                    <i class="fa-solid fa-trophy w-5"></i> Eventos Ao Vivo
-                </a>
+            {{-- Eventos / Times --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('eventosSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->routeIs('admin.events.*') || request()->routeIs('events.links.*') || request()->routeIs('admin.teams.*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-trophy mr-2"></i> Eventos / Times</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-eventosSubmenu"></i>
+                </button>
+                <div id="eventosSubmenu" class="{{ request()->routeIs('admin.events.*') || request()->routeIs('events.links.*') || request()->routeIs('admin.teams.*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.events.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.events.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-bolt w-4 mr-1"></i> Eventos Ao Vivo
+                    </a>
+                    <a href="{{ route('admin.teams.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.teams.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-shield-halved w-4 mr-1"></i> Times / Equipes
+                    </a>
+                </div>
             </div>
 
             {{-- Sliders --}}

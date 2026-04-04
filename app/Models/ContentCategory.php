@@ -12,12 +12,14 @@ class ContentCategory extends Model
         'icon',
         'order',
         'is_active',
-        'is_nav_visible'
+        'is_nav_visible',
+        'has_dedicated_content'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'is_nav_visible' => 'boolean',
+        'has_dedicated_content' => 'boolean',
         'order' => 'integer'
     ];
     

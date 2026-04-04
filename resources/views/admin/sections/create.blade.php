@@ -34,6 +34,7 @@
                     <option value="network" {{ old('type') == 'network' ? 'selected' : '' }}>Itens de uma Network</option>
                     <option value="networks" {{ old('type') == 'networks' ? 'selected' : '' }}>Lista de Networks (Cards Quadrados)</option>
                     <option value="recently_added" {{ old('type') == 'recently_added' ? 'selected' : '' }}>Recém Adicionados</option>
+                    <option value="top_10" {{ old('type') == 'top_10' ? 'selected' : '' }}>🏆 Top 10 (Netflix Style)</option>
                 </select>
             </div>
         </div>
@@ -118,7 +119,7 @@ function toggleFields() {
     const type = document.getElementById('sectionType').value;
     document.getElementById('genreField').classList.toggle('hidden', type !== 'genre');
     document.getElementById('networkField').classList.toggle('hidden', type !== 'network');
-    document.getElementById('trendingField').classList.toggle('hidden', type !== 'trending');
+    document.getElementById('trendingField').classList.toggle('hidden', type !== 'trending' && type !== 'top_10');
 }
 toggleFields();
 </script>

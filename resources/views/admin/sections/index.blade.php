@@ -139,6 +139,7 @@
                                 'genre' => 'bg-blue-600/20 text-blue-400',
                                 'trending' => 'bg-orange-600/20 text-orange-400',
                                 'network' => 'bg-green-600/20 text-green-400',
+                                'top_10' => 'bg-yellow-600/20 text-yellow-400',
                             ];
                         @endphp
                         <span class="px-2 py-0.5 rounded text-xs {{ $typeColors[$section->type] ?? '' }}">
@@ -154,7 +155,7 @@
                             <span class="text-xs text-neutral-400">• {{ $section->network->name }}</span>
                         @endif
 
-                        @if($section->type === 'trending' && $section->trending_period)
+                        @if(in_array($section->type, ['trending', 'top_10']) && $section->trending_period)
                             <span class="text-xs text-neutral-400">• {{ $section->trending_period }}</span>
                         @endif
                     </div>

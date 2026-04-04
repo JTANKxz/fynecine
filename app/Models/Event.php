@@ -11,6 +11,8 @@ class Event extends Model
         'description',
         'home_team',
         'away_team',
+        'home_team_id',
+        'away_team_id',
         'image_url',
         'start_time',
         'end_time',
@@ -33,6 +35,16 @@ class Event extends Model
     public function links()
     {
         return $this->hasMany(EventLink::class);
+    }
+
+    public function homeTeam()
+    {
+        return $this->belongsTo(Team::class, 'home_team_id');
+    }
+
+    public function awayTeam()
+    {
+        return $this->belongsTo(Team::class, 'away_team_id');
     }
 
     /**

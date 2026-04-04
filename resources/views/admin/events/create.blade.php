@@ -44,19 +44,50 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-neutral-800/30 rounded-xl border border-neutral-800">
-                {{-- Time Home --}}
-                <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Time da Casa (Opcional)</label>
-                    <input type="text" name="home_team" value="{{ old('home_team') }}" placeholder="Ex: Real Madrid"
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+            <div class="p-4 bg-neutral-800/30 rounded-xl border border-neutral-800 space-y-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-shield-halved text-netflix"></i>
+                    <span class="text-xs font-bold text-neutral-400 uppercase">Times (Opcional)</span>
                 </div>
 
-                {{-- Time Away --}}
-                <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Time Visitante (Opcional)</label>
-                    <input type="text" name="away_team" value="{{ old('away_team') }}" placeholder="Ex: Borussia Dortmund"
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Time Home --}}
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Time da Casa</label>
+                        <input type="text" name="home_team" value="{{ old('home_team') }}" placeholder="Digite o nome (ex: Real Madrid)"
+                            class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                        <input type="hidden" name="home_team_id" id="home_team_id" value="{{ old('home_team_id') }}">
+                        <div class="relative">
+                            <input type="text" id="search_home_team" placeholder="🔍 Buscar time cadastrado..."
+                                class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-netflix transition"
+                                oninput="searchTeam('home', this.value)">
+                            <div id="home_team_results" class="hidden absolute z-10 w-full bg-neutral-900 border border-neutral-700 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-xl"></div>
+                        </div>
+                        <div id="home_team_preview" class="hidden flex items-center gap-2 bg-neutral-900 rounded-lg p-2 border border-netflix/30">
+                            <img id="home_team_img" src="" class="w-8 h-8 object-contain rounded">
+                            <span id="home_team_name" class="text-xs font-bold text-white flex-1"></span>
+                            <button type="button" onclick="clearTeam('home')" class="text-red-400 text-xs hover:text-red-300"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+
+                    {{-- Time Away --}}
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Time Visitante</label>
+                        <input type="text" name="away_team" value="{{ old('away_team') }}" placeholder="Digite o nome (ex: Barcelona)"
+                            class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                        <input type="hidden" name="away_team_id" id="away_team_id" value="{{ old('away_team_id') }}">
+                        <div class="relative">
+                            <input type="text" id="search_away_team" placeholder="🔍 Buscar time cadastrado..."
+                                class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-netflix transition"
+                                oninput="searchTeam('away', this.value)">
+                            <div id="away_team_results" class="hidden absolute z-10 w-full bg-neutral-900 border border-neutral-700 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-xl"></div>
+                        </div>
+                        <div id="away_team_preview" class="hidden flex items-center gap-2 bg-neutral-900 rounded-lg p-2 border border-netflix/30">
+                            <img id="away_team_img" src="" class="w-8 h-8 object-contain rounded">
+                            <span id="away_team_name" class="text-xs font-bold text-white flex-1"></span>
+                            <button type="button" onclick="clearTeam('away')" class="text-red-400 text-xs hover:text-red-300"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -99,3 +130,60 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+let searchTimeout;
+function searchTeam(side, query) {
+    clearTimeout(searchTimeout);
+    const results = document.getElementById(side + '_team_results');
+    if (query.length < 2) { results.classList.add('hidden'); return; }
+    
+    searchTimeout = setTimeout(() => {
+        fetch('{{ route("admin.teams.search") }}?query=' + encodeURIComponent(query))
+            .then(r => r.json())
+            .then(teams => {
+                if (teams.length === 0) {
+                    results.innerHTML = '<div class="p-3 text-neutral-500 text-xs text-center">Nenhum time encontrado</div>';
+                } else {
+                    results.innerHTML = teams.map(t => `
+                        <div onclick="selectTeam('${side}', ${t.id}, '${t.name.replace(/'/g, "\\'")}', '${t.image_url || ''}')" 
+                             class="flex items-center gap-2 p-2 hover:bg-neutral-800 cursor-pointer transition">
+                            ${t.image_url ? `<img src="${t.image_url}" class="w-6 h-6 object-contain rounded">` : '<i class="fa-solid fa-shield-halved text-neutral-600 w-6 text-center"></i>'}
+                            <span class="text-xs text-white">${t.name}</span>
+                        </div>
+                    `).join('');
+                }
+                results.classList.remove('hidden');
+            });
+    }, 300);
+}
+
+function selectTeam(side, id, name, image) {
+    document.getElementById(side + '_team_id').value = id;
+    document.querySelector(`[name="${side}_team"]`).value = name;
+    document.getElementById(side + '_team_results').classList.add('hidden');
+    document.getElementById('search_' + side + '_team').value = '';
+    
+    // Show preview
+    const preview = document.getElementById(side + '_team_preview');
+    document.getElementById(side + '_team_name').textContent = name;
+    if (image) document.getElementById(side + '_team_img').src = image;
+    preview.classList.remove('hidden');
+}
+
+function clearTeam(side) {
+    document.getElementById(side + '_team_id').value = '';
+    document.getElementById(side + '_team_preview').classList.add('hidden');
+}
+
+document.addEventListener('click', (e) => {
+    ['home', 'away'].forEach(side => {
+        const results = document.getElementById(side + '_team_results');
+        if (results && !results.contains(e.target) && e.target.id !== 'search_' + side + '_team') {
+            results.classList.add('hidden');
+        }
+    });
+});
+</script>
+@endpush

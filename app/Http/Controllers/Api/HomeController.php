@@ -33,7 +33,10 @@ class HomeController extends Controller
         ==================
         */
         $sliders = Slider::where('active', true)
-            ->where('content_category_id', $categoryId)
+            ->when($categoryId, 
+                fn($q) => $q->where('content_category_id', $categoryId),
+                fn($q) => $q->whereNull('content_category_id')
+            )
             ->orderBy('position')
             ->get()
             ->map(function ($slider) {
@@ -74,7 +77,10 @@ class HomeController extends Controller
         ==================
         */
         $sections = HomeSection::where('is_active', true)
-            ->where('content_category_id', $categoryId)
+            ->when($categoryId, 
+                fn($q) => $q->where('content_category_id', $categoryId),
+                fn($q) => $q->whereNull('content_category_id')
+            )
             ->orderBy('order')
             ->get()
             ->map(function ($section) {

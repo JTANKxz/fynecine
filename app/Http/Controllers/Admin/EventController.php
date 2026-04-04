@@ -36,13 +36,17 @@ class EventController extends Controller
             'description' => 'nullable|string',
             'home_team' => 'nullable|string|max:100',
             'away_team' => 'nullable|string|max:100',
+            'home_team_id' => 'nullable|exists:teams,id',
+            'away_team_id' => 'nullable|exists:teams,id',
             'image_url' => 'nullable|url',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'is_active' => 'boolean',
         ]);
 
-        $data['is_active'] = $request->has('is_global') || $request->has('is_active'); // Compatibilidade names
+        $data['is_active'] = $request->has('is_global') || $request->has('is_active');
+        $data['home_team_id'] = $request->input('home_team_id') ?: null;
+        $data['away_team_id'] = $request->input('away_team_id') ?: null;
 
         Event::create($data);
 
@@ -61,6 +65,8 @@ class EventController extends Controller
             'description' => 'nullable|string',
             'home_team' => 'nullable|string|max:100',
             'away_team' => 'nullable|string|max:100',
+            'home_team_id' => 'nullable|exists:teams,id',
+            'away_team_id' => 'nullable|exists:teams,id',
             'image_url' => 'nullable|url',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
@@ -68,6 +74,8 @@ class EventController extends Controller
         ]);
 
         $data['is_active'] = $request->has('is_active');
+        $data['home_team_id'] = $request->input('home_team_id') ?: null;
+        $data['away_team_id'] = $request->input('away_team_id') ?: null;
 
         $event->update($data);
 

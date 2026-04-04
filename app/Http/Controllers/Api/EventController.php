@@ -14,7 +14,12 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::visible()->orderBy('start_time')->get();
+        $events = Event::with(['homeTeam', 'awayTeam'])->visible()->orderBy('start_time')->get()->map(function ($event) {
+            $event->home_team_image = $event->homeTeam?->image_url;
+            $event->away_team_image = $event->awayTeam?->image_url;
+            unset($event->homeTeam, $event->awayTeam);
+            return $event;
+        });
         return response()->json($events);
     }
 

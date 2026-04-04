@@ -76,6 +76,9 @@ class HomeSection extends Model
             case 'events':
                 return $this->resolveEvents($limit);
 
+            case 'top_10':
+                return $this->resolveTrending(10);
+
             default:
                 return collect();
         }
@@ -103,14 +106,27 @@ class HomeSection extends Model
         })->filter()->take($limit)->values();
     }
 
+    private function isDedicatedCategory(): bool
+    {
+        if (!$this->content_category_id) return false;
+        return $this->category && $this->category->has_dedicated_content;
+    }
+
     private function applyCategoryFilter($query)
     {
-        // Only filter by content_category_id when sections belong to the main home (null category).
-        // For custom category pages, sections should show ALL matching content,
-        // not just content that also has the same content_category_id assigned.
         if (!$this->content_category_id) {
+            // Home: sem filtro, mostra tudo (geral)
+            return $query;
+        }
+
+        if ($this->isDedicatedCategory()) {
+            // Animes/Doramas: mostrar só conteúdo dessa categoria
+            $query->where('content_category_id', $this->content_category_id);
+        } else {
+            // Filmes/outras: mostrar só conteúdo geral (sem categoria)
             $query->whereNull('content_category_id');
         }
+
         return $query;
     }
 
@@ -150,8 +166,12 @@ class HomeSection extends Model
                 ->where('content_views.content_type', 'movie')
                 ->groupBy('content_id');
 
-            if (!$this->content_category_id) {
-                $query->whereNull('movies.content_category_id');
+            if ($this->content_category_id) {
+                if ($this->isDedicatedCategory()) {
+                    $query->where('movies.content_category_id', $this->content_category_id);
+                } else {
+                    $query->whereNull('movies.content_category_id');
+                }
             }
 
             if ($period === 'today') {
@@ -179,8 +199,12 @@ class HomeSection extends Model
                 ->where('content_views.content_type', 'series')
                 ->groupBy('content_id');
 
-            if (!$this->content_category_id) {
-                $query->whereNull('series.content_category_id');
+            if ($this->content_category_id) {
+                if ($this->isDedicatedCategory()) {
+                    $query->where('series.content_category_id', $this->content_category_id);
+                } else {
+                    $query->whereNull('series.content_category_id');
+                }
             }
 
             if ($period === 'today') {

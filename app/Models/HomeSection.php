@@ -91,13 +91,21 @@ class HomeSection extends Model
 
     private function resolveEvents($limit)
     {
-        return Event::with(['homeTeam', 'awayTeam'])->visible()->orderBy('start_time')->limit($limit)->get()->map(function ($event) {
-            $event->home_team_image = $event->homeTeam?->image_url;
-            $event->away_team_image = $event->awayTeam?->image_url;
-            // Unset relationships to keep the JSON payload clean
-            unset($event->homeTeam, $event->awayTeam);
-            return $event;
-        });
+        $now = now()->setTimezone('America/Sao_Paulo')->format('Y-m-d H:i:s');
+
+        return Event::with(['homeTeam', 'awayTeam'])
+             ->visible()
+             ->orderByRaw("CASE WHEN ? >= start_time AND ? <= end_time THEN 0 ELSE 1 END ASC", [$now, $now])
+             ->orderBy('start_time')
+             ->limit($limit)
+             ->get()
+             ->map(function ($event) {
+                 $event->home_team_image = $event->homeTeam?->image_url;
+                 $event->away_team_image = $event->awayTeam?->image_url;
+                 // Unset relationships to keep the JSON payload clean
+                 unset($event->homeTeam, $event->awayTeam);
+                 return $event;
+             });
     }
 
     private function resolveCustom($limit)

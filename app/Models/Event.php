@@ -29,7 +29,18 @@ class Event extends Model
 
     public function getDisplayTimeAttribute()
     {
-        return $this->start_time->format('H:i');
+        $now = now()->setTimezone('America/Sao_Paulo');
+        $start = \Illuminate\Support\Carbon::parse($this->start_time)->setTimezone('America/Sao_Paulo');
+        
+        $time = $start->format('H:i');
+        
+        if ($start->isSameDay($now)) {
+            return "Hoje • {$time}";
+        } elseif ($start->isSameDay($now->copy()->addDay())) {
+            return "Amanhã • {$time}";
+        } else {
+            return $start->format('d/m') . " • {$time}";
+        }
     }
 
     public function links()

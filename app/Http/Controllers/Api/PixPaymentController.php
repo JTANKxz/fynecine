@@ -36,11 +36,46 @@ class PixPaymentController extends Controller
             return response()->json(['message' => 'Este plano não está disponível.'], 422);
         }
 
-        // Cancela qualquer PIX "pendente" anterior para gerar sempre um novo limpo
-        PixPayment::where('user_id', $user->id)
+        // Pega qualquer pagamento anterior pendente
+        $existingPayment = PixPayment::where('user_id', $user->id)
             ->where('subscription_plan_id', $plan->id)
             ->where('status', 'pending')
-            ->update(['status' => 'cancelled']);
+            ->first();
+
+        if ($existingPayment) {
+            // Antes de cancelar, vamos conferir no MP se o usuário não acabou de pagar ele!
+            try {
+                $client = new PaymentClient();
+                $mpPayment = $client->get($existingPayment->mp_payment_id);
+                
+                if ($mpPayment && $mpPayment->status === 'approved') {
+                    // O usuário pagou enquanto o app estava fechado! Ativa o plano dele
+                    $existingPayment->update([
+                        'status' => 'approved',
+                        'paid_at' => Carbon::now(),
+                    ]);
+                    
+                    $currentExpires = $user->plan_expires_at && $user->plan_expires_at->isFuture()
+                        ? $user->plan_expires_at
+                        : Carbon::now();
+
+                    $user->plan_type = $plan->plan_type;
+                    $user->plan_expires_at = $currentExpires->copy()->addDays($plan->duration_days);
+                    $user->features = $plan->features;
+                    $user->save();
+
+                    // Retorna o checkout antigo, que vai carregar e dar a tela de Sucesso Verde imediatamente.
+                    return response()->json([
+                        'payment_id' => $existingPayment->id,
+                        'checkout_url' => url("/pix/checkout/{$existingPayment->id}"),
+                        'expires_at' => $existingPayment->expires_at->toISOString(),
+                    ]);
+                }
+            } catch (\Exception $e) { }
+
+            // Se consultamos o MP e de fato AINDA não foi pago, cancelamos localmente para gerar o novo que o usuário pediu
+            $existingPayment->update(['status' => 'cancelled']);
+        }
 
         try {
             $client = new PaymentClient();

@@ -77,6 +77,15 @@ class PixPaymentController extends Controller
             $existingPayment->update(['status' => 'cancelled']);
         }
 
+        // 1. Criar o registro local PRIMEIRO para gerar o ID de referência interna (external_reference)
+        $pixPayment = PixPayment::create([
+            'user_id' => $user->id,
+            'subscription_plan_id' => $plan->id,
+            'amount' => $plan->price,
+            'status' => 'pending',
+            'expires_at' => Carbon::now()->addMinutes(30),
+        ]);
+
         try {
             $client = new PaymentClient();
 
@@ -85,29 +94,46 @@ class PixPaymentController extends Controller
                 "X-Idempotency-Key: " . uniqid('pix_', true)
             ]);
 
+            // Split name for MP recommendation
+            $nameParts = explode(' ', trim($user->name));
+            $firstName = $nameParts[0] ?? 'Cliente';
+            $lastName = count($nameParts) > 1 ? end($nameParts) : 'FyneCine';
+
             $paymentData = [
                 "transaction_amount" => (float) $plan->price,
                 "description" => "Plano {$plan->name} - {$plan->duration_days} dias",
                 "payment_method_id" => "pix",
+                "external_reference" => (string) $pixPayment->id, // Ação Obrigatória (14 pts)
+                "notification_url" => url('/api/webhooks/mercadopago'), // Ação Obrigatória (Webhook)
+                "statement_descriptor" => "FYNE CINE PLANO", // Recomendado
+                "binary_mode" => true, // Recomendado para aprovação instantânea
                 "payer" => [
                     "email" => $user->email,
-                    "first_name" => $user->name,
+                    "first_name" => $firstName,
+                    "last_name" => $lastName, // Recomendado
+                ],
+                "additional_info" => [
+                    "items" => [
+                        [
+                            "id" => (string) $plan->id,
+                            "title" => "Plano " . $plan->name,
+                            "description" => $plan->duration_days . " dias de acesso VIP",
+                            "category_id" => "services",
+                            "quantity" => 1,
+                            "unit_price" => (float) $plan->price
+                        ]
+                    ]
                 ]
             ];
 
             $payment = $client->create($paymentData, $requestOptions);
 
-            // Salvar no banco
-            $pixPayment = PixPayment::create([
-                'user_id' => $user->id,
-                'subscription_plan_id' => $plan->id,
+            // 2. Atualizar o registro local com os dados do Mercado Pago
+            $pixPayment->update([
                 'mp_payment_id' => $payment->id,
-                'amount' => $plan->price,
-                'status' => 'pending',
                 'pix_qr_code' => $payment->point_of_interaction->transaction_data->qr_code ?? null,
                 'pix_qr_code_base64' => $payment->point_of_interaction->transaction_data->qr_code_base64 ?? null,
                 'pix_ticket_url' => $payment->point_of_interaction->transaction_data->ticket_url ?? null,
-                'expires_at' => Carbon::now()->addMinutes(30),
             ]);
 
             return response()->json([
@@ -117,6 +143,9 @@ class PixPaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            // Em caso de erro no MP, removemos o registro local "limpo" ou marcamos como falha
+            $pixPayment->delete();
+
             \Log::error('MercadoPago PIX Error', [
                 'message' => $e->getMessage(),
                 'user_id' => $user->id,

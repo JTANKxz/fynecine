@@ -16,6 +16,17 @@ class CheckApiToken
      */
     public function handle(Request $request, Closure $next)
     {
+        exit('IS EXECUTING THIS FILE');
+        
+        // Debug: Log the path
+        \Log::info('CheckApiToken Path: ' . $request->path());
+
+        // PULA TUDO DO PIX / MERCADO PAGO SEM ERRO
+        $uri = $request->getRequestUri();
+        if (str_contains($uri, 'mercadopago') || str_contains($uri, 'pix/status')) {
+            return $next($request);
+        }
+
         $token = $request->header('X-API-Token');
         $expectedToken = 'jtanktlg2020';
 

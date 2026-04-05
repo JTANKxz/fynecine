@@ -138,8 +138,26 @@ class PixPaymentController extends Controller
     {
         $payment = PixPayment::with(['plan', 'user'])->findOrFail($paymentId);
 
-        // Sempre consultar a API do MP se estiver pendente, independente de estar expirado localmente
-        if ($payment->isPending()) {
+        // Se já estiver aprovado no banco (via webhook ou poll anterior), retorna imediatamente.
+        // Isso torna o polling extremamente rápido e responsivo.
+        if ($payment->status === 'approved') {
+            return response()->json([
+                'status' => 'approved',
+                'plan_name' => $payment->plan->name ?? null,
+                'paid_at' => $payment->paid_at?->toISOString(),
+            ]);
+        }
+
+        // Se estiver pendente, decidimos se consultamos o Mercado Pago agora ou esperamos o próximo ciclo.
+        // Consultamos o MP se:
+        // 1. Nunca foi consultado (updated_at == created_at)
+        // 2. A última consulta/atualização foi há mais de 10 segundos
+        $shouldCheckMP = $payment->isPending() && (
+            $payment->updated_at->eq($payment->created_at) || 
+            $payment->updated_at->diffInSeconds(Carbon::now()) > 10
+        );
+
+        if ($shouldCheckMP) {
             try {
                 $client = new PaymentClient();
                 $mpPayment = $client->get($payment->mp_payment_id);
@@ -165,17 +183,18 @@ class PixPaymentController extends Controller
                         $user->save();
                     }
                     
-                    \Log::info('Polling: MercadoPago PIX Approved', ['payment_id' => $payment->id]);
+                    \Log::info('Polling: MercadoPago PIX Approved (Synced)', ['payment_id' => $payment->id]);
                 } elseif ($mpPayment && in_array($mpPayment->status, ['rejected', 'cancelled'])) {
                     $payment->update(['status' => 'rejected']);
                 } elseif ($payment->isExpired()) {
-                    // MP ainda diz pending ou não processou, mas nossa janela expirou
                     $payment->update(['status' => 'cancelled']);
+                } else {
+                    // Apenas atualiza o 'updated_at' para resetar o timer de 10s do polling
+                    $payment->touch();
                 }
             } catch (\Exception $e) {
                 \Log::error('PixPaymentController::status MP Check Error', [
                     'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
                 ]);
             }
         }

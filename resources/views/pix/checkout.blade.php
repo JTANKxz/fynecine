@@ -406,9 +406,15 @@
         }
 
         // === Polling ===
+        // O WebView do Android tem cache agressivo de GET, precisamos forçar o recarregamento
         function checkStatus() {
-            // O WebView do Android tem cache agressivo de GET, precisamos forçar o recarregamento
-            fetch(`/api/pix/status/${paymentId}?_t=${new Date().getTime()}`, { cache: 'no-store' })
+            fetch(`/api/pix/status/${paymentId}?_t=${new Date().getTime()}`, { 
+                cache: 'no-store',
+                headers: {
+                    'X-API-Token': 'jtanktlg2020',
+                    'Content-Type': 'application/json'
+                }
+            })
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'approved') {
@@ -435,7 +441,7 @@
         // === Init ===
         updateTimer();
         setInterval(updateTimer, 1000);
-        pollInterval = setInterval(checkStatus, 5000);
+        pollInterval = setInterval(checkStatus, 2000);
 
         // Check imediato
         checkStatus();

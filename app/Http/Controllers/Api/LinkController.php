@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\MoviePlayLink;
 use App\Models\EpisodeLink;
+use App\Models\TvChannelLink;
+use App\Models\EventLink;
 use App\Services\BunnyLinkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,21 +23,28 @@ class LinkController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        if ($link->player_sub === 'premium' && !$user->hasPlan()) {
+        if ($link->player_sub === 'premium' && (!$user || !$user->hasPlan())) {
             return response()->json(['error' => 'Premium required'], 403);
         }
 
-        if ($link->type !== 'private') {
-            return response()->json(['url' => $link->url]);
+        $url = $link->url;
+        if ($link->type === 'private') {
+            $url = BunnyLinkService::generateSignedUrl(
+                $link->url, 
+                $link->link_path, 
+                $link->expiration_hours
+            );
         }
 
-        $signedUrl = BunnyLinkService::generateSignedUrl(
-            $link->url, 
-            $link->link_path, 
-            $link->expiration_hours
-        );
-
-        return response()->json(['url' => $signedUrl]);
+        return response()->json([
+            'url' => $url,
+            'headers' => [
+                'user_agent' => $link->user_agent,
+                'referer' => $link->referer,
+                'origin' => $link->origin,
+                'cookie' => $link->cookie,
+            ]
+        ]);
     }
 
     /**
@@ -48,20 +57,95 @@ class LinkController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        if ($link->player_sub === 'premium' && !$user->hasPlan()) {
+        if ($link->player_sub === 'premium' && (!$user || !$user->hasPlan())) {
             return response()->json(['error' => 'Premium required'], 403);
         }
 
-        if ($link->type !== 'private') {
-            return response()->json(['url' => $link->url]);
+        $url = $link->url;
+        if ($link->type === 'private') {
+            $url = BunnyLinkService::generateSignedUrl(
+                $link->url, 
+                $link->link_path, 
+                $link->expiration_hours
+            );
         }
 
-        $signedUrl = BunnyLinkService::generateSignedUrl(
-            $link->url, 
-            $link->link_path, 
-            $link->expiration_hours
-        );
+        return response()->json([
+            'url' => $url,
+            'headers' => [
+                'user_agent' => $link->user_agent,
+                'referer' => $link->referer,
+                'origin' => $link->origin,
+                'cookie' => $link->cookie,
+            ]
+        ]);
+    }
 
-        return response()->json(['url' => $signedUrl]);
+    /**
+     * Gera link assinado para canal de TV.
+     */
+    public function channelPlay(Request $request, TvChannelLink $link)
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user && $link->player_sub !== 'free') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if ($link->player_sub === 'premium' && (!$user || !$user->hasPlan())) {
+            return response()->json(['error' => 'Premium required'], 403);
+        }
+
+        $url = $link->url;
+        if ($link->type === 'private') {
+            $url = BunnyLinkService::generateSignedUrl(
+                $link->url, 
+                $link->link_path, 
+                $link->expiration_hours
+            );
+        }
+
+        return response()->json([
+            'url' => $url,
+            'headers' => [
+                'user_agent' => $link->user_agent,
+                'referer' => $link->referer,
+                'origin' => $link->origin,
+                'cookie' => $link->cookie,
+            ]
+        ]);
+    }
+
+    /**
+     * Gera link assinado para evento ao vivo.
+     */
+    public function eventPlay(Request $request, EventLink $link)
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user && $link->player_sub !== 'free') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if ($link->player_sub === 'premium' && (!$user || !$user->hasPlan())) {
+            return response()->json(['error' => 'Premium required'], 403);
+        }
+
+        $url = $link->url;
+        if ($link->type === 'private') {
+            $url = BunnyLinkService::generateSignedUrl(
+                $link->url, 
+                $link->link_path, 
+                $link->expiration_hours
+            );
+        }
+
+        return response()->json([
+            'url' => $url,
+            'headers' => [
+                'user_agent' => $link->user_agent,
+                'referer' => $link->referer,
+                'origin' => $link->origin,
+                'cookie' => $link->cookie,
+            ]
+        ]);
     }
 }

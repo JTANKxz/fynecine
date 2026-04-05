@@ -275,16 +275,25 @@
                         <i class="fa-solid fa-list w-4 mr-1"></i> Todos os Usuários
                     </a>
                     <a href="{{ route('admin.comments.index') }}"
-                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.comments.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-comments w-4 mr-1"></i> Moderação (Comentários)
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.comments.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }} flex items-center justify-between">
+                        <span><i class="fa-solid fa-comments w-4 mr-1"></i> Moderação (Comentários)</span>
+                        @if($pending_comments_count > 0)
+                            <span class="bg-netflix text-[10px] px-1.5 py-0.5 rounded-full font-bold">{{ $pending_comments_count }}</span>
+                        @endif
                     </a>
                     <a href="{{ route('admin.requests.index') }}"
-                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.requests.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-hand-holding-heart w-4 mr-1"></i> Pedidos (Requests)
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.requests.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }} flex items-center justify-between">
+                        <span><i class="fa-solid fa-hand-holding-heart w-4 mr-1"></i> Pedidos (Requests)</span>
+                        @if($pending_requests_count > 0)
+                            <span class="bg-blue-500 text-[10px] px-1.5 py-0.5 rounded-full font-bold">{{ $pending_requests_count }}</span>
+                        @endif
                     </a>
                     <a href="{{ route('admin.tickets.index') }}"
-                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.tickets.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-headset w-4 mr-1"></i> Suporte e Tickets
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.tickets.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }} flex items-center justify-between">
+                        <span><i class="fa-solid fa-headset w-4 mr-1"></i> Suporte e Tickets</span>
+                        @if($pending_tickets_count > 0)
+                            <span class="bg-red-500 text-[10px] px-1.5 py-0.5 rounded-full font-bold">{{ $pending_tickets_count }}</span>
+                        @endif
                     </a>
                     <a href="{{ route('admin.in-app-notifications.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.in-app-notifications.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">

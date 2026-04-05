@@ -80,6 +80,8 @@ Route::middleware('api.token')->group(function () {
     // Links de Reprodução (Geração de URL Assinada)
     Route::get('/links/movie/{link}/play', [LinkController::class, 'moviePlay']);
     Route::get('/links/episode/{link}/play', [LinkController::class, 'episodePlay']);
+    Route::get('/links/channel/{link}/play', [LinkController::class, 'channelPlay']);
+    Route::get('/links/event/{link}/play', [LinkController::class, 'eventPlay']);
 
     /*
     |--------------------------------------------------------------------------

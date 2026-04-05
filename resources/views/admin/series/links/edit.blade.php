@@ -56,6 +56,7 @@
                         <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
                         <option value="mkv" {{ $link->type == 'mkv' ? 'selected' : '' }}>MKV</option>
                         <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>
+                        <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>Private (Bunny CDN)</option>
 
                     </select>
                 </div>
@@ -69,10 +70,56 @@
                         <option value="premium" {{ $link->player_sub == 'premium' ? 'selected' : '' }}>Premium</option>
 
                     </select>
-                </div>
-
             </div>
 
+            {{-- BUNNY CDN SETTINGS --}}
+            <div class="grid md:grid-cols-2 gap-4 p-4 border border-dashed border-neutral-700 bg-neutral-800/30 rounded">
+                <div class="md:col-span-2">
+                    <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Bunny CDN (Private Only)</h3>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Path do Vídeo</label>
+                    <input type="text" name="link_path" value="{{ old('link_path', $link->link_path) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="Ex: /d478e2ca-f254.../">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Expiração (Horas)</label>
+                    <input type="number" name="expiration_hours" value="{{ old('expiration_hours', $link->expiration_hours ?? 4) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
+                </div>
+            </div>
+
+            {{-- HTTP HEADERS --}}
+            <div class="grid md:grid-cols-2 gap-4 p-4 border border-dashed border-neutral-700 bg-neutral-800/20 rounded">
+                <div class="md:col-span-2">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">HTTP Headers & Cookies (Optional)</h3>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">User Agent</label>
+                    <input type="text" name="user_agent" value="{{ old('user_agent', $link->user_agent) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="ExoPlayer">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Referer</label>
+                    <input type="text" name="referer" value="{{ old('referer', $link->referer) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="https://meusite.com">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Origin</label>
+                    <input type="text" name="origin" value="{{ old('origin', $link->origin) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="https://meusite.com">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Cookie</label>
+                    <input type="text" name="cookie" value="{{ old('cookie', $link->cookie) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="key=value; key2=value2">
+                </div>
+            </div>
 
             {{-- SKIP INTRO --}}
             <div class="grid md:grid-cols-2 gap-4">

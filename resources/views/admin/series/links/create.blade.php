@@ -59,6 +59,7 @@
                         <option value="m3u8">M3U8</option>
                         <option value="mkv">MKV</option>
                         <option value="custom">Custom (Sniffer)</option>
+                        <option value="private">Private (Bunny CDN)</option>
 
                     </select>
                 </div>
@@ -74,6 +75,56 @@
                     </select>
                 </div>
 
+            </div>
+
+            {{-- BUNNY CDN SETTINGS --}}
+            <div class="grid md:grid-cols-2 gap-4 p-4 border border-dashed border-neutral-700 bg-neutral-800/30 rounded">
+                <div class="md:col-span-2">
+                    <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Bunny CDN (Private Only)</h3>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Path do Vídeo</label>
+                    <input type="text" name="link_path"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="Ex: /d478e2ca-f254.../">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Expiração (Horas)</label>
+                    <input type="number" name="expiration_hours"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        value="4">
+                </div>
+            </div>
+
+            {{-- HTTP HEADERS --}}
+            <div class="grid md:grid-cols-2 gap-4 p-4 border border-dashed border-neutral-700 bg-neutral-800/20 rounded">
+                <div class="md:col-span-2">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">HTTP Headers & Cookies (Optional)</h3>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">User Agent</label>
+                    <input type="text" name="user_agent"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="ExoPlayer">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Referer</label>
+                    <input type="text" name="referer"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="https://meusite.com">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Origin</label>
+                    <input type="text" name="origin"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="https://meusite.com">
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Cookie</label>
+                    <input type="text" name="cookie"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="key=value; key2=value2">
+                </div>
             </div>
 
             {{-- SKIP INTRO --}}

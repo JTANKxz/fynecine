@@ -25,7 +25,9 @@
 
         <div class="bg-neutral-900 rounded-lg overflow-hidden">
 
-            <table class="w-full">
+            <div class="table-container">
+
+                <table class="w-full">
 
                 <thead class="bg-neutral-800">
 
@@ -108,6 +110,7 @@
                 </tbody>
 
             </table>
+            </div>
 
             <div class="p-4">
 

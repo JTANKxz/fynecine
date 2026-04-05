@@ -292,4 +292,5 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
 
 });
 
-
+// PIX Checkout (página pública para WebView do app)
+Route::get('/pix/checkout/{pixPaymentId}', [\App\Http\Controllers\PixCheckoutController::class, 'show'])->name('pix.checkout');

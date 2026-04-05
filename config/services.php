@@ -40,4 +40,8 @@ return [
         'service_account' => storage_path('app/firebase-auth.json'),
     ],
 
+    'mercadopago' => [
+        'token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+    ],
+
 ];

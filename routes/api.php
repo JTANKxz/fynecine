@@ -144,3 +144,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Notificações — Listagem Pública (Internamente decide se mostra globais ou privadas)
 Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+
+// PIX Checkout (Mercado Pago)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/pix/create', [\App\Http\Controllers\Api\PixPaymentController::class, 'create']);
+});
+
+// Status público (consumido pelo JS da página de checkout)
+Route::get('/pix/status/{paymentId}', [\App\Http\Controllers\Api\PixPaymentController::class, 'status']);
+
+// Webhook do Mercado Pago (público — sem auth)
+Route::post('/webhooks/mercadopago', [\App\Http\Controllers\Api\PixWebhookController::class, 'handle']);

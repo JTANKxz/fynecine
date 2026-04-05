@@ -36,21 +36,11 @@ class PixPaymentController extends Controller
             return response()->json(['message' => 'Este plano não está disponível.'], 422);
         }
 
-        // Verificar se já existe um pagamento pendente para este plano
-        $existingPayment = PixPayment::where('user_id', $user->id)
+        // Cancela qualquer PIX "pendente" anterior para gerar sempre um novo limpo
+        PixPayment::where('user_id', $user->id)
             ->where('subscription_plan_id', $plan->id)
             ->where('status', 'pending')
-            ->where('expires_at', '>', now())
-            ->first();
-
-        if ($existingPayment) {
-            // Retorna o pagamento existente ainda válido
-            return response()->json([
-                'payment_id' => $existingPayment->id,
-                'checkout_url' => url("/pix/checkout/{$existingPayment->id}"),
-                'expires_at' => $existingPayment->expires_at->toISOString(),
-            ]);
-        }
+            ->update(['status' => 'cancelled']);
 
         try {
             $client = new PaymentClient();
@@ -113,12 +103,8 @@ class PixPaymentController extends Controller
     {
         $payment = PixPayment::with(['plan', 'user'])->findOrFail($paymentId);
 
-        // Se está pendente mas já expirou, marca como cancelled
-        if ($payment->isPending() && $payment->isExpired()) {
-            $payment->update(['status' => 'cancelled']);
-        } 
-        // Se ainda está pendente, consulta a API do MP (Fallback do Webhook)
-        elseif ($payment->isPending()) {
+        // Sempre consultar a API do MP se estiver pendente, independente de estar expirado localmente
+        if ($payment->isPending()) {
             try {
                 $client = new PaymentClient();
                 $mpPayment = $client->get($payment->mp_payment_id);
@@ -129,7 +115,7 @@ class PixPaymentController extends Controller
                         'paid_at' => Carbon::now(),
                     ]);
                     
-                    // Atribui o plano (lógica importada do Webhook)
+                    // Atribui o plano
                     $user = $payment->user;
                     $plan = $payment->plan;
                     
@@ -147,10 +133,15 @@ class PixPaymentController extends Controller
                     \Log::info('Polling: MercadoPago PIX Approved', ['payment_id' => $payment->id]);
                 } elseif ($mpPayment && in_array($mpPayment->status, ['rejected', 'cancelled'])) {
                     $payment->update(['status' => 'rejected']);
+                } elseif ($payment->isExpired()) {
+                    // MP ainda diz pending ou não processou, mas nossa janela expirou
+                    $payment->update(['status' => 'cancelled']);
                 }
             } catch (\Exception $e) {
-                // Silencia falhas de comunicação aqui para não quebrar o polling
-                \Log::warning('PixPaymentController::status MP Check Error', ['message' => $e->getMessage()]);
+                \Log::error('PixPaymentController::status MP Check Error', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
         }
 

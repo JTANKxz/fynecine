@@ -23,38 +23,45 @@ class SubscriptionController extends Controller
         $formattedPlans = $plans->map(function ($plan) {
             $type = $plan->plan_type;
             $features = collect($plan->features ?? []);
-            $readableFeatures = collect();
+            
+            // Lista comparativa de benefícios (Sync total entre planos)
+            $comparisonFeatures = collect();
 
-            // 1. Perfis
+            // 1. Jogos ao Vivo (O ponto chave)
+            $comparisonFeatures->push([
+                'name' => 'Jogos e Eventos Ao Vivo',
+                'included' => $type === 'premium'
+            ]);
+
+            // 2. Perfis
             $maxProfiles = ($type === 'premium') ? 6 : (($type === 'basic') ? 3 : 1);
-            $readableFeatures->push("✅ Até {$maxProfiles} perfis de usuário");
+            $comparisonFeatures->push([
+                'name' => "Até {$maxProfiles} perfis de usuário",
+                'included' => true
+            ]);
 
-            // 2. Anúncios
-            if ($features->contains('no_ads')) {
-                $readableFeatures->push("✅ Sem anúncios (Interface Limpa)");
-            }
-
-            // 3. Eventos Ao Vivo
-            if ($type === 'premium') {
-                $readableFeatures->push("✅ Jogos e Eventos Ao Vivo");
-            } else {
-                $readableFeatures->push("❌ Sem Eventos Ao Vivo");
-            }
-
-            // 4. Canais
-            if ($features->contains('premium_channels')) {
-                $readableFeatures->push("✅ Todos os Canais de TV (IPTV)");
-            }
-
-            // 5. Quotas Diárias
+            // 3. Quotas Diárias (Requests e Support)
             $quota = ($type === 'premium') ? 5 : (($type === 'basic') ? 3 : 1);
-            $readableFeatures->push("✅ {$quota} Pedidos de filmes diários");
-            $readableFeatures->push("✅ {$quota} Suporte prioritário diário");
+            $comparisonFeatures->push([
+                'name' => "{$quota} Pedidos de filmes diários",
+                'included' => true
+            ]);
+            $comparisonFeatures->push([
+                'name' => "{$quota} Suporte prioritário diário",
+                'included' => true
+            ]);
 
-            // 6. Diferenciais do Banco (se houver extras)
-            if ($features->contains('priority_support') && $type !== 'premium') {
-                $readableFeatures->push("✅ Suporte Prioritário");
-            }
+            // 4. Anúncios
+            $comparisonFeatures->push([
+                'name' => 'Navegação Sem anúncios',
+                'included' => $features->contains('no_ads')
+            ]);
+
+            // 5. Canais
+            $comparisonFeatures->push([
+                'name' => 'Canais de TV (IPTV)',
+                'included' => $features->contains('premium_channels')
+            ]);
 
             return [
                 'id' => $plan->id,
@@ -62,7 +69,7 @@ class SubscriptionController extends Controller
                 'plan_type' => $plan->plan_type,
                 'price' => $plan->price,
                 'duration_days' => $plan->duration_days,
-                'features' => $readableFeatures->values(),
+                'features' => $comparisonFeatures->values(),
                 'raw_features' => $plan->features
             ];
         });

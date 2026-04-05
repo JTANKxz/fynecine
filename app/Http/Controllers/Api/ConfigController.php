@@ -82,6 +82,8 @@ class ConfigController extends Controller
                 (filter_var($config->custom_interstitial_media, FILTER_VALIDATE_URL) ? $config->custom_interstitial_media : asset('storage/' . $config->custom_interstitial_media)) : null,
             'custom_interstitial_link' => $config->custom_interstitial_link,
             'interstitial_interval' => (int) $config->interstitial_interval,
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+          ->header('Pragma', 'no-cache')
+          ->header('Expires', '0');
     }
 }

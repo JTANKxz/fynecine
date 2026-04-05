@@ -35,7 +35,8 @@ class HomeSectionController extends Controller
         $categories = \App\Models\ContentCategory::orderBy('order')->get();
         
         // Buscar sliders desta página/categoria
-        $sliders = \App\Models\Slider::where('content_category_id', $categoryId)
+        $sliders = \App\Models\Slider::with(['movie', 'serie'])
+            ->where('content_category_id', $categoryId)
             ->orderBy('position')
             ->get();
 

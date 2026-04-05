@@ -13,11 +13,6 @@ class TvChannelController extends Controller
 
     public function index(Request $request)
     {
-        $config = \App\Models\AppConfig::getSettings();
-        if (!$config->is_channels_active) {
-            return response()->json(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20));
-        }
-
         $query = TvChannel::with('categories');
 
         // Filtro por categoria

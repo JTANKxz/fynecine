@@ -14,6 +14,8 @@ class Slider extends Model
         'content_category_id'
     ];
 
+    protected $appends = ['title', 'image_url'];
+
     public function category()
     {
         return $this->belongsTo(ContentCategory::class, 'content_category_id');
@@ -34,5 +36,19 @@ class Slider extends Model
         return $this->content_type === 'movie'
             ? $this->movie
             : $this->serie;
+    }
+
+    public function getTitleAttribute()
+    {
+        $content = $this->content;
+        if (!$content) return null;
+        return $this->content_type === 'movie' ? $content->title : $content->name;
+    }
+
+    public function getImageUrlAttribute()
+    {
+        $content = $this->content;
+        if (!$content) return null;
+        return $content->backdrop_url ?? $content->poster_url ?? null;
     }
 }

@@ -15,7 +15,7 @@ class SliderController extends Controller
     {
         $categoryId = $request->query('category_id');
         
-        $query = Slider::orderBy('position');
+        $query = Slider::with(['movie', 'serie'])->orderBy('position');
         
         if ($categoryId) {
             $query->where('content_category_id', $categoryId);

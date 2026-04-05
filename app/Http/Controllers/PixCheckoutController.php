@@ -17,6 +17,7 @@ class PixCheckoutController extends Controller
         return view('pix.checkout', [
             'payment' => $payment,
             'plan' => $payment->plan,
+            'apiToken' => \App\Models\AppConfig::getSettings()->api_token_key,
         ]);
     }
 }

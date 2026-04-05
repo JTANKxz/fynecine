@@ -411,7 +411,7 @@
             fetch(`/api/pix/status/${paymentId}?_t=${new Date().getTime()}`, { 
                 cache: 'no-store',
                 headers: {
-                    'X-API-Token': 'jtanktlg2020',
+                    'X-API-Token': '{{ $apiToken }}',
                     'Content-Type': 'application/json'
                 }
             })

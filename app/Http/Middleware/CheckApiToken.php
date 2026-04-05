@@ -27,7 +27,7 @@ class CheckApiToken
         }
 
         $token = $request->header('X-API-Token');
-        $expectedToken = 'jtanktlg2020';
+        $expectedToken = \App\Models\AppConfig::getSettings()->api_token_key;
 
         if ($token !== $expectedToken) {
             return response()->json([

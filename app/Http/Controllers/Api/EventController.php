@@ -22,8 +22,10 @@ class EventController extends Controller
             ->orderBy('start_time')
             ->get()
             ->map(function ($event) {
+                $user = auth('sanctum')->user();
                 $event->home_team_image = $event->homeTeam?->image_url;
                 $event->away_team_image = $event->awayTeam?->image_url;
+                $event->is_locked = !($user && $user->canWatchEvents());
                 unset($event->homeTeam, $event->awayTeam);
                 return $event;
             });
@@ -44,13 +46,13 @@ class EventController extends Controller
 
         // Se o modo de segurança não estiver bloqueando
         if (!$config->security_mode) {
-            $hasPlan = $user && $user->hasPlan();
+            $canWatch = $user && $user->canWatchEvents();
             
             foreach ($event->links as $link) {
                 $playLinks->push([
                     'id' => $link->id,
                     'name' => $link->name,
-                    'url' => ($hasPlan || $link->player_sub === 'free') ? $link->url : null,
+                    'url' => ($canWatch || $link->player_sub === 'free') ? $link->url : null,
                     'type' => $link->type
                 ]);
             }

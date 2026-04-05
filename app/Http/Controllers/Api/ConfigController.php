@@ -61,11 +61,14 @@ class ConfigController extends Controller
             'autoembed_movie_sources' => array_values($config->autoembed_movie_sources ?? []),
             'autoembed_serie_sources' => array_values($config->autoembed_serie_sources ?? []),
 
-            // Ads Settings
-            'ads_banner_status' => (bool) $config->ads_banner_status,
+            // ========= ADS LOGIC: Disable for Basic/Premium =========
+            'ads_banner_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_banner_status),
             'ads_banner_type' => $config->ads_banner_type,
-            'ads_interstitial_status' => (bool) $config->ads_interstitial_status,
+            'ads_interstitial_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_interstitial_status),
             'ads_interstitial_type' => $config->ads_interstitial_type,
+            'ads_native_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_native_status),
+            'ads_rewarded_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_rewarded_status),
+            // ========================================================
             
             'admob_app_id' => $config->admob_app_id,
             'admob_banner_id' => $config->admob_banner_id,

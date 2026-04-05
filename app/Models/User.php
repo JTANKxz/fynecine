@@ -135,14 +135,39 @@ class User extends Authenticatable
     public function maxProfilesCount(): int
     {
         if ($this->isPremium()) {
-            return 6; // Main + 4 normal + 1 kids
+            return 6; // Master + 5
         }
 
         if ($this->isBasic()) {
-            return 3; // Main + 2 normal
+            return 3; // Master + 2
         }
 
-        return 2; // Free: Main + 1 normal
+        return 1; // Free: Apenas o perfil principal
+    }
+
+    /**
+     * Limites Diários: Free=1, Basic=3, Premium=5
+     */
+    public function getDailyRequestLimit(): int
+    {
+        if ($this->isPremium()) return 5;
+        if ($this->isBasic()) return 3;
+        return 1;
+    }
+
+    public function getDailyTicketLimit(): int
+    {
+        if ($this->isPremium()) return 5;
+        if ($this->isBasic()) return 3;
+        return 1;
+    }
+
+    /**
+     * Acesso a Eventos Ao Vivo (Apenas Premium)
+     */
+    public function canWatchEvents(): bool
+    {
+        return $this->isPremium();
     }
     public function notifications()
     {

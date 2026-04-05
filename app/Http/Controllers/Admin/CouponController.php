@@ -29,8 +29,9 @@ class CouponController extends Controller
             'plan' => ['nullable', 'required_without:subscription_plan_id', 'in:basic,premium'],
             'days' => ['nullable', 'required_without:subscription_plan_id', 'integer', 'min:1'],
             'max_uses' => ['nullable', 'integer', 'min:1'],
-            // Features Opcionais (Legacy)
+            // Features (Configuração Individual de Benefícios)
             'feature_no_ads' => ['nullable'],
+            'feature_live_events' => ['nullable'],
             'feature_priority_support' => ['nullable'],
             'feature_priority_requests' => ['nullable'],
             'feature_premium_channels' => ['nullable'],
@@ -38,6 +39,7 @@ class CouponController extends Controller
 
         $features = [];
         if ($request->has('feature_no_ads')) $features[] = 'no_ads';
+        if ($request->has('feature_live_events')) $features[] = 'live_events';
         if ($request->has('feature_priority_support')) $features[] = 'priority_support';
         if ($request->has('feature_priority_requests')) $features[] = 'priority_requests';
         if ($request->has('feature_premium_channels')) $features[] = 'premium_channels';
@@ -69,10 +71,17 @@ class CouponController extends Controller
             'plan' => ['nullable', 'required_without:subscription_plan_id', 'in:basic,premium'],
             'days' => ['nullable', 'required_without:subscription_plan_id', 'integer', 'min:1'],
             'max_uses' => ['nullable', 'integer', 'min:1'],
+            // Features (Configuração Individual de Benefícios)
+            'feature_no_ads' => ['nullable'],
+            'feature_live_events' => ['nullable'],
+            'feature_priority_support' => ['nullable'],
+            'feature_priority_requests' => ['nullable'],
+            'feature_premium_channels' => ['nullable'],
         ]);
 
         $features = [];
         if ($request->has('feature_no_ads')) $features[] = 'no_ads';
+        if ($request->has('feature_live_events')) $features[] = 'live_events';
         if ($request->has('feature_priority_support')) $features[] = 'priority_support';
         if ($request->has('feature_priority_requests')) $features[] = 'priority_requests';
         if ($request->has('feature_premium_channels')) $features[] = 'premium_channels';

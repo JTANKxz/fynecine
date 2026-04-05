@@ -16,18 +16,38 @@ class SubscriptionController extends Controller
      */
     public function plans(): JsonResponse
     {
+        // Mapa de nomes legíveis para os benefícios (Anti-Crack e Profissional)
+        $benefitNames = [
+            'no_ads' => 'Sem anúncios (Banner/Intersticial)',
+            'live_events' => 'Jogos e Eventos Ao Vivo (Premium)',
+            'priority_support' => 'Suporte Prioritário Via Ticket',
+            'priority_requests' => 'Pedidos de Filmes Prioritários',
+            'premium_channels' => 'Todos os Canais de TV (IPTV)',
+            'max_profiles' => 'Suporte a Múltiplos Perfis',
+        ];
+
         $plans = \App\Models\SubscriptionPlan::where('is_active', true)
             ->orderBy('price', 'asc')
-            ->get([
-                'id', 
-                'name', 
-                'plan_type', 
-                'price', 
-                'duration_days', 
-                'features'
-            ]);
+            ->get();
 
-        return response()->json($plans);
+        $formattedPlans = $plans->map(function ($plan) use ($benefitNames) {
+            // Converte os identificadores (no_ads) em nomes reais para o App
+            $readableFeatures = collect($plan->features ?? [])->map(function ($feature) use ($benefitNames) {
+                return $benefitNames[$feature] ?? ucfirst(str_replace('_', ' ', $feature));
+            })->values();
+
+            return [
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'plan_type' => $plan->plan_type,
+                'price' => $plan->price,
+                'duration_days' => $plan->duration_days,
+                'features' => $readableFeatures, // Agora vem com nomes reais!
+                'raw_features' => $plan->features // Caso o app precise do ID original
+            ];
+        });
+
+        return response()->json($formattedPlans);
     }
 
     /**
@@ -61,8 +81,12 @@ class SubscriptionController extends Controller
         $daysToAdd = $coupon->subscription_plan_id ? $coupon->subscriptionPlan->duration_days : $coupon->days;
         $planType = $coupon->subscription_plan_id ? $coupon->subscriptionPlan->plan_type : $coupon->plan;
         
-        // As features também vêm do plano se ele existir, senão do próprio cupom
-        $features = $coupon->subscription_plan_id ? $coupon->subscriptionPlan->features : $coupon->features;
+        // As features também vêm do plano se ele existir, mesclando com as do próprio cupom (Sobrescrita inteligente)
+        $planFeatures = $coupon->subscription_plan_id ? ($coupon->subscriptionPlan->features ?? []) : [];
+        $couponFeatures = $coupon->features ?? [];
+        
+        // Combina os dois arrays e remove duplicatas
+        $features = array_unique(array_merge($planFeatures, $couponFeatures));
 
         $currentExpires = $user->plan_expires_at && $user->plan_expires_at->isFuture()
             ? $user->plan_expires_at

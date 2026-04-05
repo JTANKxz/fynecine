@@ -56,13 +56,8 @@ class TicketController extends Controller
 
         $user = $request->user();
 
-        // Limites baseados no plano: Premium = 6, Basic = 3, Free = 1
-        $limit = 1;
-        if ($user->isPremium()) {
-            $limit = 6;
-        } elseif ($user->isBasic()) {
-            $limit = 3;
-        }
+        // Limites baseados no plano: Premium = 5, Basic = 3, Free = 1
+        $limit = $user->getDailyTicketLimit();
 
         $todayTickets = Ticket::where('user_id', $user->id)
             ->whereDate('created_at', now()->toDateString())

@@ -94,13 +94,8 @@ class RequestController extends Controller
 
         $user = $request->user();
         
-        // Verifica Cota (Free=1, Basic=3, Premium=6)
-        $limit = 1; // Default
-        if ($user->isPremium()) {
-            $limit = 6;
-        } elseif ($user->isBasic()) {
-            $limit = 3;
-        }
+        // Verifica Cota (Free=1, Basic=3, Premium=5)
+        $limit = $user->getDailyRequestLimit();
 
         $requestsToday = ContentRequest::where('user_id', $user->id)
             ->whereDate('created_at', now()->toDateString())

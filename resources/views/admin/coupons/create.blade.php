@@ -83,22 +83,42 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label class="flex items-center p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
                     <input type="checkbox" name="feature_no_ads" value="1" checked class="w-5 h-5 accent-netflix rounded border-neutral-600 bg-neutral-700">
-                    <span class="ml-3 text-sm">Sem Anúncios</span>
+                    <div class="ml-3">
+                        <span class="block text-sm font-bold">Sem Anúncios</span>
+                        <span class="block text-xs text-neutral-500">Remove banners e interstitials.</span>
+                    </div>
+                </label>
+
+                <label class="flex items-center p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
+                    <input type="checkbox" name="feature_live_events" value="1" class="w-5 h-5 accent-netflix rounded border-neutral-600 bg-neutral-700">
+                    <div class="ml-3">
+                        <span class="block text-sm font-bold">Eventos Ao Vivo (Jogos)</span>
+                        <span class="block text-xs text-neutral-500">Libera acesso aos jogos e transmissões ao vivo.</span>
+                    </div>
                 </label>
                 
                 <label class="flex items-center p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
                     <input type="checkbox" name="feature_priority_support" value="1" class="w-5 h-5 accent-netflix rounded border-neutral-600 bg-neutral-700">
-                    <span class="ml-3 text-sm">Suporte Prioritário</span>
+                    <div class="ml-3">
+                        <span class="block text-sm font-bold">Suporte Prioritário</span>
+                        <span class="block text-xs text-neutral-500">Aumenta o limite diário de tickets de suporte.</span>
+                    </div>
                 </label>
 
                 <label class="flex items-center p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
                     <input type="checkbox" name="feature_priority_requests" value="1" class="w-5 h-5 accent-netflix rounded border-neutral-600 bg-neutral-700">
-                    <span class="ml-3 text-sm">Pedidos de Conteúdo Prioritários</span>
+                    <div class="ml-3">
+                        <span class="block text-sm font-bold">Pedidos Prioritários</span>
+                        <span class="block text-xs text-neutral-500">Aumenta o limite diário de pedidos de conteúdo.</span>
+                    </div>
                 </label>
 
                 <label class="flex items-center p-3 bg-neutral-800/50 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-800 transition">
                     <input type="checkbox" name="feature_premium_channels" value="1" class="w-5 h-5 accent-netflix rounded border-neutral-600 bg-neutral-700">
-                    <span class="ml-3 text-sm">Canais Premium (TV ao Vivo)</span>
+                    <div class="ml-3">
+                        <span class="block text-sm font-bold">Canais de TV (IPTV)</span>
+                        <span class="block text-xs text-neutral-500">Libera a grade completa de canais de TV.</span>
+                    </div>
                 </label>
             </div>
         </div>

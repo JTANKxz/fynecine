@@ -97,6 +97,9 @@ class SettingController extends Controller
             'interstitial_interval' => ['nullable', 'integer', 'min:0'],
             'ads_native_status' => ['nullable', 'boolean'],
             'ads_rewarded_status' => ['nullable', 'boolean'],
+            
+            'bunny_security_key' => ['nullable', 'string', 'max:255'],
+            'bunny_cdn_url' => ['nullable', 'string', 'max:255'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -196,6 +199,9 @@ class SettingController extends Controller
             $config->custom_interstitial_media = $request->custom_interstitial_media_url;
         }
         $config->custom_interstitial_link = $request->custom_interstitial_link;
+
+        $config->bunny_security_key = $request->bunny_security_key;
+        $config->bunny_cdn_url = $request->bunny_cdn_url;
 
         $config->save();
 

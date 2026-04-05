@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\NetworkController;
 use App\Http\Controllers\Api\HomeSectionController;
 use App\Http\Controllers\Api\AvatarController;
+use App\Http\Controllers\Api\LinkController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('api.token')->group(function () {
@@ -75,6 +76,10 @@ Route::middleware('api.token')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\WatchProgressController::class, 'index']);
         Route::get('/{contentId}', [\App\Http\Controllers\Api\WatchProgressController::class, 'show']);
     });
+
+    // Links de Reprodução (Geração de URL Assinada)
+    Route::get('/links/movie/{link}/play', [LinkController::class, 'moviePlay']);
+    Route::get('/links/episode/{link}/play', [LinkController::class, 'episodePlay']);
 
     /*
     |--------------------------------------------------------------------------

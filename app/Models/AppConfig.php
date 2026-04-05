@@ -65,6 +65,8 @@ class AppConfig extends Model
         'interstitial_interval',
         'ads_native_status',
         'ads_rewarded_status',
+        'bunny_security_key',
+        'bunny_cdn_url',
     ];
 
     protected $casts = [

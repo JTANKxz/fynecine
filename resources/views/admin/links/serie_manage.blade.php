@@ -52,7 +52,12 @@
                                             <option value="mp4">MP4</option>
                                             <option value="m3u8">M3U8</option>
                                             <option value="custom">CUSTOM</option>
+                                            <option value="private">PRIVATE</option>
                                         </select>
+                                        <div class="bunny-fields hidden flex gap-1">
+                                            <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-24">
+                                            <input type="number" name="expiration_hours" value="4" placeholder="Exp (h)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-12">
+                                        </div>
                                         <select name="player_sub" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none text-yellow-500 font-bold">
                                             <option value="free">FREE</option>
                                             <option value="premium">VIP</option>
@@ -99,8 +104,15 @@
                                                             <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
                                                             <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
                                                             <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
+                                                            <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>PRIVATE</option>
                                                         </select>
                                                     </div>
+                                                    @if($link->type == 'private')
+                                                    <div class="flex gap-1 mt-1">
+                                                        <input type="text" name="link_path" value="{{ $link->link_path }}" placeholder="Path" class="w-1/2 bg-black/40 border-none rounded px-2 py-1 text-[8px] text-neutral-400">
+                                                        <input type="number" name="expiration_hours" value="{{ $link->expiration_hours }}" placeholder="Hs" class="w-1/4 bg-black/40 border-none rounded px-2 py-1 text-[8px] text-neutral-400">
+                                                    </div>
+                                                    @endif
                                                 </div>
                                                 <div>
                                                     <label class="block text-[9px] text-neutral-500 uppercase font-bold mb-1">Assinatura / Ordem</label>
@@ -163,5 +175,19 @@
             document.getElementById(`delete-link-${id}`).submit();
         }
     }
+
+    document.querySelectorAll('select[name="type"]').forEach(select => {
+        select.addEventListener('change', function() {
+            const form = this.closest('form');
+            const bunnyFields = form.querySelector('.bunny-fields');
+            if (bunnyFields) {
+                if (this.value === 'private') {
+                    bunnyFields.classList.remove('hidden');
+                } else {
+                    bunnyFields.classList.add('hidden');
+                }
+            }
+        });
+    });
 </script>
 @endsection

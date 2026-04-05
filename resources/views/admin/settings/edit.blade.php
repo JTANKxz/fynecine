@@ -236,6 +236,27 @@
                     </div>
                 </div>
 
+                <!-- BUNNY CDN CONFIG -->
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
+                    <h3 class="text-white font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-bolt text-yellow-400"></i> Bunny CDN (Token Auth)
+                    </h3>
+                    <p class="text-[10px] text-neutral-500 leading-tight">Configurações globais para links do tipo <code>private</code>. A Security Key nunca é exposta ao app.</p>
+
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Security Key (Token Authentication)</label>
+                        <input type="password" name="bunny_security_key" value="{{ old('bunny_security_key', $config->bunny_security_key) }}" 
+                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-yellow-500 outline-none font-mono text-sm" placeholder="Sua Security Key do Bunny">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Host CDN Padrão</label>
+                        <input type="text" name="bunny_cdn_url" value="{{ old('bunny_cdn_url', $config->bunny_cdn_url) }}" 
+                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-yellow-500 outline-none text-sm font-mono" placeholder="ex: seu-cdn.b-cdn.net">
+                        <p class="text-[10px] text-neutral-600 mt-1">Usado se o link for inserido sem o host completo.</p>
+                    </div>
+                </div>
+
                 <!-- UPDATE INFO -->
                 <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                     <h3 class="text-white font-bold flex items-center gap-2">

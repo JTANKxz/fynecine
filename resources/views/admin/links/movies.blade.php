@@ -48,7 +48,12 @@
                             <option value="mp4">MP4</option>
                             <option value="m3u8">M3U8</option>
                             <option value="custom">CUSTOM</option>
+                            <option value="private">PRIVATE (BUNNY)</option>
                         </select>
+                        <div class="bunny-fields hidden flex gap-2">
+                            <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-28 outline-none">
+                            <input type="number" name="expiration_hours" placeholder="Exp (h)" value="4" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-16 outline-none">
+                        </div>
                         <select name="player_sub" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none text-yellow-500 font-bold">
                             <option value="free">FREE</option>
                             <option value="premium">VIP</option>
@@ -86,12 +91,20 @@
                                             <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
                                             <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
                                             <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
+                                            <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>PRIVATE</option>
                                         </select>
                                         <select name="player_sub" class="bg-transparent border-none text-[9px] p-0 outline-none {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-400' }}">
                                             <option value="free" {{ $link->player_sub == 'free' ? 'selected' : '' }}>FREE</option>
                                             <option value="premium" {{ $link->player_sub == 'premium' ? 'selected' : '' }}>VIP</option>
                                         </select>
                                     </div>
+
+                                    @if($link->type == 'private')
+                                    <div class="grid grid-cols-2 gap-2 mt-1 p-1 bg-black/20 rounded border border-neutral-800/50">
+                                        <input type="text" name="link_path" value="{{ $link->link_path }}" placeholder="Path override" class="bg-transparent text-[8px] text-neutral-400 outline-none border-r border-neutral-800 px-1">
+                                        <input type="number" name="expiration_hours" value="{{ $link->expiration_hours }}" placeholder="Exp (h)" class="bg-transparent text-[8px] text-neutral-400 outline-none px-1">
+                                    </div>
+                                    @endif
                                 </form>
                                 <form id="delete-link-{{ $link->id }}" action="{{ route('admin.links.movies.delete', $link->id) }}" method="POST" class="hidden">
                                     @csrf @method('DELETE')
@@ -117,5 +130,19 @@
             document.getElementById(`delete-link-${id}`).submit();
         }
     }
+
+    document.querySelectorAll('select[name="type"]').forEach(select => {
+        select.addEventListener('change', function() {
+            const form = this.closest('form');
+            const bunnyFields = form.querySelector('.bunny-fields');
+            if (bunnyFields) {
+                if (this.value === 'private') {
+                    bunnyFields.classList.remove('hidden');
+                } else {
+                    bunnyFields.classList.add('hidden');
+                }
+            }
+        });
+    });
 </script>
 @endsection

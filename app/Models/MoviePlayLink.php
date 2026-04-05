@@ -14,6 +14,8 @@ class MoviePlayLink extends Model
         'url',
         'type',
         'player_sub',
+        'link_path',
+        'expiration_hours',
     ];
     
     protected $casts = [

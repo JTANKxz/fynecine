@@ -205,11 +205,17 @@ class SerieController extends Controller
                             $user = Auth::guard('sanctum')->user();
                             $hasPlan = $user && $user->hasPlan();
 
-                            foreach ($episode->links as $link) {
+                            foreach ($episode->links->sortBy('order') as $link) {
+                                $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
+                                
+                                if ($url && $link->type === 'private') {
+                                    $url = url("/api/links/episode/{$link->id}/play");
+                                }
+
                                 $links->push([
                                     'id' => $link->id,
                                     'name' => $link->name,
-                                    'url' => $hasPlan || $link->player_sub === 'free' ? $link->url : null,
+                                    'url' => $url,
                                     'type' => $link->type,
                                     'quality' => $link->quality,
                                     'player_sub' => $link->player_sub,

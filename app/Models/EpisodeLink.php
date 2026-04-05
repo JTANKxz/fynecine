@@ -17,7 +17,9 @@ class EpisodeLink extends Model
         'skip_intro_start',
         'skip_intro_end',
         'skip_ending_start',
-        'skip_ending_end'
+        'skip_ending_end',
+        'link_path',
+        'expiration_hours',
     ];
 
     public function episode()

@@ -45,10 +45,12 @@ class LinkController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
-            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
+            'link_path' => 'nullable|string|max:255',
+            'expiration_hours' => 'nullable|integer|min:1',
         ]);
 
         $movie->playLinks()->create($validated);
@@ -61,10 +63,12 @@ class LinkController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
-            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
+            'link_path' => 'nullable|string|max:255',
+            'expiration_hours' => 'nullable|integer|min:1',
         ]);
 
         $link->update($validated);
@@ -97,6 +101,8 @@ class LinkController extends Controller
             'skip_intro_end' => 'nullable|integer',
             'skip_ending_start' => 'nullable|integer',
             'skip_ending_end' => 'nullable|integer',
+            'link_path' => 'nullable|string|max:255',
+            'expiration_hours' => 'nullable|integer|min:1',
         ]);
 
         $episode->links()->create($validated);
@@ -117,6 +123,8 @@ class LinkController extends Controller
             'skip_intro_end' => 'nullable|integer',
             'skip_ending_start' => 'nullable|integer',
             'skip_ending_end' => 'nullable|integer',
+            'link_path' => 'nullable|string|max:255',
+            'expiration_hours' => 'nullable|integer|min:1',
         ]);
 
         $link->update($validated);

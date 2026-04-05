@@ -16,7 +16,6 @@ class CheckApiToken
      */
     public function handle(Request $request, Closure $next)
     {
-        exit('IS EXECUTING THIS FILE');
         
         // Debug: Log the path
         \Log::info('CheckApiToken Path: ' . $request->path());

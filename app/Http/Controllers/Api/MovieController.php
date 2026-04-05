@@ -148,6 +148,12 @@ class MovieController extends Controller
                     'skip_intro_end' => $link->skip_intro_end,
                     'skip_ending_start' => $link->skip_ending_start,
                     'skip_ending_end' => $link->skip_ending_end,
+                    'headers' => [
+                        'user_agent' => $link->user_agent,
+                        'referer' => $link->referer,
+                        'origin' => $link->origin,
+                        'cookie' => $link->cookie,
+                    ]
                 ]);
             }
 

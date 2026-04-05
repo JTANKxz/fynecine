@@ -12,6 +12,12 @@ class EventLink extends Model
         'url',
         'type',
         'player_sub',
+        'link_path',
+        'expiration_hours',
+        'user_agent',
+        'referer',
+        'origin',
+        'cookie',
     ];
 
     public function event()

@@ -205,14 +205,12 @@ class SerieController extends Controller
                             $user = Auth::guard('sanctum')->user();
                             $hasPlan = $user && $user->hasPlan();
 
-                            foreach ($episode->links->sortBy('order') as $link) {
+                            $links = $episode->links->sortBy('order')->map(function($link) use ($hasPlan) {
                                 $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
-                                
                                 if ($url && $link->type === 'private') {
                                     $url = url("/api/links/episode/{$link->id}/play");
                                 }
-
-                                $links->push([
+                                return [
                                     'id' => $link->id,
                                     'name' => $link->name,
                                     'url' => $url,
@@ -223,8 +221,14 @@ class SerieController extends Controller
                                     'skip_intro_end' => $link->skip_intro_end,
                                     'skip_ending_start' => $link->skip_ending_start,
                                     'skip_ending_end' => $link->skip_ending_end,
-                                ]);
-                            }
+                                    'headers' => [
+                                        'user_agent' => $link->user_agent,
+                                        'referer' => $link->referer,
+                                        'origin' => $link->origin,
+                                        'cookie' => $link->cookie,
+                                    ]
+                                ];
+                            });
 
                             if ($config->autoembed_series && $config->autoembed_serie_url) {
                                 $autoSub = $config->autoembed_serie_player_sub ?? 'free';

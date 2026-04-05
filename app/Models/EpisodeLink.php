@@ -20,6 +20,10 @@ class EpisodeLink extends Model
         'skip_ending_end',
         'link_path',
         'expiration_hours',
+        'user_agent',
+        'referer',
+        'origin',
+        'cookie',
     ];
 
     public function episode()

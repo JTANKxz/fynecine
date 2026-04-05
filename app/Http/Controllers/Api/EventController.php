@@ -49,11 +49,23 @@ class EventController extends Controller
             $canWatch = $user && $user->canWatchEvents();
             
             foreach ($event->links as $link) {
+                $url = ($canWatch || $link->player_sub === 'free') ? $link->url : null;
+
+                if ($url && $link->type === 'private') {
+                    $url = url("/api/links/event/{$link->id}/play");
+                }
+
                 $playLinks->push([
                     'id' => $link->id,
                     'name' => $link->name,
-                    'url' => ($canWatch || $link->player_sub === 'free') ? $link->url : null,
-                    'type' => $link->type
+                    'url' => $url,
+                    'type' => $link->type,
+                    'headers' => [
+                        'user_agent' => $link->user_agent,
+                        'referer' => $link->referer,
+                        'origin' => $link->origin,
+                        'cookie' => $link->cookie,
+                    ]
                 ]);
             }
         }

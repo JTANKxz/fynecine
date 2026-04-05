@@ -108,10 +108,16 @@ class TvChannelController extends Controller
             'name' => 'required|string|max:255',
             'order' => 'nullable|integer',
             'url' => 'required|string',
-            'type' => 'required|in:embed,m3u8,custom',
+            'type' => 'required|in:embed,m3u8,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
-
+        
         $validated['tv_channel_id'] = $channel->id;
 
         TvChannelLink::create($validated);
@@ -132,8 +138,14 @@ class TvChannelController extends Controller
             'name' => 'required|string|max:255',
             'order' => 'nullable|integer',
             'url' => 'required|string',
-            'type' => 'required|in:embed,m3u8,custom',
+            'type' => 'required|in:embed,m3u8,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $link->update($validated);

@@ -108,8 +108,14 @@ class EventController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|string',
-            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom',
+            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $event->links()->create($data);
@@ -128,8 +134,14 @@ class EventController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|string',
-            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom',
+            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $link->update($data);

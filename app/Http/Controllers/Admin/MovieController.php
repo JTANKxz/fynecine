@@ -114,9 +114,15 @@ class MovieController extends Controller
             'name' => 'required|string|max:255',
             'quality' => 'nullable|string|max:50',
             'order' => 'nullable|integer',
-            'url' => 'required|url',
-            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
+            'url' => 'required|string',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $validated['movie_id'] = $movie->id;
@@ -139,10 +145,16 @@ class MovieController extends Controller
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'url' => 'required|string',
-            'type' => 'required|in:embed,mp4,m3u8,mkv,custom',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
-
+        
         $link->update($data);
 
         return redirect()

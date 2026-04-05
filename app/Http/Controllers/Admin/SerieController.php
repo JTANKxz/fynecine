@@ -186,6 +186,19 @@ class SerieController extends Controller
 
     public function storeEpisodeLink(Request $request, Episode $episode)
     {
+        $request->validate([
+            'name' => 'required',
+            'url' => 'required',
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
+            'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
+        ]);
+
         $data = $request->all();
 
         $data['skip_intro_start'] = $this->timeToSeconds($request->skip_intro_start);
@@ -223,7 +236,14 @@ class SerieController extends Controller
         $request->validate([
             'name' => 'required',
             'url' => 'required',
-            'type' => 'required'
+            'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
+            'player_sub' => 'required|in:free,premium',
+            'link_path' => 'nullable|string',
+            'expiration_hours' => 'nullable|integer',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $data = $request->all();

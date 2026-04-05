@@ -16,28 +16,30 @@ class BunnyLinkService
      */
     public static function generateSignedUrl(string $url, ?string $linkPath = null, ?int $expirationHours = 4)
     {
-        $config = AppConfig::getSettings();
-        $securityKey = $config->bunny_security_key;
+        $securityKey = env('BUNNY_SECURITY_KEY');
+        $cdnUrl = env('BUNNY_CDN_URL');
+
+        if (!$securityKey || !$cdnUrl) {
+            $config = AppConfig::getSettings();
+            $securityKey = $securityKey ?: $config->bunny_security_key;
+            $cdnUrl = $cdnUrl ?: $config->bunny_cdn_url;
+        }
         
         if (!$securityKey) {
             return $url;
         }
 
         $parsedUrl = parse_url($url);
-        $host = $parsedUrl['host'] ?? '';
+        $host = $parsedUrl['host'] ?? $cdnUrl;
         $scheme = $parsedUrl['scheme'] ?? 'https';
         $fullPath = $parsedUrl['path'] ?? '';
 
-        // Se URL não tem host, usamos o padrão global
-        if (empty($host) && $config->bunny_cdn_url) {
-            $host = $config->bunny_cdn_url;
-            // Se o usuário inseriu apenas o path, garantimos que comece com /
-            $fullPath = '/' . ltrim($fullPath, '/');
+        if (empty($host)) {
+            return $url;
         }
 
-        if (empty($host)) {
-            return $url; // Não tem como gerar link assinado sem host
-        }
+        // Garante que o fullPath comece com /
+        $fullPath = '/' . ltrim($fullPath, '/');
 
         // Se não informar o linkPath, extraímos o diretório da URL
         if (!$linkPath) {
@@ -56,14 +58,12 @@ class BunnyLinkService
         // Expiração (em segundos)
         $expires = time() + (($expirationHours ?? 4) * 3600);
 
-        // Assinatura: security_key + path + expires
-        // Bunny CDN usa SHA256 HASH -> base64
-        $tokenStr = $securityKey . $linkPath . $expires;
-        $hash = hash('sha256', $tokenStr, true);
-        $token = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($hash));
+        // Assinatura Avançada (HMAC-SHA256)
+        // token = "HS256-" + Base64URL(HMAC-SHA256(security_key, linkPath + expires))
+        $hash = hash_hmac('sha256', $linkPath . $expires, $securityKey, true);
+        $token = 'HS256-' . str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($hash));
 
         // Formato final: https://host/bcdn_token=TOKEN&expires=TIMESTAMP&token_path=PATH/actual_path
-        // Nota: O token_path na query string deve ser URL encoded
         $signedUrl = sprintf(
             "%s://%s/bcdn_token=%s&expires=%s&token_path=%s%s",
             $scheme,

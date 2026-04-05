@@ -45,6 +45,7 @@
                         <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
                         <option value="mkv" {{ $link->type == 'mkv' ? 'selected' : '' }}>MKV</option>
                         <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>
+                        <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>Private (Bunny HLS)</option>
                     </select>
                 </div>
 
@@ -59,6 +60,41 @@
                 </div>
             </div>
 
+            {{-- Bunny fields --}}
+            <div id="bunny_fields" class="{{ $link->type == 'private' ? '' : 'hidden' }} grid md:grid-cols-2 gap-6 border-t border-neutral-800 pt-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Link Path (opcional)</label>
+                    <input type="text" name="link_path" value="{{ old('link_path', $link->link_path) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition" placeholder="/video-folder/">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Expiração (horas)</label>
+                    <input type="number" name="expiration_hours" value="{{ old('expiration_hours', $link->expiration_hours ?? 4) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                </div>
+            </div>
+
+            {{-- Header fields --}}
+            <div class="border-t border-neutral-800 pt-6">
+                <h3 class="text-xs font-bold text-neutral-500 mb-4 uppercase tracking-[0.2em]">Configurações de Headers</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-neutral-500 uppercase">User-Agent</label>
+                        <input type="text" name="user_agent" value="{{ old('user_agent', $link->user_agent) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-2 text-white text-sm focus:border-netflix outline-none" placeholder="ExoPlayer/2.18.1">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-neutral-500 uppercase">Referer</label>
+                        <input type="text" name="referer" value="{{ old('referer', $link->referer) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-2 text-white text-sm focus:border-netflix outline-none" placeholder="https://site.com">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-neutral-500 uppercase">Origin</label>
+                        <input type="text" name="origin" value="{{ old('origin', $link->origin) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-2 text-white text-sm focus:border-netflix outline-none" placeholder="https://site.com">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-neutral-500 uppercase">Cookies</label>
+                        <input type="text" name="cookie" value="{{ old('cookie', $link->cookie) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-2 text-white text-sm focus:border-netflix outline-none" placeholder="key=value;">
+                    </div>
+                </div>
+            </div>
+
             <div class="border-t border-neutral-800 pt-6">
                 <button type="submit" class="w-full bg-netflix hover:bg-red-700 text-white font-black px-10 py-4 rounded-xl shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-save mr-1"></i> ATUALIZAR LINK
@@ -67,4 +103,14 @@
         </form>
     </div>
 </section>
+    <script>
+        document.querySelector('select[name="type"]').addEventListener('change', function() {
+            const bunnyFields = document.getElementById('bunny_fields');
+            if (this.value === 'private') {
+                bunnyFields.classList.remove('hidden');
+            } else {
+                bunnyFields.classList.add('hidden');
+            }
+        });
+    </script>
 @endsection

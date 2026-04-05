@@ -16,6 +16,10 @@ class MoviePlayLink extends Model
         'player_sub',
         'link_path',
         'expiration_hours',
+        'user_agent',
+        'referer',
+        'origin',
+        'cookie',
     ];
     
     protected $casts = [

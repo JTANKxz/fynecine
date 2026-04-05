@@ -37,30 +37,44 @@
                     </div>
 
                     {{-- Form de Adição Rápida --}}
-                    <form action="{{ route('admin.links.movies.store', $movie->id) }}" method="POST" class="flex flex-wrap items-center gap-2 bg-black/40 p-2 rounded border border-neutral-800">
+                    <form action="{{ route('admin.links.movies.store', $movie->id) }}" method="POST" class="flex flex-col gap-2 bg-black/40 p-2 rounded border border-neutral-800">
                         @csrf
-                        <input type="text" name="name" placeholder="Servidor" required class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-28 outline-none">
-                        <input type="text" name="url" placeholder="URL do Player" required class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-40 outline-none">
-                        <input type="text" name="quality" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-20 outline-none">
-                        <input type="number" name="order" placeholder="Ord" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-12 outline-none">
-                        <select name="type" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none">
-                            <option value="embed">EMBED</option>
-                            <option value="mp4">MP4</option>
-                            <option value="m3u8">M3U8</option>
-                            <option value="custom">CUSTOM</option>
-                            <option value="private">PRIVATE (BUNNY)</option>
-                        </select>
-                        <div class="bunny-fields hidden flex gap-2">
-                            <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-28 outline-none">
-                            <input type="number" name="expiration_hours" placeholder="Exp (h)" value="4" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-16 outline-none">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <input type="text" name="name" placeholder="Servidor" required class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-28 outline-none">
+                            <input type="text" name="url" placeholder="URL do Player" required class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-40 outline-none">
+                            <input type="text" name="quality" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-20 outline-none">
+                            <input type="number" name="order" placeholder="Ord" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-12 outline-none">
+                            <select name="type" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none">
+                                <option value="embed">EMBED</option>
+                                <option value="mp4">MP4</option>
+                                <option value="m3u8">M3U8</option>
+                                <option value="custom">CUSTOM</option>
+                                <option value="private">PRIVATE (BUNNY)</option>
+                            </select>
+                            <div class="bunny-fields hidden flex gap-2">
+                                <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-28 outline-none">
+                                <input type="number" name="expiration_hours" placeholder="Exp (h)" value="4" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs w-16 outline-none">
+                            </div>
+                            <select name="player_sub" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none text-yellow-500 font-bold">
+                                <option value="free">FREE</option>
+                                <option value="premium">VIP</option>
+                            </select>
+                            
+                            <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1 rounded text-[10px] hover:bg-neutral-700 transition">
+                                <i class="fa-solid fa-gears mr-1"></i> HEADERS
+                            </button>
+
+                            <button type="submit" class="bg-netflix text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-700 transition">
+                                + ADD
+                            </button>
                         </div>
-                        <select name="player_sub" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none text-yellow-500 font-bold">
-                            <option value="free">FREE</option>
-                            <option value="premium">VIP</option>
-                        </select>
-                        <button type="submit" class="bg-netflix text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-700 transition">
-                            + ADD
-                        </button>
+
+                        <div class="advanced-fields hidden grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-neutral-800/50">
+                            <input type="text" name="user_agent" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
+                            <input type="text" name="referer" placeholder="Referer (ex: https://site.com)" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
+                            <input type="text" name="origin" placeholder="Origin" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
+                            <input type="text" name="cookie" placeholder="Cookies (key=val;)" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
+                        </div>
                     </form>
                 </div>
 
@@ -84,7 +98,6 @@
                                         <input type="number" name="order" value="{{ $link->order }}" placeholder="Ordem" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px]">
                                     </div>
 
-
                                     <div class="flex justify-between items-center gap-2 pt-1 border-t border-neutral-800 mt-1">
                                         <select name="type" class="bg-transparent border-none text-[9px] p-0 outline-none">
                                             <option value="embed" {{ $link->type == 'embed' ? 'selected' : '' }}>EMBED</option>
@@ -93,10 +106,24 @@
                                             <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
                                             <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>PRIVATE</option>
                                         </select>
+                                        
+                                        <button type="button" onclick="toggleAdvanced(this)" class="text-[8px] text-neutral-500 hover:text-white uppercase">
+                                            Advanced
+                                        </button>
+
                                         <select name="player_sub" class="bg-transparent border-none text-[9px] p-0 outline-none {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-400' }}">
                                             <option value="free" {{ $link->player_sub == 'free' ? 'selected' : '' }}>FREE</option>
                                             <option value="premium" {{ $link->player_sub == 'premium' ? 'selected' : '' }}>VIP</option>
                                         </select>
+                                    </div>
+
+                                    <div class="advanced-fields hidden space-y-1 mt-1 pt-1 border-t border-neutral-800/50">
+                                        <div class="grid grid-cols-2 gap-1">
+                                            <input type="text" name="user_agent" value="{{ $link->user_agent }}" placeholder="User-Agent" class="bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded">
+                                            <input type="text" name="referer" value="{{ $link->referer }}" placeholder="Referer" class="bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded">
+                                            <input type="text" name="origin" value="{{ $link->origin }}" placeholder="Origin" class="bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded">
+                                            <input type="text" name="cookie" value="{{ $link->cookie }}" placeholder="Cookies" class="bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded">
+                                        </div>
                                     </div>
 
                                     @if($link->type == 'private')
@@ -128,6 +155,14 @@
     function deleteLink(id) {
         if(confirm('Tem certeza que deseja apagar este player?')) {
             document.getElementById(`delete-link-${id}`).submit();
+        }
+    }
+
+    function toggleAdvanced(btn) {
+        const form = btn.closest('form');
+        const advancedFields = form.querySelector('.advanced-fields');
+        if (advancedFields) {
+            advancedFields.classList.toggle('hidden');
         }
     }
 

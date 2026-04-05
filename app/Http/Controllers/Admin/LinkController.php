@@ -44,13 +44,17 @@ class LinkController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|url',
+            'url' => 'required|string',
             'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
             'expiration_hours' => 'nullable|integer|min:1',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $movie->playLinks()->create($validated);
@@ -62,13 +66,17 @@ class LinkController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|url',
+            'url' => 'required|string',
             'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
             'expiration_hours' => 'nullable|integer|min:1',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $link->update($validated);
@@ -92,7 +100,7 @@ class LinkController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|url',
+            'url' => 'required|string',
             'type' => 'required|string',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
@@ -103,6 +111,10 @@ class LinkController extends Controller
             'skip_ending_end' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
             'expiration_hours' => 'nullable|integer|min:1',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $episode->links()->create($validated);
@@ -114,7 +126,7 @@ class LinkController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|url',
+            'url' => 'required|string',
             'type' => 'required|string',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
@@ -125,6 +137,10 @@ class LinkController extends Controller
             'skip_ending_end' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
             'expiration_hours' => 'nullable|integer|min:1',
+            'user_agent' => 'nullable|string',
+            'referer' => 'nullable|string',
+            'origin' => 'nullable|string',
+            'cookie' => 'nullable|string',
         ]);
 
         $link->update($validated);

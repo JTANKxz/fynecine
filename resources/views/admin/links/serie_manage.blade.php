@@ -40,28 +40,45 @@
                                 </div>
                                 
                                 {{-- Form Novo Link Ep --}}
-                                <form action="{{ route('admin.links.series.episode.store', $episode->id) }}" method="POST" class="bg-neutral-900 border border-neutral-800 p-3 rounded-lg flex flex-wrap items-center gap-3">
+                                <form action="{{ route('admin.links.series.episode.store', $episode->id) }}" method="POST" class="bg-neutral-900 border border-neutral-800 p-3 rounded-lg flex flex-col gap-3">
                                     @csrf
-                                    <input type="text" name="name" placeholder="Servidor (Ex: Netu)" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-32 outline-none">
-                                    <input type="text" name="url" placeholder="URL do Link" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-48 outline-none">
-                                    <input type="text" name="quality" placeholder="Qualidade (Ex: 1080p)" class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-24 outline-none">
-                                    
-                                    <div class="flex gap-2">
-                                        <select name="type" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none">
-                                            <option value="embed">EMBED</option>
-                                            <option value="mp4">MP4</option>
-                                            <option value="m3u8">M3U8</option>
-                                            <option value="custom">CUSTOM</option>
-                                            <option value="private">PRIVATE</option>
-                                        </select>
-                                        <div class="bunny-fields hidden flex gap-1">
-                                            <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-24">
-                                            <input type="number" name="expiration_hours" value="4" placeholder="Exp (h)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-12">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <input type="text" name="name" placeholder="Servidor (Ex: Netu)" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-32 outline-none">
+                                        <input type="text" name="url" placeholder="URL do Link" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-48 outline-none">
+                                        <input type="text" name="quality" placeholder="Qualidade (Ex: 1080p)" class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-24 outline-none">
+                                        
+                                        <div class="flex gap-2">
+                                            <select name="type" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none">
+                                                <option value="embed">EMBED</option>
+                                                <option value="mp4">MP4</option>
+                                                <option value="m3u8">M3U8</option>
+                                                <option value="custom">CUSTOM</option>
+                                                <option value="private">PRIVATE</option>
+                                            </select>
+                                            <div class="bunny-fields hidden flex gap-1">
+                                                <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-24">
+                                                <input type="number" name="expiration_hours" value="4" placeholder="Exp (h)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-12">
+                                            </div>
+                                            <select name="player_sub" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none text-yellow-500 font-bold">
+                                                <option value="free">FREE</option>
+                                                <option value="premium">VIP</option>
+                                            </select>
                                         </div>
-                                        <select name="player_sub" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none text-yellow-500 font-bold">
-                                            <option value="free">FREE</option>
-                                            <option value="premium">VIP</option>
-                                        </select>
+
+                                        <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1.5 rounded text-[10px] hover:bg-neutral-700 transition">
+                                            <i class="fa-solid fa-gears mr-1"></i> HEADERS
+                                        </button>
+
+                                        <button type="submit" class="bg-netflix text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-red-700 transition shadow-lg">
+                                            + ADICIONAR
+                                        </button>
+                                    </div>
+
+                                    <div class="advanced-fields hidden grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-neutral-800/50">
+                                        <input type="text" name="user_agent" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="referer" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="origin" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="cookie" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-2">
@@ -70,10 +87,6 @@
                                         <input type="number" name="skip_ending_start" placeholder="Skip Encerramento Início (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
                                         <input type="number" name="skip_ending_end" placeholder="Skip Encerramento Fim (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
                                     </div>
-
-                                    <button type="submit" class="bg-netflix text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-red-700 transition shadow-lg">
-                                        + ADICIONAR
-                                    </button>
                                 </form>
                             </div>
 
@@ -126,19 +139,34 @@
                                                 </div>
                                             </div>
 
+                                            <div class="flex items-center gap-2 pt-1 border-t border-neutral-800/50">
+                                                <button type="button" onclick="toggleAdvanced(this)" class="text-[8px] text-neutral-500 hover:text-white uppercase font-bold">
+                                                    <i class="fa-solid fa-gears mr-1"></i> Headers
+                                                </button>
+                                            </div>
+
+                                            <div class="advanced-fields hidden space-y-2 p-2 bg-black/30 rounded">
+                                                <div class="grid grid-cols-2 gap-2">
+                                                    <input type="text" name="user_agent" value="{{ $link->user_agent }}" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
+                                                    <input type="text" name="referer" value="{{ $link->referer }}" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
+                                                    <input type="text" name="origin" value="{{ $link->origin }}" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
+                                                    <input type="text" name="cookie" value="{{ $link->cookie }}" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
+                                                </div>
+                                            </div>
+
                                             <div class="grid grid-cols-2 gap-4 p-2 bg-black/30 rounded">
                                                 <div>
-                                                    <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Abertura (segundos)</label>
+                                                    <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Abertura / Encerramento (s)</label>
                                                     <div class="flex gap-1">
-                                                        <input type="number" name="skip_intro_start" value="{{ $link->skip_intro_start }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[9px] w-full">
-                                                        <input type="number" name="skip_intro_end" value="{{ $link->skip_intro_end }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[9px] w-full">
+                                                        <input type="number" name="skip_intro_start" value="{{ $link->skip_intro_start }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
+                                                        <input type="number" name="skip_intro_end" value="{{ $link->skip_intro_end }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Encerramento (segundos)</label>
+                                                    <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Encerramento (s)</label>
                                                     <div class="flex gap-1">
-                                                        <input type="number" name="skip_ending_start" value="{{ $link->skip_ending_start }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[9px] w-full">
-                                                        <input type="number" name="skip_ending_end" value="{{ $link->skip_ending_end }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[9px] w-full">
+                                                        <input type="number" name="skip_ending_start" value="{{ $link->skip_ending_start }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
+                                                        <input type="number" name="skip_ending_end" value="{{ $link->skip_ending_end }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
                                                     </div>
                                                 </div>
                                             </div>
@@ -173,6 +201,14 @@
     function deleteLink(id) {
         if(confirm('Deseja realmente remover este player?')) {
             document.getElementById(`delete-link-${id}`).submit();
+        }
+    }
+
+    function toggleAdvanced(btn) {
+        const form = btn.closest('form');
+        const advancedFields = form.querySelector('.advanced-fields');
+        if (advancedFields) {
+            advancedFields.classList.toggle('hidden');
         }
     }
 

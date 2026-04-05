@@ -53,11 +53,23 @@ class TvChannelController extends Controller
             $hasPlan = $user && $user->hasPlan();
 
             foreach ($channel->links as $link) {
+                $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
+                
+                if ($url && $link->type === 'private') {
+                    $url = url("/api/links/channel/{$link->id}/play");
+                }
+
                 $playLinks->push([
                     'id'   => $link->id,
                     'name' => $link->name,
-                    'url'  => ($hasPlan || $link->player_sub === 'free') ? $link->url : null,
+                    'url'  => $url,
                     'type' => $link->type,
+                    'headers' => [
+                        'user_agent' => $link->user_agent,
+                        'referer' => $link->referer,
+                        'origin' => $link->origin,
+                        'cookie' => $link->cookie,
+                    ]
                 ]);
             }
         }

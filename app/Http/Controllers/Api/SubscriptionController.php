@@ -16,25 +16,45 @@ class SubscriptionController extends Controller
      */
     public function plans(): JsonResponse
     {
-        // Mapa de nomes legíveis para os benefícios (Anti-Crack e Profissional)
-        $benefitNames = [
-            'no_ads' => 'Sem anúncios (Banner/Intersticial)',
-            'live_events' => 'Jogos e Eventos Ao Vivo (Premium)',
-            'priority_support' => 'Suporte Prioritário Via Ticket',
-            'priority_requests' => 'Pedidos de Filmes Prioritários',
-            'premium_channels' => 'Todos os Canais de TV (IPTV)',
-            'max_profiles' => 'Suporte a Múltiplos Perfis',
-        ];
-
         $plans = \App\Models\SubscriptionPlan::where('is_active', true)
             ->orderBy('price', 'asc')
             ->get();
 
-        $formattedPlans = $plans->map(function ($plan) use ($benefitNames) {
-            // Converte os identificadores (no_ads) em nomes reais para o App
-            $readableFeatures = collect($plan->features ?? [])->map(function ($feature) use ($benefitNames) {
-                return $benefitNames[$feature] ?? ucfirst(str_replace('_', ' ', $feature));
-            })->values();
+        $formattedPlans = $plans->map(function ($plan) {
+            $type = $plan->plan_type;
+            $features = collect($plan->features ?? []);
+            $readableFeatures = collect();
+
+            // 1. Perfis
+            $maxProfiles = ($type === 'premium') ? 6 : (($type === 'basic') ? 3 : 1);
+            $readableFeatures->push("✅ Até {$maxProfiles} perfis de usuário");
+
+            // 2. Anúncios
+            if ($features->contains('no_ads')) {
+                $readableFeatures->push("✅ Sem anúncios (Interface Limpa)");
+            }
+
+            // 3. Eventos Ao Vivo
+            if ($type === 'premium') {
+                $readableFeatures->push("✅ Jogos e Eventos Ao Vivo");
+            } else {
+                $readableFeatures->push("❌ Sem Eventos Ao Vivo");
+            }
+
+            // 4. Canais
+            if ($features->contains('premium_channels')) {
+                $readableFeatures->push("✅ Todos os Canais de TV (IPTV)");
+            }
+
+            // 5. Quotas Diárias
+            $quota = ($type === 'premium') ? 5 : (($type === 'basic') ? 3 : 1);
+            $readableFeatures->push("✅ {$quota} Pedidos de filmes diários");
+            $readableFeatures->push("✅ {$quota} Suporte prioritário diário");
+
+            // 6. Diferenciais do Banco (se houver extras)
+            if ($features->contains('priority_support') && $type !== 'premium') {
+                $readableFeatures->push("✅ Suporte Prioritário");
+            }
 
             return [
                 'id' => $plan->id,
@@ -42,8 +62,8 @@ class SubscriptionController extends Controller
                 'plan_type' => $plan->plan_type,
                 'price' => $plan->price,
                 'duration_days' => $plan->duration_days,
-                'features' => $readableFeatures, // Agora vem com nomes reais!
-                'raw_features' => $plan->features // Caso o app precise do ID original
+                'features' => $readableFeatures->values(),
+                'raw_features' => $plan->features
             ];
         });
 

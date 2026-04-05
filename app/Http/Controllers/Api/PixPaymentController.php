@@ -111,11 +111,47 @@ class PixPaymentController extends Controller
      */
     public function status(int $paymentId): JsonResponse
     {
-        $payment = PixPayment::with('plan')->findOrFail($paymentId);
+        $payment = PixPayment::with(['plan', 'user'])->findOrFail($paymentId);
 
         // Se está pendente mas já expirou, marca como cancelled
         if ($payment->isPending() && $payment->isExpired()) {
             $payment->update(['status' => 'cancelled']);
+        } 
+        // Se ainda está pendente, consulta a API do MP (Fallback do Webhook)
+        elseif ($payment->isPending()) {
+            try {
+                $client = new PaymentClient();
+                $mpPayment = $client->get($payment->mp_payment_id);
+                
+                if ($mpPayment && $mpPayment->status === 'approved') {
+                    $payment->update([
+                        'status' => 'approved',
+                        'paid_at' => Carbon::now(),
+                    ]);
+                    
+                    // Atribui o plano (lógica importada do Webhook)
+                    $user = $payment->user;
+                    $plan = $payment->plan;
+                    
+                    if ($user && $plan) {
+                        $currentExpires = $user->plan_expires_at && $user->plan_expires_at->isFuture()
+                            ? $user->plan_expires_at
+                            : Carbon::now();
+
+                        $user->plan_type = $plan->plan_type;
+                        $user->plan_expires_at = $currentExpires->copy()->addDays($plan->duration_days);
+                        $user->features = $plan->features;
+                        $user->save();
+                    }
+                    
+                    \Log::info('Polling: MercadoPago PIX Approved', ['payment_id' => $payment->id]);
+                } elseif ($mpPayment && in_array($mpPayment->status, ['rejected', 'cancelled'])) {
+                    $payment->update(['status' => 'rejected']);
+                }
+            } catch (\Exception $e) {
+                // Silencia falhas de comunicação aqui para não quebrar o polling
+                \Log::warning('PixPaymentController::status MP Check Error', ['message' => $e->getMessage()]);
+            }
         }
 
         return response()->json([

@@ -81,8 +81,9 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // Cupons VIP
     Route::resource('coupons', CouponController::class)->except(['show']);
 
-    // Planos de Assinatura
+    // Planos de Assinatura e Pagamentos PIX
     Route::resource('subscription-plans', SubscriptionPlanController::class)->except(['show']);
+    Route::get('/pix-payments', [\App\Http\Controllers\Admin\PixPaymentController::class, 'index'])->name('pix-payments.index');
 
     // Configurações Globais
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');

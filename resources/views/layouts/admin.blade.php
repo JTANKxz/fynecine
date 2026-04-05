@@ -351,6 +351,14 @@
                 </a>
             </div>
 
+            {{-- Vendas PIX --}}
+            <div>
+                <a href="{{ route('admin.pix-payments.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.pix-payments.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-brands fa-pix w-5 text-center text-green-400"></i> Vendas PIX
+                </a>
+            </div>
+
             {{-- Cupons VIP --}}
             <div>
                 <a href="{{ route('admin.coupons.index') }}"

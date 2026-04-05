@@ -407,7 +407,8 @@
 
         // === Polling ===
         function checkStatus() {
-            fetch(`/api/pix/status/${paymentId}`)
+            // O WebView do Android tem cache agressivo de GET, precisamos forçar o recarregamento
+            fetch(`/api/pix/status/${paymentId}?_t=${new Date().getTime()}`, { cache: 'no-store' })
                 .then(r => r.json())
                 .then(data => {
                     if (data.status === 'approved') {

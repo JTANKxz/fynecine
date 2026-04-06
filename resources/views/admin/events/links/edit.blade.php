@@ -23,29 +23,31 @@
             <div class="space-y-2">
                 <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Nome do Player</label>
                 <input type="text" name="name" value="{{ old('name', $link->name) }}" required
-                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition @error('name') border-red-500 @enderror">
+                @error('name') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
             {{-- URL --}}
             <div class="space-y-2">
                 <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">URL do Stream</label>
-                <input type="text" name="url" value="{{ old('url', $link->url) }}" required
-                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition font-mono text-sm">
+                <input type="text" name="url" value="{{ old('url', $link->url) }}"
+                    class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition font-mono text-sm @error('url') border-red-500 @enderror">
+                @error('url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Tipo --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Tipo de Link</label>
-                    <select name="type" required
+                    <select name="type" id="type_select" required
                         class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition cursor-pointer">
-                        <option value="embed" {{ $link->type == 'embed' ? 'selected' : '' }}>Embed (Iframe/Webview)</option>
-                        <option value="direct" {{ $link->type == 'direct' ? 'selected' : '' }}>Direct (Player Interno)</option>
-                        <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8 (HLS)</option>
-                        <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
-                        <option value="mkv" {{ $link->type == 'mkv' ? 'selected' : '' }}>MKV</option>
-                        <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>
-                        <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>Private (Bunny HLS)</option>
+                        <option value="embed" {{ old('type', $link->type) == 'embed' ? 'selected' : '' }}>Embed (Iframe/Webview)</option>
+                        <option value="direct" {{ old('type', $link->type) == 'direct' ? 'selected' : '' }}>Direct (Player Interno)</option>
+                        <option value="m3u8" {{ old('type', $link->type) == 'm3u8' ? 'selected' : '' }}>M3U8 (HLS)</option>
+                        <option value="mp4" {{ old('type', $link->type) == 'mp4' ? 'selected' : '' }}>MP4</option>
+                        <option value="mkv" {{ old('type', $link->type) == 'mkv' ? 'selected' : '' }}>MKV</option>
+                        <option value="custom" {{ old('type', $link->type) == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>
+                        <option value="private" {{ old('type', $link->type) == 'private' ? 'selected' : '' }}>Private (Bunny CDN)</option>
                     </select>
                 </div>
 
@@ -54,27 +56,31 @@
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Nível de Acesso</label>
                     <select name="player_sub" required
                         class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition cursor-pointer">
-                        <option value="free" {{ $link->player_sub == 'free' ? 'selected' : '' }}>Livre (Free)</option>
-                        <option value="premium" {{ $link->player_sub == 'premium' ? 'selected' : '' }}>Somente VIP / Premium</option>
+                        <option value="free" {{ old('player_sub', $link->player_sub) == 'free' ? 'selected' : '' }}>Livre (Free)</option>
+                        <option value="premium" {{ old('player_sub', $link->player_sub) == 'premium' ? 'selected' : '' }}>Somente VIP / Premium</option>
                     </select>
                 </div>
             </div>
 
             {{-- Bunny fields --}}
-            <div id="bunny_fields" class="{{ $link->type == 'private' ? '' : 'hidden' }} grid md:grid-cols-2 gap-6 border-t border-neutral-800 pt-6">
+            <div id="bunny_fields" class="{{ old('type', $link->type) == 'private' ? '' : 'hidden' }} grid md:grid-cols-2 gap-6 border-t border-neutral-800 pt-6">
                 <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Link Path (opcional)</label>
-                    <input type="text" name="link_path" value="{{ old('link_path', $link->link_path) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition" placeholder="/video-folder/">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px] text-purple-400">Link Path (Bunny CDN)</label>
+                    <input type="text" name="link_path" value="{{ old('link_path', $link->link_path) }}" class="w-full bg-black border border-purple-900/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition" placeholder="/video-folder/">
+                    @error('link_path') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="space-y-2">
-                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Expiração (horas)</label>
-                    <input type="number" name="expiration_hours" value="{{ old('expiration_hours', $link->expiration_hours ?? 4) }}" class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px] text-purple-400">Expiração (horas)</label>
+                    <input type="number" name="expiration_hours" value="{{ old('expiration_hours', $link->expiration_hours ?? 4) }}" class="w-full bg-black border border-purple-900/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                    @error('expiration_hours') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             {{-- Header fields --}}
             <div class="border-t border-neutral-800 pt-6">
-                <h3 class="text-xs font-bold text-neutral-500 mb-4 uppercase tracking-[0.2em]">Configurações de Headers</h3>
+                <h3 class="text-xs font-bold text-blue-500 mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i class="fa-solid fa-gears"></i> Configurações de Headers
+                </h3>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-neutral-500 uppercase">User-Agent</label>
@@ -103,14 +109,17 @@
         </form>
     </div>
 </section>
-    <script>
-        document.querySelector('select[name="type"]').addEventListener('change', function() {
-            const bunnyFields = document.getElementById('bunny_fields');
-            if (this.value === 'private') {
-                bunnyFields.classList.remove('hidden');
-            } else {
-                bunnyFields.classList.add('hidden');
-            }
-        });
-    </script>
+
+@push('scripts')
+<script>
+    document.getElementById('type_select').addEventListener('change', function() {
+        const bunnyFields = document.getElementById('bunny_fields');
+        if (this.value === 'private') {
+            bunnyFields.classList.remove('hidden');
+        } else {
+            bunnyFields.classList.add('hidden');
+        }
+    });
+</script>
+@endpush
 @endsection

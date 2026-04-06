@@ -43,25 +43,35 @@
                                 <form action="{{ route('admin.links.series.episode.store', $episode->id) }}" method="POST" class="bg-neutral-900 border border-neutral-800 p-3 rounded-lg flex flex-col gap-3">
                                     @csrf
                                     <div class="flex flex-wrap items-center gap-3">
-                                        <input type="text" name="name" placeholder="Servidor (Ex: Netu)" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-32 outline-none">
-                                        <input type="text" name="url" placeholder="URL do Link" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-48 outline-none">
-                                        <input type="text" name="quality" placeholder="Qualidade (Ex: 1080p)" class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-24 outline-none">
+                                        <div class="flex flex-col">
+                                            <input type="text" name="name" value="{{ old('name') }}" placeholder="Servidor (Ex: Netu)" required class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-32 outline-none @error('name') ring-1 ring-red-500 @enderror">
+                                            @error('name') <span class="text-[8px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+                                        
+                                        <div class="flex flex-col">
+                                            <input type="text" name="url" value="{{ old('url') }}" placeholder="URL do Link" class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-48 outline-none @error('url') ring-1 ring-red-500 @enderror">
+                                            @error('url') <span class="text-[8px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        <div class="flex flex-col">
+                                            <input type="text" name="quality" value="{{ old('quality', '1080p') }}" placeholder="Qualidade" class="bg-neutral-800 border-none rounded px-3 py-1.5 text-xs w-24 outline-none">
+                                        </div>
                                         
                                         <div class="flex gap-2">
                                             <select name="type" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none">
-                                                <option value="embed">EMBED</option>
-                                                <option value="mp4">MP4</option>
-                                                <option value="m3u8">M3U8</option>
-                                                <option value="custom">CUSTOM</option>
-                                                <option value="private">PRIVATE</option>
+                                                <option value="embed" {{ old('type') == 'embed' ? 'selected' : '' }}>EMBED</option>
+                                                <option value="mp4" {{ old('type') == 'mp4' ? 'selected' : '' }}>MP4</option>
+                                                <option value="m3u8" {{ old('type') == 'm3u8' ? 'selected' : '' }}>M3U8</option>
+                                                <option value="custom" {{ old('type') == 'custom' ? 'selected' : '' }}>CUSTOM</option>
+                                                <option value="private" {{ old('type') == 'private' ? 'selected' : '' }}>PRIVATE</option>
                                             </select>
-                                            <div class="bunny-fields hidden flex gap-1">
-                                                <input type="text" name="link_path" placeholder="Path (opcional)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-24">
-                                                <input type="number" name="expiration_hours" value="4" placeholder="Exp (h)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-12">
+                                            <div class="bunny-fields {{ old('type') == 'private' ? '' : 'hidden' }} flex gap-1">
+                                                <input type="text" name="link_path" value="{{ old('link_path') }}" placeholder="Path (opcional)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-24">
+                                                <input type="number" name="expiration_hours" value="{{ old('expiration_hours', 4) }}" placeholder="Exp (h)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-12">
                                             </div>
                                             <select name="player_sub" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none text-yellow-500 font-bold">
-                                                <option value="free">FREE</option>
-                                                <option value="premium">VIP</option>
+                                                <option value="free" {{ old('player_sub') == 'free' ? 'selected' : '' }}>FREE</option>
+                                                <option value="premium" {{ old('player_sub', 'premium') == 'premium' ? 'selected' : '' }}>VIP</option>
                                             </select>
                                         </div>
 
@@ -75,17 +85,29 @@
                                     </div>
 
                                     <div class="advanced-fields hidden grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-neutral-800/50">
-                                        <input type="text" name="user_agent" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
-                                        <input type="text" name="referer" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
-                                        <input type="text" name="origin" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
-                                        <input type="text" name="cookie" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="user_agent" value="{{ old('user_agent') }}" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="referer" value="{{ old('referer') }}" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="origin" value="{{ old('origin') }}" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                        <input type="text" name="cookie" value="{{ old('cookie') }}" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                     </div>
 
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <input type="number" name="skip_intro_start" placeholder="Skip Intro Início (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
-                                        <input type="number" name="skip_intro_end" placeholder="Skip Intro Fim (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
-                                        <input type="number" name="skip_ending_start" placeholder="Skip Encerramento Início (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
-                                        <input type="number" name="skip_ending_end" placeholder="Skip Encerramento Fim (s)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-28">
+                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                                        <div class="flex flex-col">
+                                            <input type="text" name="skip_intro_start" value="{{ old('skip_intro_start') }}" placeholder="Intro Início (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            @error('skip_intro_start') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <input type="text" name="skip_intro_end" value="{{ old('skip_intro_end') }}" placeholder="Intro Fim (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            @error('skip_intro_end') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <input type="text" name="skip_ending_start" value="{{ old('skip_ending_start') }}" placeholder="Fim Início (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            @error('skip_ending_start') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <input type="text" name="skip_ending_end" value="{{ old('skip_ending_end') }}" placeholder="Fim Fim (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            @error('skip_ending_end') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -98,75 +120,73 @@
                                             @csrf @method('PUT')
                                             
                                             <div class="flex justify-between items-center">
-                                                <input type="text" name="name" value="{{ $link->name }}" class="bg-transparent border-none p-0 text-sm font-bold text-white outline-none w-32">
+                                                <input type="text" name="name" value="{{ old('name', $link->name) }}" class="bg-transparent border-none p-0 text-sm font-bold text-white outline-none w-32 focus:ring-1 focus:ring-netflix rounded">
                                                 <div class="flex gap-2">
                                                     <button type="submit" title="Salvar" class="text-blue-500 hover:text-white transition"><i class="fa-solid fa-floppy-disk"></i></button>
                                                     <button type="button" onclick="deleteLink({{ $link->id }})" title="Excluir" class="text-red-500 hover:text-white transition"><i class="fa-solid fa-trash-can"></i></button>
                                                 </div>
                                             </div>
 
-                                            <input type="text" name="url" value="{{ $link->url }}" class="w-full bg-neutral-800 border-none rounded px-2 py-1.5 text-xs text-neutral-400 font-mono italic">
+                                            <input type="text" name="url" value="{{ old('url', $link->url) }}" class="w-full bg-neutral-800 border-none rounded px-2 py-1.5 text-xs text-neutral-400 font-mono italic outline-none focus:ring-1 focus:ring-netflix">
                                             
                                             <div class="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-[9px] text-neutral-500 uppercase font-bold mb-1">Qualidade / Tipo</label>
                                                     <div class="flex gap-2">
-                                                        <input type="text" name="quality" value="{{ $link->quality }}" placeholder="Qualidade" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px]">
-                                                        <select name="type" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px]">
-                                                            <option value="embed" {{ $link->type == 'embed' ? 'selected' : '' }}>EMBED</option>
-                                                            <option value="mp4" {{ $link->type == 'mp4' ? 'selected' : '' }}>MP4</option>
-                                                            <option value="m3u8" {{ $link->type == 'm3u8' ? 'selected' : '' }}>M3U8</option>
-                                                            <option value="custom" {{ $link->type == 'custom' ? 'selected' : '' }}>CUSTOM</option>
-                                                            <option value="private" {{ $link->type == 'private' ? 'selected' : '' }}>PRIVATE</option>
+                                                        <input type="text" name="quality" value="{{ old('quality', $link->quality) }}" placeholder="Qualidade" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                                        <select name="type" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
+                                                            <option value="embed" {{ old('type', $link->type) == 'embed' ? 'selected' : '' }}>EMBED</option>
+                                                            <option value="mp4" {{ old('type', $link->type) == 'mp4' ? 'selected' : '' }}>MP4</option>
+                                                            <option value="m3u8" {{ old('type', $link->type) == 'm3u8' ? 'selected' : '' }}>M3U8</option>
+                                                            <option value="custom" {{ old('type', $link->type) == 'custom' ? 'selected' : '' }}>CUSTOM</option>
+                                                            <option value="private" {{ old('type', $link->type) == 'private' ? 'selected' : '' }}>PRIVATE</option>
                                                         </select>
                                                     </div>
-                                                    @if($link->type == 'private')
-                                                    <div class="flex gap-1 mt-1">
-                                                        <input type="text" name="link_path" value="{{ $link->link_path }}" placeholder="Path" class="w-1/2 bg-black/40 border-none rounded px-2 py-1 text-[8px] text-neutral-400">
-                                                        <input type="number" name="expiration_hours" value="{{ $link->expiration_hours }}" placeholder="Hs" class="w-1/4 bg-black/40 border-none rounded px-2 py-1 text-[8px] text-neutral-400">
+                                                    <div class="bunny-fields {{ old('type', $link->type) == 'private' ? '' : 'hidden' }} flex gap-1 mt-1">
+                                                        <input type="text" name="link_path" value="{{ old('link_path', $link->link_path) }}" placeholder="Path" class="w-1/2 bg-black/40 border-none rounded px-2 py-1 text-[8px] text-neutral-400">
+                                                        <input type="number" name="expiration_hours" value="{{ old('expiration_hours', $link->expiration_hours ?? 4) }}" placeholder="Hs" class="w-1/4 bg-black/40 border-none rounded px-2 py-1 text-[8px] text-neutral-400">
                                                     </div>
-                                                    @endif
                                                 </div>
                                                 <div>
                                                     <label class="block text-[9px] text-neutral-500 uppercase font-bold mb-1">Assinatura / Ordem</label>
                                                     <div class="flex gap-2">
-                                                        <select name="player_sub" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-500' }}">
-                                                            <option value="free" {{ $link->player_sub == 'free' ? 'selected' : '' }}>FREE</option>
-                                                            <option value="premium" {{ $link->player_sub == 'premium' ? 'selected' : '' }}>PREMIUM</option>
+                                                        <select name="player_sub" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-500' }} outline-none">
+                                                            <option value="free" {{ old('player_sub', $link->player_sub) == 'free' ? 'selected' : '' }}>FREE</option>
+                                                            <option value="premium" {{ old('player_sub', $link->player_sub) == 'premium' ? 'selected' : '' }}>PREMIUM</option>
                                                         </select>
-                                                        <input type="number" name="order" value="{{ $link->order }}" placeholder="Ordem" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px]">
+                                                        <input type="number" name="order" value="{{ old('order', $link->order) }}" placeholder="Ordem" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="flex items-center gap-2 pt-1 border-t border-neutral-800/50">
                                                 <button type="button" onclick="toggleAdvanced(this)" class="text-[8px] text-neutral-500 hover:text-white uppercase font-bold">
-                                                    <i class="fa-solid fa-gears mr-1"></i> Headers
+                                                    <i class="fa-solid fa-gears mr-1"></i> Headers / Skips
                                                 </button>
                                             </div>
 
                                             <div class="advanced-fields hidden space-y-2 p-2 bg-black/30 rounded">
                                                 <div class="grid grid-cols-2 gap-2">
-                                                    <input type="text" name="user_agent" value="{{ $link->user_agent }}" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
-                                                    <input type="text" name="referer" value="{{ $link->referer }}" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
-                                                    <input type="text" name="origin" value="{{ $link->origin }}" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
-                                                    <input type="text" name="cookie" value="{{ $link->cookie }}" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400">
+                                                    <input type="text" name="user_agent" value="{{ old('user_agent', $link->user_agent) }}" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">
+                                                    <input type="text" name="referer" value="{{ old('referer', $link->referer) }}" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">
+                                                    <input type="text" name="origin" value="{{ old('origin', $link->origin) }}" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">
+                                                    <input type="text" name="cookie" value="{{ old('cookie', $link->cookie) }}" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">
                                                 </div>
-                                            </div>
 
-                                            <div class="grid grid-cols-2 gap-4 p-2 bg-black/30 rounded">
-                                                <div>
-                                                    <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Abertura / Encerramento (s)</label>
-                                                    <div class="flex gap-1">
-                                                        <input type="number" name="skip_intro_start" value="{{ $link->skip_intro_start }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
-                                                        <input type="number" name="skip_intro_end" value="{{ $link->skip_intro_end }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
+                                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                                    <div>
+                                                        <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Abertura (mm:ss)</label>
+                                                        <div class="flex gap-1">
+                                                            <input type="text" name="skip_intro_start" value="{{ old('skip_intro_start', $link->skip_intro_start ? gmdate('i:s', $link->skip_intro_start) : '') }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full outline-none">
+                                                            <input type="text" name="skip_intro_end" value="{{ old('skip_intro_end', $link->skip_intro_end ? gmdate('i:s', $link->skip_intro_end) : '') }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full outline-none">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Encerramento (s)</label>
-                                                    <div class="flex gap-1">
-                                                        <input type="number" name="skip_ending_start" value="{{ $link->skip_ending_start }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
-                                                        <input type="number" name="skip_ending_end" value="{{ $link->skip_ending_end }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full">
+                                                    <div>
+                                                        <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Encerramento (mm:ss)</label>
+                                                        <div class="flex gap-1">
+                                                            <input type="text" name="skip_ending_start" value="{{ old('skip_ending_start', $link->skip_ending_start ? gmdate('i:s', $link->skip_ending_start) : '') }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full outline-none">
+                                                            <input type="text" name="skip_ending_end" value="{{ old('skip_ending_end', $link->skip_ending_end ? gmdate('i:s', $link->skip_ending_end) : '') }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full outline-none">
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

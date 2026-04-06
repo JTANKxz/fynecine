@@ -16,14 +16,9 @@ class BunnyLinkService
      */
     public static function generateSignedUrl(string $url, ?string $linkPath = null, ?int $expirationHours = 4)
     {
-        $securityKey = env('BUNNY_SECURITY_KEY');
-        $cdnUrl = env('BUNNY_CDN_URL');
-
-        if (!$securityKey || !$cdnUrl) {
-            $config = AppConfig::getSettings();
-            $securityKey = $securityKey ?: $config->bunny_security_key;
-            $cdnUrl = $cdnUrl ?: $config->bunny_cdn_url;
-        }
+        $config = AppConfig::getSettings();
+        $securityKey = env('BUNNY_SECURITY_KEY', $config->bunny_security_key);
+        $cdnUrl = env('BUNNY_CDN_URL', $config->bunny_cdn_url);
         
         if (!$securityKey) {
             return $url;

@@ -107,7 +107,7 @@ class TvChannelController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'order' => 'nullable|integer',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'type' => 'required|in:embed,m3u8,custom,private',
             'player_sub' => 'required|in:free,premium',
             'link_path' => 'nullable|string',
@@ -137,7 +137,7 @@ class TvChannelController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'order' => 'nullable|integer',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'type' => 'required|in:embed,m3u8,custom,private',
             'player_sub' => 'required|in:free,premium',
             'link_path' => 'nullable|string',

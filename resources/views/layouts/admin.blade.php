@@ -418,6 +418,35 @@
         </header>
 
         <main class="p-6 space-y-10">
+            {{-- Global Alerts --}}
+            @if(session('success'))
+                <div class="bg-green-600/20 border border-green-600/50 text-green-400 p-4 rounded-lg flex items-center gap-3">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="bg-red-600/20 border border-red-600/50 text-red-100 p-4 rounded-lg flex items-center gap-3">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="bg-red-600/20 border border-red-600/50 text-red-100 p-4 rounded-lg">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span class="font-bold">Por favor, verifique os erros abaixo:</span>
+                    </div>
+                    <ul class="list-disc list-inside text-sm space-y-1 opacity-80">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>

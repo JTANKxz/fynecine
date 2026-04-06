@@ -44,7 +44,7 @@ class LinkController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
@@ -66,7 +66,7 @@ class LinkController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
@@ -98,9 +98,18 @@ class LinkController extends Controller
 
     public function storeEpisodeLink(Request $request, Episode $episode)
     {
-        $validated = $request->validate([
+        $data = $request->all();
+        
+        // Converte tempos mm:ss para segundos
+        foreach (['skip_intro_start', 'skip_intro_end', 'skip_ending_start', 'skip_ending_end'] as $field) {
+            if ($request->filled($field)) {
+                $data[$field] = $this->parseTimeToSeconds($request->input($field));
+            }
+        }
+
+        $validated = \Validator::make($data, [
             'name' => 'required|string|max:255',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'type' => 'required|string',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
@@ -115,7 +124,7 @@ class LinkController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
-        ]);
+        ])->validate();
 
         $episode->links()->create($validated);
 
@@ -124,9 +133,18 @@ class LinkController extends Controller
 
     public function updateEpisodeLink(Request $request, EpisodeLink $link)
     {
-        $validated = $request->validate([
+        $data = $request->all();
+
+        // Converte tempos mm:ss para segundos
+        foreach (['skip_intro_start', 'skip_intro_end', 'skip_ending_start', 'skip_ending_end'] as $field) {
+            if ($request->filled($field)) {
+                $data[$field] = $this->parseTimeToSeconds($request->input($field));
+            }
+        }
+
+        $validated = \Validator::make($data, [
             'name' => 'required|string|max:255',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'type' => 'required|string',
             'player_sub' => 'required|in:free,premium',
             'quality' => 'nullable|string',
@@ -141,11 +159,27 @@ class LinkController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
-        ]);
+        ])->validate();
 
         $link->update($validated);
 
         return back()->with('success', 'Link do episódio atualizado!');
+    }
+
+    private function parseTimeToSeconds($time)
+    {
+        if (is_numeric($time)) {
+            return (int) $time;
+        }
+
+        $parts = explode(':', $time);
+        if (count($parts) === 2) {
+            return ($parts[0] * 60) + $parts[1];
+        } elseif (count($parts) === 3) {
+            return ($parts[0] * 3600) + ($parts[1] * 60) + $parts[2];
+        }
+
+        return (int) $time;
     }
 
     public function destroyEpisodeLink(EpisodeLink $link)

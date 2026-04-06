@@ -7,10 +7,12 @@ use App\Models\AppConfig;
 class BunnyLinkService
 {
     /**
-     * Gera uma URL assinada para o Bunny CDN usando SHA256 e token de diretório.
+     * Gera uma URL assinada para o Bunny CDN.
+     * Suporta o formato padrão de Query String (?token=...) 
+     * compatível com a maioria das Pull Zones.
      *
      * @param string $url URL original (ex: https://cdn.net/video/playlist.m3u8)
-     * @param string|null $linkPath Caminho customizado para o token (ex: /video/)
+     * @param string|null $linkPath Caminho customizado para o token (default: extraído da URL)
      * @param int|null $expirationHours Horas de expiração (default: 4)
      * @return string URL assinada
      */
@@ -19,7 +21,7 @@ class BunnyLinkService
         $config = AppConfig::getSettings();
         $securityKey = env('BUNNY_SECURITY_KEY', $config->bunny_security_key);
         $cdnUrl = env('BUNNY_CDN_URL', $config->bunny_cdn_url);
-        
+
         if (!$securityKey) {
             return $url;
         }
@@ -29,44 +31,45 @@ class BunnyLinkService
         $scheme = $parsedUrl['scheme'] ?? 'https';
         $fullPath = $parsedUrl['path'] ?? '';
 
-        if (empty($host)) {
+        if (empty($host) || empty($fullPath)) {
             return $url;
         }
 
         // Garante que o fullPath comece com /
         $fullPath = '/' . ltrim($fullPath, '/');
 
-        // Se não informar o linkPath, extraímos o diretório da URL
-        if (!$linkPath) {
-            $linkPath = dirname($fullPath);
-            if ($linkPath === '/' || $linkPath === '\\') {
-                $linkPath = '/';
-            } else {
-                $linkPath = rtrim($linkPath, '/') . '/';
-            }
-        }
-
-        // Garante que o linkPath comece e termine com /
-        $linkPath = '/' . ltrim($linkPath, '/');
-        $linkPath = rtrim($linkPath, '/') . '/';
-
         // Expiração (em segundos)
         $expires = time() + (($expirationHours ?? 4) * 3600);
 
-        // Assinatura Avançada (HMAC-SHA256)
-        // token = "HS256-" + Base64URL(HMAC-SHA256(security_key, linkPath + expires))
-        $hash = hash_hmac('sha256', $linkPath . $expires, $securityKey, true);
-        $token = 'HS256-' . str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($hash));
+        // Algoritmo Padrão Bunny (MD5) ou HS256 (dependente da chave)
+        // A maioria das Pull Zones usa Security Key + Path + Expires
+        // linkPath para validação de diretório (token_path)
+        if (!$linkPath) {
+             // Por padrão Bunny valida o arquivo específico. 
+             // Se quiser validar a pasta toda, informa linkPath.
+             $tokenContent = $securityKey . $fullPath . $expires;
+        } else {
+             $linkPath = '/' . ltrim(rtrim($linkPath, '/'), '/') . '/';
+             $tokenContent = $securityKey . $linkPath . $expires;
+        }
 
-        // Formato final: https://host/bcdn_token=TOKEN&expires=TIMESTAMP&token_path=PATH/actual_path
+        // Gerando o Token (MD5 é o padrão universal Bunny para Pull Zones)
+        $hash = md5($tokenContent, true);
+        $token = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($hash));
+
+        // Montando a Query String
+        $query = "token={$token}&expires={$expires}";
+        
+        if ($linkPath) {
+            $query .= "&token_path=" . urlencode($linkPath);
+        }
+
         $signedUrl = sprintf(
-            "%s://%s/bcdn_token=%s&expires=%s&token_path=%s%s",
+            "%s://%s%s?%s",
             $scheme,
             $host,
-            $token,
-            $expires,
-            urlencode($linkPath),
-            $fullPath
+            $fullPath,
+            $query
         );
 
         return $signedUrl;

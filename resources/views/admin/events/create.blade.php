@@ -29,13 +29,27 @@
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Campeonato --}}
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Campeonato (Opcional)</label>
+                    <select name="championship_id" onchange="updateTitleFromChamp(this)"
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition h-[48px]">
+                        <option value="">Selecione um campeonato...</option>
+                        @foreach($championships as $champ)
+                            <option value="{{ $champ->id }}">{{ $champ->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- Título --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Título do Evento</label>
-                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="Ex: Final da Champions League"
+                    <input type="text" name="title" id="event_title" value="{{ old('title') }}" required placeholder="Ex: Final da Champions League"
                         class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
                 </div>
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 {{-- Imagem --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">URL da Capa/Banner (Opcional)</label>
@@ -95,15 +109,15 @@
                 {{-- Início --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Horário de Início (Fuso SP)</label>
-                    <input type="datetime-local" name="start_time" value="{{ old('start_time') }}" required
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                    <input type="datetime-local" name="start_time" value="{{ old('start_time', $default_start) }}" required
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition text-xs">
                 </div>
 
                 {{-- Fim --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Horário de Término (Fuso SP)</label>
-                    <input type="datetime-local" name="end_time" value="{{ old('end_time') }}" required
-                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition">
+                    <input type="datetime-local" name="end_time" value="{{ old('end_time', $default_end) }}" required
+                        class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition text-xs">
                 </div>
             </div>
 
@@ -133,6 +147,14 @@
 
 @push('scripts')
 <script>
+function updateTitleFromChamp(select) {
+    const titleInput = document.getElementById('event_title');
+    const selectedText = select.options[select.selectedIndex].text;
+    if (select.value) {
+        titleInput.value = selectedText;
+    }
+}
+
 let searchTimeout;
 function searchTeam(side, query) {
     clearTimeout(searchTimeout);

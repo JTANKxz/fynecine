@@ -85,6 +85,11 @@ class MovieController extends Controller
         */
 
         $movies = $query->paginate(20);
+        
+        $movies->getCollection()->transform(function ($movie) {
+            $movie->tag_text = ($movie->tag_expires_at === null || $movie->tag_expires_at->isFuture()) ? $movie->tag_text : null;
+            return $movie;
+        });
 
         return response()->json($movies);
     }
@@ -200,6 +205,7 @@ class MovieController extends Controller
 
             'poster' => $movie->poster_path,
             'backdrop' => $movie->backdrop_path,
+            'tag_text' => ($movie->tag_expires_at === null || $movie->tag_expires_at->isFuture()) ? $movie->tag_text : null,
 
             'trailer' => [
                 'key' => $movie->trailer_key,

@@ -285,4 +285,19 @@ class SerieController extends Controller
         $serie->update(['content_category_id' => $request->content_category_id ?: null]);
         return back()->with('success', 'Categoria atualizada com sucesso!');
     }
+
+    public function updateTag(Request $request, Serie $serie)
+    {
+        $request->validate([
+            'tag_text' => 'nullable|string|max:50',
+            'tag_expires_at' => 'nullable|date'
+        ]);
+
+        $serie->update([
+            'tag_text' => $request->tag_text,
+            'tag_expires_at' => $request->tag_expires_at
+        ]);
+
+        return back()->with('success', 'Tag atualizada com sucesso!');
+    }
 }

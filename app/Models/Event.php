@@ -17,7 +17,13 @@ class Event extends Model
         'start_time',
         'end_time',
         'is_active',
+        'championship_id',
     ];
+
+    public function championship()
+    {
+        return $this->belongsTo(Championship::class);
+    }
 
     protected $casts = [
         'start_time' => 'datetime',

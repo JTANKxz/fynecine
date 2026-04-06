@@ -26,7 +26,14 @@ class EventController extends Controller
 
     public function create()
     {
-        return view('admin.events.create');
+        $championships = \App\Models\Championship::orderBy('name')->get();
+        
+        // Data atual no formato para datetime-local (Y-m-d\TH:i)
+        $now = now()->setTimezone('America/Sao_Paulo');
+        $default_start = $now->format('Y-m-d\TH:i');
+        $default_end = $now->addHours(2)->format('Y-m-d\TH:i');
+
+        return view('admin.events.create', compact('championships', 'default_start', 'default_end'));
     }
 
     public function store(Request $request)
@@ -38,6 +45,7 @@ class EventController extends Controller
             'away_team' => 'nullable|string|max:100',
             'home_team_id' => 'nullable|exists:teams,id',
             'away_team_id' => 'nullable|exists:teams,id',
+            'championship_id' => 'nullable|exists:championships,id',
             'image_url' => 'nullable|url',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
@@ -47,6 +55,7 @@ class EventController extends Controller
         $data['is_active'] = $request->has('is_global') || $request->has('is_active');
         $data['home_team_id'] = $request->input('home_team_id') ?: null;
         $data['away_team_id'] = $request->input('away_team_id') ?: null;
+        $data['championship_id'] = $request->input('championship_id') ?: null;
 
         Event::create($data);
 
@@ -55,7 +64,8 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        return view('admin.events.edit', compact('event'));
+        $championships = \App\Models\Championship::orderBy('name')->get();
+        return view('admin.events.edit', compact('event', 'championships'));
     }
 
     public function update(Request $request, Event $event)
@@ -67,6 +77,7 @@ class EventController extends Controller
             'away_team' => 'nullable|string|max:100',
             'home_team_id' => 'nullable|exists:teams,id',
             'away_team_id' => 'nullable|exists:teams,id',
+            'championship_id' => 'nullable|exists:championships,id',
             'image_url' => 'nullable|url',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
@@ -76,6 +87,7 @@ class EventController extends Controller
         $data['is_active'] = $request->has('is_active');
         $data['home_team_id'] = $request->input('home_team_id') ?: null;
         $data['away_team_id'] = $request->input('away_team_id') ?: null;
+        $data['championship_id'] = $request->input('championship_id') ?: null;
 
         $event->update($data);
 

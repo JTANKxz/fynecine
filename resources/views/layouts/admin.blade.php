@@ -186,6 +186,10 @@
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.events.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-bolt w-4 mr-1"></i> Eventos Ao Vivo
                     </a>
+                    <a href="{{ route('admin.championships.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.championships.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-trophy w-4 mr-1"></i> Campeonatos
+                    </a>
                     <a href="{{ route('admin.teams.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.teams.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-shield-halved w-4 mr-1"></i> Times / Equipes

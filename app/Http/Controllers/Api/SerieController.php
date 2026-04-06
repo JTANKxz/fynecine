@@ -96,7 +96,8 @@ class SerieController extends Controller
                     'seasons' => $serie->number_of_seasons,
                     'episodes' => $serie->number_of_episodes,
                     'poster' => $serie->poster_path,
-                    'backdrop' => $serie->backdrop_path
+                    'backdrop' => $serie->backdrop_path,
+                    'tag_text' => ($serie->tag_expires_at === null || $serie->tag_expires_at->isFuture()) ? $serie->tag_text : null,
                 ];
 
             }),
@@ -159,6 +160,7 @@ class SerieController extends Controller
 
             'poster' => $serie->poster_path,
             'backdrop' => $serie->backdrop_path,
+            'tag_text' => ($serie->tag_expires_at === null || $serie->tag_expires_at->isFuture()) ? $serie->tag_text : null,
 
             'trailer' => [
                 'key' => $serie->trailer_key,

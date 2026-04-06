@@ -23,8 +23,13 @@ class Serie extends Model
         'trailer_url',
         'content_type',
         'age_rating',
-        'content_category_id'
+        'content_category_id',
+        'tag_text',
+        'tag_expires_at'
+    ];
 
+    protected $casts = [
+        'tag_expires_at' => 'datetime',
     ];
 
     public function contentCategory()

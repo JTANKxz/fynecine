@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\PushNotificationController;
 use App\Http\Controllers\Admin\ContentCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ChampionshipController;
 use App\Http\Controllers\Admin\TMDBController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\FrontendController;
@@ -114,6 +115,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
 
         Route::delete('/{movie}', [MovieController::class, 'destroy'])->name('delete');
         Route::patch('/{movie}/category', [MovieController::class, 'updateCategory'])->name('category.update');
+        Route::patch('/{movie}/tag', [MovieController::class, 'updateTag'])->name('tag.update');
 
         Route::get('/{movie}/links', [MovieController::class, 'links'])->name('links');
         Route::get('/{movie}/links/create', [MovieController::class, 'createLink'])->name('links.create');
@@ -131,6 +133,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
 
         Route::delete('/{serie}', [SerieController::class, 'destroy'])->name('delete');
         Route::patch('/{serie}/category', [SerieController::class, 'updateCategory'])->name('category.update');
+        Route::patch('/{serie}/tag', [SerieController::class, 'updateTag'])->name('tag.update');
         Route::get('/{serie}/seasons', [SerieController::class, 'seasons'])->name('seasons');
         Route::get('/seasons/{season}/episodes', [SerieController::class, 'episodes'])->name('episodes');
         Route::put('/seasons/{season}', [SerieController::class, 'updateSeason'])
@@ -280,6 +283,9 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     // ========== TIMES / EQUIPES ==========
     Route::resource('teams', \App\Http\Controllers\Admin\TeamController::class)->names('teams');
     Route::get('teams-search', [\App\Http\Controllers\Admin\TeamController::class, 'search'])->name('teams.search');
+
+    // ========== CAMPEONATOS ==========
+    Route::resource('championships', ChampionshipController::class)->except(['show', 'create', 'edit']);
 
     // ========== ANOTAÇÕES ==========
     Route::prefix('notes')->name('notes.')->group(function () {

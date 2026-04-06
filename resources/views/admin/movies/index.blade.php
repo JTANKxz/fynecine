@@ -80,6 +80,10 @@
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
+
+                                <button type="button" onclick="openTagModal('movie', {{ $movie->id }}, '{{ addslashes($movie->title) }}', '{{ $movie->tag_text }}', '{{ $movie->tag_expires_at ? $movie->tag_expires_at->format('Y-m-d\TH:i') : '' }}')" class="ml-2 text-yellow-500 hover:text-yellow-400" title="Gerenciar Tag">
+                                    <i class="fa-solid fa-tag"></i>
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -170,6 +174,22 @@
         document.getElementById('contentNotificationModal').classList.add('hidden');
     }
 
+    function openTagModal(type, id, title, tagText, tagExpires) {
+        document.getElementById('tagContentId').value = id;
+        document.getElementById('tagContentTitle').textContent = title;
+        document.getElementById('tagText').value = tagText || '';
+        document.getElementById('tagExpiresAt').value = tagExpires || '';
+        
+        const form = document.getElementById('tagForm');
+        form.action = `/dashzin/movies/${id}/tag`;
+        
+        document.getElementById('tagModal').classList.remove('hidden');
+    }
+
+    function closeTagModal() {
+        document.getElementById('tagModal').classList.add('hidden');
+    }
+
     function validateContentNotification() {
         const inApp = document.querySelector('#contentNotificationModal input[name="send_in_app"]').checked;
         const push = document.querySelector('#contentNotificationModal input[name="send_push"]').checked;
@@ -185,5 +205,51 @@
     document.getElementById('contentNotificationModal')?.addEventListener('click', function(e) {
         if (e.target === this) closeContentNotificationModal();
     });
+    document.getElementById('tagModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeTagModal();
+    });
 </script>
+
+{{-- Modal de Gerenciar Tag --}}
+<div id="tagModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 rounded-lg p-6 max-w-md w-full border border-neutral-800 text-white">
+        <h3 class="text-lg font-bold mb-4">
+            <i class="fa-solid fa-tag mr-2 text-yellow-500"></i> Gerenciar Tag Promocional
+        </h3>
+
+        <form id="tagForm" action="" method="POST">
+            @csrf
+            @method('PATCH')
+
+            <div class="mb-4">
+                <p class="text-xs text-neutral-500 mb-1">Filme:</p>
+                <p id="tagContentTitle" class="font-bold text-sm"></p>
+                <input type="hidden" id="tagContentId">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-2">Texto da Tag (ex: NOVO EPISÓDIO)</label>
+                <input type="text" id="tagText" name="tag_text" maxlength="50" placeholder="Deixe vazio para remover"
+                       class="w-full px-3 py-2 bg-neutral-800 text-white rounded border border-neutral-700 focus:border-purple-500 focus:outline-none">
+                <p class="text-[10px] text-neutral-500 mt-1 italic">* Máximo 50 caracteres. Aparecerá sobre o pôster no App.</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-2">Expira em (Opcional)</label>
+                <input type="datetime-local" id="tagExpiresAt" name="tag_expires_at"
+                       class="w-full px-3 py-2 bg-neutral-800 text-white rounded border border-neutral-700 focus:border-purple-500 focus:outline-none">
+                <p class="text-[10px] text-neutral-500 mt-1 italic">* Após esta data, a tag deixará de aparecer automaticamente.</p>
+            </div>
+
+            <div class="flex gap-2 mt-6">
+                <button type="button" onclick="closeTagModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition font-bold">
+                    <i class="fa-solid fa-save mr-1"></i> Salvar Tag
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

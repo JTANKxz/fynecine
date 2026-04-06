@@ -32,6 +32,9 @@
                 <label class="block text-sm font-bold text-neutral-400 uppercase tracking-widest text-[10px]">URL do Stream</label>
                 <input type="text" name="url" value="{{ old('url', $link->url) }}"
                     class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-netflix transition font-mono text-sm @error('url') border-red-500 @enderror">
+                <p class="text-[10px] text-neutral-500 mt-1">
+                    <i class="fa-solid fa-circle-info mr-1"></i> Para tipo <b>Private</b>, você pode colar apenas o <b>ID do Vídeo</b> (ex: d478e2ca-f254-4e83-9f46-cefeea39729b).
+                </p>
                 @error('url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 

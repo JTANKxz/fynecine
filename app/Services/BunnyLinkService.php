@@ -25,14 +25,26 @@ class BunnyLinkService
         }
 
         $parsedUrl = parse_url($url);
-
         $host = $parsedUrl['host'] ?? null;
-        $scheme = $parsedUrl['scheme'] ?? 'https';
         $fullPath = $parsedUrl['path'] ?? '';
+
+        // Se a entrada for apenas um ID (não for uma URL completa), montamos ela
+        if (!$host && !empty($url)) {
+             $cdnUrl = $config->bunny_cdn_url;
+             $cdnUrlClean = rtrim(ltrim(ltrim($cdnUrl, 'https://'), 'http://'), '/');
+             
+             // Remontamos o $url como uma URL completa da Bunny
+             $url = "https://{$cdnUrlClean}/" . ltrim($url, '/') . "/playlist.m3u8";
+             $parsedUrl = parse_url($url);
+             $host = $parsedUrl['host'] ?? $cdnUrlClean;
+             $fullPath = $parsedUrl['path'] ?? '';
+        }
 
         if (empty($host) || empty($fullPath)) {
             return $url;
         }
+
+        $scheme = $parsedUrl['scheme'] ?? 'https';
 
         // Garantir formato correto do path
         $fullPath = '/' . ltrim($fullPath, '/');

@@ -36,7 +36,16 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json(['url' => $url]);
+        $headers = [];
+        if ($link->user_agent) $headers['User-Agent'] = $link->user_agent;
+        if ($link->referer) $headers['Referer'] = $link->referer;
+        if ($link->origin) $headers['Origin'] = $link->origin;
+
+        return response()->json([
+            'url'     => $url,
+            'headers' => !empty($headers) ? $headers : null,
+            'cookies' => $link->cookie
+        ]);
     }
 
     /**
@@ -62,7 +71,16 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json(['url' => $url]);
+        $headers = [];
+        if ($link->user_agent) $headers['User-Agent'] = $link->user_agent;
+        if ($link->referer) $headers['Referer'] = $link->referer;
+        if ($link->origin) $headers['Origin'] = $link->origin;
+
+        return response()->json([
+            'url'     => $url,
+            'headers' => !empty($headers) ? $headers : null,
+            'cookies' => $link->cookie
+        ]);
     }
 
     /**
@@ -88,7 +106,16 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json(['url' => $url]);
+        $headers = [];
+        if ($link->user_agent) $headers['User-Agent'] = $link->user_agent;
+        if ($link->referer) $headers['Referer'] = $link->referer;
+        if ($link->origin) $headers['Origin'] = $link->origin;
+
+        return response()->json([
+            'url'     => $url,
+            'headers' => !empty($headers) ? $headers : null,
+            'cookies' => $link->cookie
+        ]);
     }
 
     /**
@@ -114,6 +141,15 @@ class LinkController extends Controller
             );
         }
 
-        return redirect($url);
+        $headers = [];
+        if ($link->user_agent) $headers['User-Agent'] = $link->user_agent;
+        if ($link->referer) $headers['Referer'] = $link->referer;
+        if ($link->origin) $headers['Origin'] = $link->origin;
+
+        return response()->json([
+            'url'     => $url,
+            'headers' => !empty($headers) ? $headers : null,
+            'cookies' => $link->cookie
+        ]);
     }
 }

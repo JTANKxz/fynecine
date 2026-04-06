@@ -40,6 +40,9 @@
                     <label class="block text-sm text-neutral-400 mb-1">URL</label>
                     <input type="text" name="url" value="{{ old('url', $link->url) }}"
                         class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none @error('url') border border-red-500 @enderror">
+                    <p class="text-xs text-neutral-500 mt-1">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Para tipo <b>Private</b>, você pode colar apenas o <b>ID do Vídeo</b> (ex: d478e2ca-f254-4e83-9f46-cefeea39729b).
+                    </p>
                     @error('url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                 </div>
 

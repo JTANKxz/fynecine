@@ -84,6 +84,15 @@
                                 <button type="button" onclick="openTagModal('movie', {{ $movie->id }}, '{{ addslashes($movie->title) }}', '{{ $movie->tag_text }}', '{{ $movie->tag_expires_at ? $movie->tag_expires_at->format('Y-m-d\TH:i') : '' }}')" class="ml-2 text-yellow-500 hover:text-yellow-400" title="Gerenciar Tag">
                                     <i class="fa-solid fa-tag"></i>
                                 </button>
+
+                                <form action="{{ route('admin.movies.tag.update', $movie->id) }}" method="POST" class="inline-block ml-2" onsubmit="return confirm('Remover a tag deste filme?')">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="tag_text" value="">
+                                    <button type="submit" class="text-red-400 hover:text-red-300" title="Limpar Tag">
+                                        <i class="fa-solid fa-tag-slash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty

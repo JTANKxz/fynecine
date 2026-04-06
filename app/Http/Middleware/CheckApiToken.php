@@ -20,9 +20,9 @@ class CheckApiToken
         // Debug: Log the path
         \Log::info('CheckApiToken Path: ' . $request->path());
 
-        // PULA TUDO DO PIX / MERCADO PAGO SEM ERRO
+        // PULA TUDO DO PIX / MERCADO PAGO E LINKS DE PLAY SEM ERRO
         $uri = $request->getRequestUri();
-        if (str_contains($uri, 'mercadopago') || str_contains($uri, 'pix/status')) {
+        if (str_contains($uri, 'mercadopago') || str_contains($uri, 'pix/status') || str_contains($uri, 'links/')) {
             return $next($request);
         }
 

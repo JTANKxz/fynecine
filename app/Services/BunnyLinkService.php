@@ -39,7 +39,7 @@ class BunnyLinkService
         $fullPath = '/' . ltrim($fullPath, '/');
 
         // Expiração (em segundos)
-        $expires = time() + (($expirationHours ?? 4) * 3600);
+        $expires = time() + (($expirationHours ?? 24) * 3600);
 
         // Algoritmo Padrão Bunny (MD5) ou HS256 (dependente da chave)
         // A maioria das Pull Zones usa Security Key + Path + Expires

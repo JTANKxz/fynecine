@@ -142,6 +142,3 @@
     </script>
     @endpush
 @endsection
-
-    </section>
-@endsection

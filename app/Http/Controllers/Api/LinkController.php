@@ -36,15 +36,7 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json([
-            'url' => $url,
-            'headers' => [
-                'user_agent' => $link->user_agent,
-                'referer' => $link->referer,
-                'origin' => $link->origin,
-                'cookie' => $link->cookie,
-            ]
-        ]);
+        return redirect($url);
     }
 
     /**
@@ -70,15 +62,7 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json([
-            'url' => $url,
-            'headers' => [
-                'user_agent' => $link->user_agent,
-                'referer' => $link->referer,
-                'origin' => $link->origin,
-                'cookie' => $link->cookie,
-            ]
-        ]);
+        return redirect($url);
     }
 
     /**
@@ -104,15 +88,7 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json([
-            'url' => $url,
-            'headers' => [
-                'user_agent' => $link->user_agent,
-                'referer' => $link->referer,
-                'origin' => $link->origin,
-                'cookie' => $link->cookie,
-            ]
-        ]);
+        return redirect($url);
     }
 
     /**
@@ -138,14 +114,6 @@ class LinkController extends Controller
             );
         }
 
-        return response()->json([
-            'url' => $url,
-            'headers' => [
-                'user_agent' => $link->user_agent,
-                'referer' => $link->referer,
-                'origin' => $link->origin,
-                'cookie' => $link->cookie,
-            ]
-        ]);
+        return redirect($url);
     }
 }

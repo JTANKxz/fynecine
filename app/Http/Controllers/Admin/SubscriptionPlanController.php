@@ -24,7 +24,9 @@ class SubscriptionPlanController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'plan_type' => 'required|in:basic,premium',
+            'plan_category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
+            'original_price' => 'nullable|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
         ]);
 
@@ -37,7 +39,9 @@ class SubscriptionPlanController extends Controller
         SubscriptionPlan::create([
             'name' => $request->name,
             'plan_type' => $request->plan_type,
+            'plan_category' => $request->plan_category,
             'price' => $request->price,
+            'original_price' => $request->original_price,
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),
@@ -56,7 +60,9 @@ class SubscriptionPlanController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'plan_type' => 'required|in:basic,premium',
+            'plan_category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
+            'original_price' => 'nullable|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
         ]);
 
@@ -69,7 +75,9 @@ class SubscriptionPlanController extends Controller
         $subscriptionPlan->update([
             'name' => $request->name,
             'plan_type' => $request->plan_type,
+            'plan_category' => $request->plan_category,
             'price' => $request->price,
+            'original_price' => $request->original_price,
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),

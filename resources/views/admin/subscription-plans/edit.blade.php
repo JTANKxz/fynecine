@@ -36,6 +36,13 @@
                 </div>
 
                 <div>
+                    <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Categoria do Plano</label>
+                    <input type="text" name="plan_category" value="{{ old('plan_category', $subscriptionPlan->plan_category) }}" placeholder="Ex: Mensal, Anual, Premium Pack"
+                           class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                    <p class="text-[10px] text-neutral-500 mt-1">Agrupa planos iguais em carrosséis horizontais no App.</p>
+                </div>
+
+                <div>
                     <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Nível de Conta</label>
                     <select name="plan_type" required class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
                         <option value="premium" {{ old('plan_type', $subscriptionPlan->plan_type) == 'premium' ? 'selected' : '' }}>Premium (Múltiplas Telas, 4K, Tudo liberado)</option>
@@ -44,11 +51,18 @@
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid md:grid-cols-3 gap-6">
                 <div>
-                    <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Preço (R$)</label>
+                    <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Preço com Desconto (R$)</label>
                     <input type="number" step="0.01" name="price" value="{{ old('price', $subscriptionPlan->price) }}" required
                            class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Preço Original (R$)</label>
+                    <input type="number" step="0.01" name="original_price" value="{{ old('original_price', $subscriptionPlan->original_price) }}"
+                           class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                    <p class="text-[10px] text-neutral-500 mt-1">Opcional. Ativa o selo de % OFF no App.</p>
                 </div>
 
                 <div>

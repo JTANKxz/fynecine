@@ -67,7 +67,12 @@ class SubscriptionController extends Controller
                 'id' => $plan->id,
                 'name' => $plan->name,
                 'plan_type' => $plan->plan_type,
+                'plan_category' => $plan->plan_category,
                 'price' => $plan->price,
+                'original_price' => $plan->original_price,
+                'discount_percentage' => $plan->original_price > $plan->price 
+                    ? round((1 - ($plan->price / $plan->original_price)) * 100) 
+                    : 0,
                 'duration_days' => $plan->duration_days,
                 'features' => $comparisonFeatures->values(),
                 'raw_features' => $plan->features

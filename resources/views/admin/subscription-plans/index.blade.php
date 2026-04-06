@@ -26,8 +26,9 @@
             <thead class="bg-neutral-950 text-neutral-500 uppercase text-xs border-b border-neutral-800">
                 <tr>
                     <th class="px-6 py-4">Nome</th>
-                    <th class="px-6 py-4">Nível de Conta</th>
-                    <th class="px-6 py-4">Preço</th>
+                    <th class="px-6 py-4">Categoria</th>
+                    <th class="px-6 py-4">Nível</th>
+                    <th class="px-6 py-4 text-center">Preço (R$)</th>
                     <th class="px-6 py-4">Duração</th>
                     <th class="px-6 py-4">Status</th>
                     <th class="px-6 py-4 text-right">Ações</th>
@@ -37,14 +38,20 @@
                 @forelse($plans as $plan)
                 <tr class="hover:bg-neutral-800/50 transition">
                     <td class="px-6 py-4 font-bold text-white">{{ $plan->name }}</td>
+                    <td class="px-6 py-4 text-xs font-semibold text-netflix">{{ $plan->plan_category ?? '-' }}</td>
                     <td class="px-6 py-4">
                         @if($plan->plan_type === 'premium')
-                            <span class="bg-amber-500/20 text-amber-500 px-2 py-1 rounded text-xs font-bold uppercase"><i class="fa-solid fa-crown mr-1"></i> Premium</span>
+                            <span class="bg-amber-500/20 text-amber-500 px-2 py-1 rounded text-[10px] font-bold uppercase"><i class="fa-solid fa-crown mr-1"></i> Premium</span>
                         @else
-                            <span class="bg-blue-500/20 text-blue-500 px-2 py-1 rounded text-xs font-bold uppercase">Basic</span>
+                            <span class="bg-blue-500/20 text-blue-500 px-2 py-1 rounded text-[10px] font-bold uppercase">Basic</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">R$ {{ number_format($plan->price, 2, ',', '.') }}</td>
+                    <td class="px-6 py-4 text-center">
+                        @if($plan->original_price > $plan->price)
+                            <span class="text-[10px] text-neutral-500 line-through block">R$ {{ number_format($plan->original_price, 2, ',', '.') }}</span>
+                        @endif
+                        <span class="font-bold">R$ {{ number_format($plan->price, 2, ',', '.') }}</span>
+                    </td>
                     <td class="px-6 py-4">{{ $plan->duration_days }} dias</td>
                     <td class="px-6 py-4">
                         @if($plan->is_active)

@@ -45,6 +45,13 @@ class BunnyLinkService
         // A maioria das Pull Zones usa Security Key + Path + Expires
         // linkPath para validação de diretório (token_path)
         if (!$linkPath) {
+             // Se for .m3u8, tentamos assinar a pasta pai por padrão
+             if (str_ends_with($fullPath, '.m3u8')) {
+                 $linkPath = dirname($fullPath) . '/';
+             }
+        }
+
+        if (!$linkPath) {
              // Por padrão Bunny valida o arquivo específico. 
              // Se quiser validar a pasta toda, informa linkPath.
              $tokenContent = $securityKey . $fullPath . $expires;

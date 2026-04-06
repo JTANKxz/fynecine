@@ -36,7 +36,7 @@ class LinkController extends Controller
             );
         }
 
-        return redirect($url);
+        return response()->json(['url' => $url]);
     }
 
     /**
@@ -62,7 +62,7 @@ class LinkController extends Controller
             );
         }
 
-        return redirect($url);
+        return response()->json(['url' => $url]);
     }
 
     /**
@@ -88,7 +88,7 @@ class LinkController extends Controller
             );
         }
 
-        return redirect($url);
+        return response()->json(['url' => $url]);
     }
 
     /**

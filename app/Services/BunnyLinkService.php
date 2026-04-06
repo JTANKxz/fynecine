@@ -7,12 +7,7 @@ use App\Models\AppConfig;
 class BunnyLinkService
 {
     /**
-     * Gera uma URL assinada para o Bunny CDN (modo avançado - HLS compatível).
-     *
-     * @param string $url URL original (ex: https://cdn.net/video/playlist.m3u8)
-     * @param string|null $linkPath Caminho do diretório (opcional)
-     * @param int|null $expirationHours Horas de expiração
-     * @return string URL assinada pronta para ExoPlayer
+     * Gera URL assinada Bunny CDN (compatível com HLS / ExoPlayer / navegador)
      */
     public static function generateSignedUrl(string $url, ?string $linkPath = null, ?int $expirationHours = 4)
     {
@@ -28,13 +23,13 @@ class BunnyLinkService
         $host = $parsedUrl['host'] ?? null;
         $fullPath = $parsedUrl['path'] ?? '';
 
-        // Se a entrada for apenas um ID (não for uma URL completa), montamos ela
+        // Se for só ID, monta URL completa
         if (!$host && !empty($url)) {
             $cdnUrl = $config->bunny_cdn_url;
-            $cdnUrlClean = rtrim(ltrim(ltrim($cdnUrl, 'https://'), 'http://'), '/');
+            $cdnUrlClean = rtrim(str_replace(['https://', 'http://'], '', $cdnUrl), '/');
 
-            // Remontamos o $url como uma URL completa da Bunny
             $url = "https://{$cdnUrlClean}/" . ltrim($url, '/') . "/playlist.m3u8";
+
             $parsedUrl = parse_url($url);
             $host = $parsedUrl['host'] ?? $cdnUrlClean;
             $fullPath = $parsedUrl['path'] ?? '';
@@ -46,56 +41,36 @@ class BunnyLinkService
 
         $scheme = $parsedUrl['scheme'] ?? 'https';
 
-        // Garantir formato correto do path
+        // Normaliza path
         $fullPath = '/' . ltrim($fullPath, '/');
 
         // Expiração
         $expires = time() + (($expirationHours ?? 4) * 3600);
 
-        // Se for HLS (.m3u8), usar diretório automaticamente
+        // Se for HLS, usa diretório
         if (!$linkPath && str_ends_with($fullPath, '.m3u8')) {
             $linkPath = dirname($fullPath) . '/';
         }
 
-        // Normalizar token_path
+        // Normaliza token_path
         $tokenPath = null;
         if ($linkPath) {
-            $tokenPath = '/' . ltrim(rtrim($linkPath, '/'), '/') . '/';
+            $tokenPath = '/' . trim($linkPath, '/') . '/';
         }
 
-        // 🔐 Montar SIGNATURE (SEM security key aqui)
-        $signature = $tokenPath ?: $fullPath;
-        $signature .= $expires;
+        // 🔥 ASSINATURA CORRETA (IGUAL AO BUNNY)
+        $signature = ($tokenPath ?: $fullPath) . $expires;
 
-        // Adicionar parâmetros extras (ordem alfabética)
-        $extraParams = [];
-        if ($tokenPath) {
-            $extraParams['token_path'] = $tokenPath;
-        }
-
-        ksort($extraParams);
-
-        if (!empty($extraParams)) {
-            $paramsRaw = [];
-            foreach ($extraParams as $key => $value) {
-                $paramsRaw[] = "{$key}={$value}";
-            }
-            $signature .= implode('&', $paramsRaw);
-        }
-
-        // 🔥 HMAC-SHA256 correto
+        // 🔐 HMAC SHA256
         $hash = hash_hmac('sha256', $signature, $securityKey, true);
 
-        // Base64 URL Safe
+        // 🔥 TOKEN FINAL (SEM PREFIXO!!)
         $token = rtrim(strtr(base64_encode($hash), '+/', '-_'), '=');
 
-        // Prefixo obrigatório
-        $token = "HS256-" . $token;
-
-        // URL encode do token_path
+        // URL encode apenas no parâmetro
         $encodedTokenPath = $tokenPath ? urlencode($tokenPath) : '';
 
-        // 🔥 Montar URL FINAL (PATH TOKEN - obrigatório para HLS)
+        // 🔥 URL FINAL (formato HLS path-based)
         $signedUrl = sprintf(
             "%s://%s/bcdn_token=%s&expires=%s%s%s",
             $scheme,

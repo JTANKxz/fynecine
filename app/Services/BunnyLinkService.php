@@ -41,8 +41,6 @@ class BunnyLinkService
         // Expiração (em segundos)
         $expires = time() + (($expirationHours ?? 24) * 3600);
 
-        // Algoritmo Padrão Bunny (MD5) ou HS256 (dependente da chave)
-        // A maioria das Pull Zones usa Security Key + Path + Expires
         // linkPath para validação de diretório (token_path)
         if (!$linkPath) {
              // Se for .m3u8, tentamos assinar a pasta pai por padrão
@@ -51,24 +49,38 @@ class BunnyLinkService
              }
         }
 
-        if (!$linkPath) {
-             // Por padrão Bunny valida o arquivo específico. 
-             // Se quiser validar a pasta toda, informa linkPath.
-             $tokenContent = $securityKey . $fullPath . $expires;
-        } else {
-             $linkPath = '/' . ltrim(rtrim($linkPath, '/'), '/') . '/';
-             $tokenContent = $securityKey . $linkPath . $expires;
+        // Parâmetros extras para o Hash (devem estar em ordem alfabética)
+        $extraParams = [];
+        if ($linkPath) {
+            $extraParams['token_path'] = '/' . ltrim(rtrim($linkPath, '/'), '/') . '/';
+        }
+        ksort($extraParams);
+
+        // Montando a base do Hash SHA256 (Novo sistema Bunny)
+        // SHA256_RAW(SecurityKey + Path + Expiration + [IP] + ExtraParams)
+        $hashBase = $securityKey . $fullPath . $expires;
+        
+        // Adiciona parâmetros extras na base do hash se existirem (SEM URL ENCODE na base do hash!)
+        if (!empty($extraParams)) {
+            $paramsRaw = [];
+            foreach ($extraParams as $key => $value) {
+                $paramsRaw[] = "{$key}={$value}";
+            }
+            $hashBase .= implode('&', $paramsRaw);
         }
 
-        // Gerando o Token (MD5 é o padrão universal Bunny para Pull Zones)
-        $hash = md5($tokenContent, true);
-        $token = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($hash));
+        // Gerando o Token SHA256 (RAW BINARY)
+        $hash = hash('sha256', $hashBase, true);
+        $token = base64_encode($hash);
+        
+        // Normalização Bunny: + por -, / por _ e remove =
+        $token = str_replace(['+', '/', '='], ['-', '_', ''], $token);
 
-        // Montando a Query String
+        // Montando a Query String Final
         $query = "token={$token}&expires={$expires}";
         
-        if ($linkPath) {
-            $query .= "&token_path=" . urlencode($linkPath);
+        foreach ($extraParams as $key => $value) {
+            $query .= "&{$key}=" . urlencode($value);
         }
 
         $signedUrl = sprintf(

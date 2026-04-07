@@ -16,22 +16,27 @@
     <!-- Configurações Iniciais -->
     <div id="setupSection" class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 mb-6 shadow-lg">
         <h3 class="text-lg font-semibold mb-4 border-b border-neutral-800 pb-2">Configurar Sincronização de Animes</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-neutral-400 mb-2">Lista de TMDB IDs (Formato JSON Array)</label>
+                <textarea id="manualIds" rows="5" class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-netflix focus:outline-none transition font-mono text-xs">["121787", "94693", "80713", "1988", "607", "4229", "134581", "670", "1720", "3611", "255", "202864", "109934", "127714", "114477", "139551", "194774", "129516", "205493", "202770", "93741", "114183", "89456", "70881", "122287", "124363", "126437", "133387", "195924", "134843", "196040", "156218", "129195", "115694", "133197", "157842", "130765", "156450", "111576", "137194", "138882", "117933", "154901", "158131", "158138", "106055", "154494", "93655"]</textarea>
+                <p class="text-xs text-neutral-500 mt-1">Cole aqui a lista de IDs do TMDB que deseja importar.</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             <div>
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Iniciar de (Pular X itens)</label>
                 <input type="number" id="importSkip" value="0" min="0" 
                        class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-netflix focus:outline-none transition">
-                <p class="text-xs text-neutral-500 mt-1">Ex: Se já importou 100, coloque 100.</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Quantidade a Importar</label>
                 <input type="number" id="importQuantity" value="20" min="1" max="500" 
                        class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-netflix focus:outline-none transition">
-                <p class="text-xs text-neutral-500 mt-1">Lotes menores (20) são recomendados para animes.</p>
             </div>
             <div class="flex items-end">
                 <button id="btnFetchIds" onclick="prepareImport()" class="w-full bg-netflix hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center justify-center gap-2 h-[42px]">
-                    <i class="fa-solid fa-sync"></i> Carregar Animes
+                    <i class="fa-solid fa-sync"></i> Iniciar Importação
                 </button>
             </div>
         </div>
@@ -120,45 +125,38 @@
 
     async function prepareImport() {
         const skip = parseInt(document.getElementById('importSkip').value) || 0;
-        const qty = parseInt(document.getElementById('importQuantity').value) || 30;
+        const qty = parseInt(document.getElementById('importQuantity').value) || 20;
+        const manualIdsRaw = document.getElementById('manualIds').value;
         const btnFetch = document.getElementById('btnFetchIds');
         
         btnFetch.disabled = true;
-        btnFetch.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Sincronizando...';
-
-        addLog(`Buscando lista de Animes na API Superflix...`, 'info');
+        btnFetch.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Processando...';
 
         try {
-            const response = await fetch('{{ route("admin.series.bulk.anime.ids") }}');
-            const data = await response.json();
+            const parsedIds = JSON.parse(manualIdsRaw);
+            const allSeries = parsedIds.map(id => ({ tmdb_id: id.toString() }));
 
-            if (data.success) {
-                const allSeries = data.series || [];
-                addLog(`Total de animes encontrados na fonte: ${allSeries.length}`, 'info');
-                
-                if (skip >= allSeries.length) {
-                    Swal.fire('Aviso', 'O valor de "Pular" é maior que o total de animes disponíveis.', 'warning');
-                    resetBtn();
-                    return;
-                }
-
-                seriesQueue = allSeries.slice(skip, skip + qty);
-                stats.total = seriesQueue.length;
-                stats.processed = 0; stats.success = 0; stats.exists = 0; stats.errors = 0;
-                currentTaskIndex = 0;
-                
-                document.getElementById('setupSection').classList.add('hidden');
-                document.getElementById('statusSection').classList.remove('hidden');
-                document.getElementById('statTotal').innerText = stats.total;
-                
-                addLog(`Iniciando Lote: Pulando ${skip} e processando ${seriesQueue.length} animes.`);
-                startImport();
-            } else {
-                Swal.fire('Erro', data.error || 'Erro ao buscar dados', 'error');
+            addLog(`Total de IDs processados: ${allSeries.length}`, 'info');
+            
+            if (skip >= allSeries.length) {
+                Swal.fire('Aviso', 'O valor de "Pular" é maior que o total de IDs fornecidos.', 'warning');
                 resetBtn();
+                return;
             }
+
+            seriesQueue = allSeries.slice(skip, skip + qty);
+            stats.total = seriesQueue.length;
+            stats.processed = 0; stats.success = 0; stats.exists = 0; stats.errors = 0;
+            currentTaskIndex = 0;
+            
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('statusSection').classList.remove('hidden');
+            document.getElementById('statTotal').innerText = stats.total;
+            
+            addLog(`Iniciando Lote: Pulando ${skip} e processando ${seriesQueue.length} animes.`);
+            startImport();
         } catch (error) {
-            Swal.fire('Erro Fatal', error.message, 'error');
+            Swal.fire('Erro de Formato', 'A lista de IDs não está em um formato JSON válido.', 'error');
             resetBtn();
         }
     }

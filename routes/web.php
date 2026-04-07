@@ -131,6 +131,9 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::get('/bulk/ids', [SerieController::class, 'getBulkIds'])->name('bulk.ids');
         Route::post('/bulk/import', [SerieController::class, 'processImport'])->name('bulk.import');
 
+        Route::get('/bulk-anime', [SerieController::class, 'bulkAnimeImport'])->name('bulk.anime');
+        Route::get('/bulk-anime/ids', [SerieController::class, 'getBulkAnimeIds'])->name('bulk.anime.ids');
+
         Route::delete('/{serie}', [SerieController::class, 'destroy'])->name('delete');
         Route::patch('/{serie}/category', [SerieController::class, 'updateCategory'])->name('category.update');
         Route::patch('/{serie}/tag', [SerieController::class, 'updateTag'])->name('tag.update');

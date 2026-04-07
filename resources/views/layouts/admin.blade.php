@@ -148,6 +148,10 @@
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.tmdb') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-cloud-arrow-down w-4 mr-1"></i> Importar via TMDB
                     </a>
+                    <a href="{{ route('admin.series.bulk.anime') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.series.bulk.anime') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-robot w-4 mr-1"></i> Importar Animes (Massa)
+                    </a>
                 </div>
             </div>
 

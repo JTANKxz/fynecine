@@ -43,6 +43,11 @@ class SerieController extends Controller
         return view('admin.series.bulk');
     }
 
+    public function bulkAnimeImport()
+    {
+        return view('admin.series.bulk_anime');
+    }
+
     public function getBulkIds()
     {
         try {
@@ -64,9 +69,34 @@ class SerieController extends Controller
         }
     }
 
+    public function getBulkAnimeIds()
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::get('https://superflixapi.rest/lista?category=anime&type=tmdb&format=json&order=asc');
+            
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Não foi possível buscar os IDs da API de Animes.'], 500);
+            }
+
+            $data = $response->json();
+            // A API de animes retorna um formato diferente: [{"tmdb":"121787"}, ...]
+            $series = collect($data)->map(function($item) {
+                return ['tmdb_id' => $item['tmdb'] ?? null];
+            })->filter(fn($item) => $item['tmdb_id'] !== null)->values();
+
+            return response()->json([
+                'success' => true,
+                'series' => $series
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function processImport(Request $request)
     {
         $tmdbId = $request->tmdb_id;
+        $categoryId = $request->category_id;
 
         if (!$tmdbId) {
             return response()->json(['success' => false, 'error' => 'TMDB ID não fornecido.']);
@@ -81,7 +111,7 @@ class SerieController extends Controller
             ]);
         }
 
-        $result = $this->performSeriesImport($tmdbId, true); // true para importar tudo (temporadas/episódios)
+        $result = $this->performSeriesImport($tmdbId, true, $categoryId); // true para importar tudo (temporadas/episódios)
 
         if ($result['success']) {
             return response()->json([

@@ -30,8 +30,8 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // verifica se é admin
-            if (!$user->is_admin) {
+            // verifica se tem acesso (admin ou editor)
+            if (!$user->hasAdminPanelAccess()) {
                 Auth::logout();
 
                 return back()->withErrors([

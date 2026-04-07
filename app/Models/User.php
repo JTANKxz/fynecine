@@ -101,6 +101,11 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ADMIN || $this->is_admin;
     }
 
+    public function hasAdminPanelAccess(): bool
+    {
+        return $this->isAdmin() || $this->role === self::ROLE_EDITOR;
+    }
+
     public function isEditor(): bool
     {
         return $this->role === self::ROLE_EDITOR;

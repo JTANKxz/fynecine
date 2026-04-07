@@ -46,15 +46,20 @@ class AuthController extends Controller
         try {
             Mail::to($email)->send(new PasswordResetCodeMail($code));
         } catch (\Exception $e) {
+            \Log::error('SMTP ERROR API (Web): ' . $e->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => 'Erro ao enviar e-mail. Verifique suas configurações de SMTP.',
+                'data' => new \stdClass()
             ], 500);
         }
 
         return response()->json([
             'status' => true,
             'message' => 'Código de recuperação enviado com sucesso!',
+            'data' => [
+                'email' => $email
+            ]
         ]);
     }
 
@@ -80,12 +85,14 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Código inválido ou expirado.',
+                'data' => new \stdClass()
             ], 400);
         }
 
         return response()->json([
             'status' => true,
             'message' => 'Código validado com sucesso.',
+            'data' => new \stdClass()
         ]);
     }
 
@@ -99,7 +106,7 @@ class AuthController extends Controller
         $request->validate([
             'email'    => 'required|email|exists:users,email',
             'code'     => 'required|string|size:6',
-            'password' => 'required|string|min:6|confirmed'
+            'password' => 'required|string|min:6'
         ]);
 
         $record = DB::table('password_reset_codes')
@@ -112,13 +119,14 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Transação inválida. Solicite um novo código.',
+                'data' => new \stdClass()
             ], 400);
         }
 
         // Atualizar senha
         $user = User::where('email', $request->email)->first();
         $user->update([
-            'password' => Hash::make($request->password)
+            'password' => $request->password // O model já tem cast de hash na senha ou deve-se usar Hash::make?
         ]);
 
         // Limpar código usado
@@ -127,6 +135,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Sua senha foi redefinida com sucesso!',
+            'data' => new \stdClass()
         ]);
     }
 

@@ -67,6 +67,8 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::post('/{user}/ban', [UserController::class, 'ban'])->name('ban');
         Route::post('/{user}/unban', [UserController::class, 'unban'])->name('unban');
+        Route::post('/{user}/ban-device', [UserController::class, 'banDevice'])->name('ban-device');
+        Route::post('/{user}/revoke-token/{token}', [UserController::class, 'revokeToken'])->name('revoke-token');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('delete');
     });
     Route::prefix('sliders')->name('sliders.')->group(function () {

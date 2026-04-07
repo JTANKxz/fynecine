@@ -58,7 +58,8 @@ class UserController extends Controller
     }
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $tokens = $user->tokens()->orderBy('last_used_at', 'desc')->get();
+        return view('admin.users.edit', compact('user', 'tokens'));
     }
 
     public function update(Request $request, User $user)
@@ -96,18 +97,55 @@ class UserController extends Controller
         if ($user->last_login_ip) {
             \App\Models\BannedDevice::updateOrCreate(
                 ['ip_address' => $user->last_login_ip],
-                ['reason' => "Banimento do usuário {$user->name}"]
+                ['reason' => "Banimento total do usuário {$user->name}"]
             );
         }
 
-        if ($user->device_id) {
-            \App\Models\BannedDevice::updateOrCreate(
-                ['device_id' => $user->device_id],
-                ['reason' => "Banimento do usuário {$user->name}"]
-            );
+        // Tenta banir todos os UUIDs associados aos tokens deste usuário
+        foreach ($user->tokens as $token) {
+            if ($token->device_uuid) {
+                \App\Models\BannedDevice::updateOrCreate(
+                    ['device_uuid' => $token->device_uuid],
+                    ['reason' => "Banimento por associação à conta de {$user->name}"]
+                );
+            }
+            $token->delete();
         }
 
-        return back()->with('success', 'Usuário banido do sistema.');
+        return back()->with('success', 'Usuário e todos os seus dispositivos foram banidos.');
+    }
+
+    /**
+     * Bane um dispositivo específico por UUID.
+     */
+    public function banDevice(Request $request, User $user)
+    {
+        $request->validate([
+            'device_uuid' => 'required|string',
+            'reason' => 'nullable|string'
+        ]);
+
+        \App\Models\BannedDevice::updateOrCreate(
+            ['device_uuid' => $request->device_uuid],
+            [
+                'reason' => $request->reason ?: "Banimento manual via Admin para usuário: {$user->name}",
+                'expires_at' => null // Permanente por padrão no admin
+            ]
+        );
+
+        // Deleta todos os tokens que usam esse UUID para expulsar imediatamente
+        \App\Models\PersonalAccessToken::where('device_uuid', $request->device_uuid)->delete();
+
+        return back()->with('success', 'Dispositivo banido com sucesso e sessões encerradas.');
+    }
+
+    /**
+     * Revoga apenas um token específico (Desconectar dispositivo).
+     */
+    public function revokeToken(User $user, $tokenId)
+    {
+        $user->tokens()->where('id', $tokenId)->delete();
+        return back()->with('success', 'Dispositivo desconectado com sucesso.');
     }
 
     public function unban(User $user)

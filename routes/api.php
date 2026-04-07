@@ -98,6 +98,11 @@ Route::middleware('api.token')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login',    [AuthController::class, 'login']);
+
+        // Recuperação de Senha (OTP)
+        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('/verify-code',     [AuthController::class, 'verifyCode']);
+        Route::post('/reset-password',  [AuthController::class, 'resetPassword']);
     });
 
     // Rotas protegidas por token Sanctum

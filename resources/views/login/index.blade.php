@@ -47,17 +47,28 @@
 
             </div>
 
+            @if (session('status'))
+                <div class="bg-green-600/20 text-green-400 p-3 rounded text-sm text-center">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             <div>
 
-                <label class="text-sm text-neutral-400">
-                    Senha
-                </label>
+                <div class="flex justify-between items-center px-1">
+                    <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                        Senha
+                    </label>
+                    <a href="{{ route('password.request') }}" class="text-[10px] text-neutral-500 hover:text-red-500 transition uppercase font-bold">
+                        Esqueceu a senha?
+                    </a>
+                </div>
 
                 <input
                     type="password"
                     name="password"
                     required
-                    class="w-full p-2 bg-neutral-800 rounded mt-1 outline-none focus:ring-2 focus:ring-red-600">
+                    class="w-full p-2 bg-neutral-800 rounded mt-1 outline-none border border-neutral-700 focus:border-red-600 transition text-sm">
 
             </div>
 

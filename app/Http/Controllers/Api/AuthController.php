@@ -12,8 +12,124 @@ use Illuminate\Validation\ValidationException;
 use App\Models\BannedDevice;
 use Illuminate\Support\Facades\Http;
 
+use App\Mail\PasswordResetCodeMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 class AuthController extends Controller
 {
+    /**
+     * Envia o código de 6 dígitos para o e-mail do usuário.
+     *
+     * POST /api/auth/forgot-password
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $email = $request->email;
+        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Salvar ou atualizar código
+        DB::table('password_reset_codes')->updateOrInsert(
+            ['email' => $email],
+            [
+                'code' => $code,
+                'expires_at' => Carbon::now()->addMinutes(15),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        // Enviar E-mail
+        try {
+            Mail::to($email)->send(new PasswordResetCodeMail($code));
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao enviar e-mail. Verifique suas configurações de SMTP.',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Código de recuperação enviado com sucesso!',
+        ]);
+    }
+
+    /**
+     * Verifica se o código de 6 dígitos é válido.
+     *
+     * POST /api/auth/verify-code
+     */
+    public function verifyCode(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code'  => 'required|string|size:6'
+        ]);
+
+        $record = DB::table('password_reset_codes')
+            ->where('email', $request->email)
+            ->where('code', $request->code)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Código inválido ou expirado.',
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Código validado com sucesso.',
+        ]);
+    }
+
+    /**
+     * Redefine a senha usando o código validado.
+     *
+     * POST /api/auth/reset-password
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email'    => 'required|email|exists:users,email',
+            'code'     => 'required|string|size:6',
+            'password' => 'required|string|min:6|confirmed'
+        ]);
+
+        $record = DB::table('password_reset_codes')
+            ->where('email', $request->email)
+            ->where('code', $request->code)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Transação inválida. Solicite um novo código.',
+            ], 400);
+        }
+
+        // Atualizar senha
+        $user = User::where('email', $request->email)->first();
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        // Limpar código usado
+        DB::table('password_reset_codes')->where('email', $request->email)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Sua senha foi redefinida com sucesso!',
+        ]);
+    }
+
     /**
      * Registra um novo usuário e retorna token de acesso.
      *

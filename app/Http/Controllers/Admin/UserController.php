@@ -105,6 +105,7 @@ class UserController extends Controller
         }
 
         $user->update([
+            'is_banned' => true,
             'banned_at' => now(),
             'ban_reason' => $request->input('reason', 'Violação dos termos')
         ]);
@@ -175,6 +176,7 @@ class UserController extends Controller
     public function unban(User $user)
     {
         $user->update([
+            'is_banned' => false,
             'banned_at' => null,
             'ban_reason' => null
         ]);

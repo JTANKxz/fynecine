@@ -82,18 +82,21 @@
                 <h3 class="text-lg font-bold text-white">Dispositivos e Sessões</h3>
                 <p class="text-sm text-neutral-400">Gerencie onde este usuário está logado e realize banimentos de hardware.</p>
             </div>
-            <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" onsubmit="return confirm('Isso banirá a conta e todos os dispositivos associados permanentemente. Continuar?')">
-                @csrf
-                @if($user->banned_at)
-                    <a href="{{ route('admin.users.unban', $user->id) }}" class="bg-green-600 px-4 py-2 rounded text-white text-sm font-bold hover:bg-green-700 transition">
-                        Remover Banimento da Conta
-                    </a>
-                @else
+            @if($user->is_banned)
+                <form action="{{ route('admin.users.unban', $user->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-green-600 px-4 py-2 rounded text-white text-sm font-bold hover:bg-green-700 transition">
+                        Ativar / Remover Banimento da Conta
+                    </button>
+                </form>
+            @else
+                <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" onsubmit="return confirm('Isso banirá a conta e todos os dispositivos associados permanentemente. Continuar?')">
+                    @csrf
                     <button type="submit" class="bg-red-600 px-4 py-2 rounded text-white text-sm font-bold hover:bg-red-700 transition">
                         Banir Usuário e Todos os Aparelhos
                     </button>
-                @endif
-            </form>
+                </form>
+            @endif
         </div>
 
         <div class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">

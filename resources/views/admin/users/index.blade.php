@@ -74,10 +74,10 @@
                                 </span>
                             </td>
                             <td class="p-4">
-                                @if ($user->banned_at)
+                                @if ($user->is_banned)
                                     <span class="inline-flex items-center gap-1.5 py-1 px-2 rounded-full text-xs font-medium bg-red-900/20 text-red-500">
                                         <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                        Banido
+                                        Inativo
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1.5 py-1 px-2 rounded-full text-xs font-medium bg-green-900/20 text-green-500">

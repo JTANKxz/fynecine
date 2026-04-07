@@ -25,6 +25,13 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'role',
+        'is_banned',
+        'ban_reason',
+        'banned_at',
+        'avatar',
+        'subscription_plan_id',
+        'subscription_expires_at',
         'plan_type',
         'plan_expires_at',
         'features',
@@ -35,6 +42,10 @@ class User extends Authenticatable
         'max_profiles',
         'plan_status',
     ];
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_EDITOR = 'editor';
+    public const ROLE_USER = 'user';
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -86,7 +97,27 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->is_admin; // retorna true ou false
+        return $this->role === self::ROLE_ADMIN || $this->is_admin;
+    }
+
+    public function isEditor(): bool
+    {
+        return $this->role === self::ROLE_EDITOR;
+    }
+
+    public function canManageSettings(): bool
+    {
+        return $this->isAdmin(); // Apenas Admin real pode mudar config
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->isAdmin() || $this->isEditor();
+    }
+
+    public function canChangeUserSensitiveData(): bool
+    {
+        return $this->isAdmin(); // Editor não muda senha/cargo
     }
 
     public function profiles()

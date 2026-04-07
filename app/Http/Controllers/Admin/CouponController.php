@@ -17,12 +17,18 @@ class CouponController extends Controller
 
     public function create()
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.coupons.index')->with('error', 'Acesso negado. Apenas administradores podem criar cupons.');
+        }
         $plans = \App\Models\SubscriptionPlan::where('is_active', true)->get();
         return view('admin.coupons.create', compact('plans'));
     }
 
     public function store(Request $request)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.coupons.index')->with('error', 'Acesso negado.');
+        }
         $request->validate([
             'code' => ['required', 'string', 'unique:coupons,code'],
             'subscription_plan_id' => ['nullable', 'exists:subscription_plans,id'],
@@ -59,12 +65,18 @@ class CouponController extends Controller
 
     public function edit(Coupon $coupon)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.coupons.index')->with('error', 'Acesso negado. Apenas administradores podem editar cupons.');
+        }
         $plans = \App\Models\SubscriptionPlan::where('is_active', true)->get();
         return view('admin.coupons.edit', compact('coupon', 'plans'));
     }
 
     public function update(Request $request, Coupon $coupon)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.coupons.index')->with('error', 'Acesso negado.');
+        }
         $request->validate([
             'code' => ['required', 'string', 'unique:coupons,code,' . $coupon->id],
             'subscription_plan_id' => ['nullable', 'exists:subscription_plans,id'],
@@ -101,6 +113,9 @@ class CouponController extends Controller
 
     public function destroy(Coupon $coupon)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.coupons.index')->with('error', 'Acesso negado.');
+        }
         $coupon->delete();
         return redirect()->route('admin.coupons.index')->with('success', 'Cupom deletado.');
     }

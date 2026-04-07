@@ -21,15 +21,23 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name'                  => ['required', 'string', 'max:255'],
-            'username'              => ['required', 'string', 'max:255', 'unique:users'],
-            'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'              => ['required', 'string', 'min:8', 'confirmed'],
-            'device_uuid'           => ['required', 'string'],
-            'device_name'           => ['nullable', 'string'],
-            'device_type'           => ['nullable', 'string'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'name'                  => ['required', 'string', 'max:255'],
+                'username'              => ['required', 'string', 'max:255', 'unique:users'],
+                'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password'              => ['required', 'string', 'min:6', 'confirmed'],
+                'device_uuid'           => ['required', 'string'],
+                'device_name'           => ['nullable', 'string'],
+                'device_type'           => ['nullable', 'string'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => collect($e->errors())->flatten()->first(),
+                'errors'  => $e->errors(),
+            ], 422);
+        }
 
         $this->checkDeviceBan($request->device_uuid);
 

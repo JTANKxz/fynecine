@@ -30,14 +30,17 @@
         </div>
 
         <div class="grid md:grid-cols-2 gap-6">
+            @if(Auth::user()->canChangeUserSensitiveData())
             <div>
-                <label class="block text-sm font-medium text-neutral-400 mb-2">Tipo de Acesso</label>
-                <select name="is_admin" class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-netflix outline-none">
-                    <option value="0" {{ $user->is_admin ? '' : 'selected' }}>Cliente (App/Site)</option>
-                    <option value="1" {{ $user->is_admin ? 'selected' : '' }}>Administrador (Painel)</option>
+                <label class="block text-sm font-medium text-neutral-400 mb-2">Cargo / Permissão</label>
+                <select name="role" class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-netflix outline-none">
+                    <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>Cliente (App/Site)</option>
+                    <option value="editor" {{ $user->role === 'editor' ? 'selected' : '' }}>Editor (Gerencia Conteúdo)</option>
+                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Administrador (Total)</option>
                 </select>
-                @error('is_admin') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
+            @endif
 
             <div>
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Plano de Assinatura</label>
@@ -50,6 +53,7 @@
             </div>
         </div>
 
+        @if(Auth::user()->canChangeUserSensitiveData())
         <div class="grid md:grid-cols-1 gap-6">
             <div>
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Nova Senha (deixe em branco para não alterar)</label>
@@ -59,6 +63,7 @@
                 @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
+        @endif
 
         <div class="pt-4 flex items-center gap-4">
             <button type="submit" class="bg-netflix px-8 py-2.5 rounded text-white font-bold hover:bg-red-700 transition">
@@ -70,6 +75,7 @@
         </div>
     </form>
 
+    @if(Auth::user()->isAdmin())
     <div class="mt-8">
         <div class="mb-4 flex items-center justify-between">
             <div>
@@ -153,5 +159,6 @@
             </table>
         </div>
     </div>
+    @endif
 </section>
 @endsection

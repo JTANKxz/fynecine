@@ -10,9 +10,11 @@
             <p class="text-sm text-neutral-500">Gere códigos para ativação de planos Basic e Premium.</p>
         </div>
 
+        @if(auth()->user()->isAdmin())
         <a href="{{ route('admin.coupons.create') }}" class="bg-netflix hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded shadow-lg transition flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> GERAR NOVO CUPOM
         </a>
+        @endif
     </div>
 
     @if(session('success'))
@@ -91,16 +93,20 @@
                             </td>
                             <td class="p-4 text-right">
                                 <div class="flex items-center justify-end gap-3 opacity-20 group-hover:opacity-100 transition">
-                                    <a href="{{ route('admin.coupons.edit', $coupon) }}" class="text-neutral-400 hover:text-white transition">
+                                    @if(auth()->user()->isAdmin())
+                                    <a href="{{ route('admin.coupons.edit', $coupon) }}" class="text-neutral-400 hover:text-white transition" title="Editar">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
                                     <form action="{{ route('admin.coupons.destroy', $coupon) }}" method="POST" class="inline" onsubmit="return confirm('Deletar cupom permanentemente?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-400 transition">
+                                        <button type="submit" class="text-red-600 hover:text-red-400 transition" title="Excluir">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </form>
+                                    @else
+                                    <span class="text-neutral-600 text-xs italic">Apenas Admin</span>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

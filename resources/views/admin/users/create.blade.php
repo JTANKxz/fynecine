@@ -36,13 +36,12 @@
 
             <div class="grid md:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-sm text-neutral-400 mb-1">Tipo de usuário</label>
-                    <select name="is_admin"
+                    <label class="block text-sm text-neutral-400 mb-1">Cargo / Permissão</label>
+                    <select name="role"
                         class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
-                        <option value="0" selected>Usuário comum</option>
-                        <option value="1">Administrador</option>
-                        {{-- <option>Editor</option> --}}
-                        {{-- <option>Convidado</option> --}}
+                        <option value="user" selected>Usuário comum</option>
+                        <option value="editor">Editor (Conteúdo)</option>
+                        <option value="admin">Administrador (Total)</option>
                     </select>
                 </div>
             </div>

@@ -57,7 +57,7 @@ trait ImportableContent
         return null;
     }
 
-    public function performMovieImport($tmdbId, $categoryId = null)
+    public function performMovieImport($tmdbId, $categoryId = null, $importCast = true)
     {
         try {
             $response = $this->fetchTMDB("movie/$tmdbId", [
@@ -129,29 +129,31 @@ trait ImportableContent
             $movie->genres()->sync($genreIds);
 
             // IMPORTAR ELENCO
-            $credits = $this->fetchTMDB("movie/$tmdbId/credits", [
-                'language' => 'pt-BR'
-            ])->json();
+            if ($importCast) {
+                $credits = $this->fetchTMDB("movie/$tmdbId/credits", [
+                    'language' => 'pt-BR'
+                ])->json();
 
-            if (isset($credits['cast'])) {
-                foreach (array_slice($credits['cast'], 0, 5) as $actor) {
-                    $cast = Cast::updateOrCreate(
-                        ['tmdb_id' => $actor['id']],
-                        [
-                            'name' => $actor['name'],
-                            'slug' => Str::slug($actor['name']),
-                            'profile_path' => $actor['profile_path']
-                                ? "https://image.tmdb.org/t/p/w500" . $actor['profile_path']
-                                : null
-                        ]
-                    );
+                if (isset($credits['cast'])) {
+                    foreach (array_slice($credits['cast'], 0, 5) as $actor) {
+                        $cast = Cast::updateOrCreate(
+                            ['tmdb_id' => $actor['id']],
+                            [
+                                'name' => $actor['name'],
+                                'slug' => Str::slug($actor['name']),
+                                'profile_path' => $actor['profile_path']
+                                    ? "https://image.tmdb.org/t/p/w500" . $actor['profile_path']
+                                    : null
+                            ]
+                        );
 
-                    $movie->cast()->syncWithoutDetaching([
-                        $cast->id => [
-                            'character' => $actor['character'] ?? null,
-                            'order' => $actor['order'] ?? 0
-                        ]
-                    ]);
+                        $movie->cast()->syncWithoutDetaching([
+                            $cast->id => [
+                                'character' => $actor['character'] ?? null,
+                                'order' => $actor['order'] ?? 0
+                            ]
+                        ]);
+                    }
                 }
             }
 
@@ -161,7 +163,7 @@ trait ImportableContent
         }
     }
 
-    public function performSeriesImport($tmdbId, $fullImport = false, $categoryId = null)
+    public function performSeriesImport($tmdbId, $fullImport = false, $categoryId = null, $importCast = true)
     {
         try {
             $response = $this->fetchTMDB("tv/$tmdbId", [
@@ -234,29 +236,31 @@ trait ImportableContent
             $series->genres()->sync($genreIds);
 
             // IMPORTAR ELENCO
-            $credits = $this->fetchTMDB("tv/$tmdbId/credits", [
-                'language' => 'pt-BR'
-            ])->json();
+            if ($importCast) {
+                $credits = $this->fetchTMDB("tv/$tmdbId/credits", [
+                    'language' => 'pt-BR'
+                ])->json();
 
-            if (isset($credits['cast'])) {
-                foreach (array_slice($credits['cast'], 0, 5) as $actor) {
-                    $cast = Cast::updateOrCreate(
-                        ['tmdb_id' => $actor['id']],
-                        [
-                            'name' => $actor['name'],
-                            'slug' => Str::slug($actor['name']),
-                            'profile_path' => $actor['profile_path']
-                                ? "https://image.tmdb.org/t/p/w500" . $actor['profile_path']
-                                : null
-                        ]
-                    );
+                if (isset($credits['cast'])) {
+                    foreach (array_slice($credits['cast'], 0, 5) as $actor) {
+                        $cast = Cast::updateOrCreate(
+                            ['tmdb_id' => $actor['id']],
+                            [
+                                'name' => $actor['name'],
+                                'slug' => Str::slug($actor['name']),
+                                'profile_path' => $actor['profile_path']
+                                    ? "https://image.tmdb.org/t/p/w500" . $actor['profile_path']
+                                    : null
+                            ]
+                        );
 
-                    $series->cast()->syncWithoutDetaching([
-                        $cast->id => [
-                            'character' => $actor['character'] ?? null,
-                            'order' => $actor['order'] ?? 0
-                        ]
-                    ]);
+                        $series->cast()->syncWithoutDetaching([
+                            $cast->id => [
+                                'character' => $actor['character'] ?? null,
+                                'order' => $actor['order'] ?? 0
+                            ]
+                        ]);
+                    }
                 }
             }
 

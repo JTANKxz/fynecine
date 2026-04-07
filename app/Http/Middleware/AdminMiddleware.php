@@ -16,8 +16,8 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Se não estiver logado ou não for admin
-        if (!Auth::check() || !Auth::user()->isAdmin()) {
+        // Se não estiver logado ou não puder gerenciar (admin/editor)
+        if (!Auth::check() || !Auth::user()->canManageUsers()) {
             abort(403, 'Acesso negado'); // ou redirect('/'); se preferir redirecionar
         }
 

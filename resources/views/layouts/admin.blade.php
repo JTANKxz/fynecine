@@ -349,6 +349,7 @@
                 </a>
             </div>
 
+            @if(Auth::user()->canManageSettings())
             {{-- Configurações Gerais --}}
             <div>
                 <a href="{{ route('admin.settings.edit') }}"
@@ -356,6 +357,7 @@
                     <i class="fa-solid fa-cogs w-5"></i> Configurações
                 </a>
             </div>
+            @endif
 
             {{-- Separador --}}
             <div class="border-t border-neutral-800 my-2"></div>
@@ -368,6 +370,7 @@
                 </a>
             </div>
 
+            @if(Auth::user()->canManageSettings())
             {{-- Vendas PIX --}}
             <div>
                 <a href="{{ route('admin.pix-payments.index') }}"
@@ -383,6 +386,7 @@
                     <i class="fa-solid fa-ticket-alt w-5"></i> Cupons VIP
                 </a>
             </div>
+            @endif
 
             {{-- TMDB (atalho direto) --}}
             <div>

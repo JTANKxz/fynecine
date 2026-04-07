@@ -16,11 +16,17 @@ class SubscriptionPlanController extends Controller
 
     public function create()
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.subscription-plans.index')->with('error', 'Acesso negado. Apenas administradores podem criar planos.');
+        }
         return view('admin.subscription-plans.create');
     }
 
     public function store(Request $request)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.subscription-plans.index')->with('error', 'Acesso negado.');
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'plan_type' => 'required|in:basic,premium',
@@ -52,11 +58,17 @@ class SubscriptionPlanController extends Controller
 
     public function edit(SubscriptionPlan $subscriptionPlan)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.subscription-plans.index')->with('error', 'Acesso negado. Apenas administradores podem editar planos.');
+        }
         return view('admin.subscription-plans.edit', compact('subscriptionPlan'));
     }
 
     public function update(Request $request, SubscriptionPlan $subscriptionPlan)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.subscription-plans.index')->with('error', 'Acesso negado.');
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'plan_type' => 'required|in:basic,premium',
@@ -88,6 +100,9 @@ class SubscriptionPlanController extends Controller
 
     public function destroy(SubscriptionPlan $subscriptionPlan)
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('admin.subscription-plans.index')->with('error', 'Acesso negado.');
+        }
         $subscriptionPlan->delete();
         return redirect()->route('admin.subscription-plans.index')->with('success', 'Plano removido com sucesso!');
     }

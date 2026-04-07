@@ -29,9 +29,19 @@
                        class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-netflix focus:outline-none transition">
                 <p class="text-xs text-neutral-500 mt-1">Sugestão: 50~100 por lote.</p>
             </div>
+            <div>
+                <label class="block text-sm font-medium text-neutral-400 mb-2">Importar Elenco?</label>
+                <div class="flex items-center h-[42px]">
+                    <label class="relative inline-flex items-center cursor-pointer group">
+                        <input type="checkbox" id="importCast" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
+                        <span class="ml-3 text-sm font-bold text-neutral-400 group-hover:text-white transition-colors uppercase tracking-tighter">Sim</span>
+                    </label>
+                </div>
+            </div>
             <div class="flex items-end">
                 <button id="btnFetchIds" onclick="prepareImport()" class="w-full bg-netflix hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center justify-center gap-2 h-[42px]">
-                    <i class="fa-solid fa-sync"></i> Iniciar Processo
+                    <i class="fa-solid fa-sync"></i> Iniciar Lote
                 </button>
             </div>
         </div>
@@ -186,6 +196,8 @@
         
         addLog(`Item ${currentTaskIndex + 1}/${movieQueue.length} | TMDB ID: ${tmdbId}`, 'info');
 
+        const importCast = document.getElementById('importCast').checked;
+
         try {
             const response = await fetch('{{ route("admin.movies.bulk.import") }}', {
                 method: 'POST',
@@ -193,7 +205,10 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({ tmdb_id: tmdbId })
+                body: JSON.stringify({ 
+                    tmdb_id: tmdbId,
+                    import_cast: importCast
+                })
             });
 
             const result = await response.json();

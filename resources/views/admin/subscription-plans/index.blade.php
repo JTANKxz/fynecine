@@ -9,9 +9,11 @@
             <h2 class="text-2xl font-bold text-white">Planos de Assinatura</h2>
             <p class="text-sm text-neutral-500">Crie e gerencie os planos VIP e seus preços.</p>
         </div>
+        @if(auth()->user()->isAdmin())
         <a href="{{ route('admin.subscription-plans.create') }}" class="bg-netflix hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Novo Plano
         </a>
+        @endif
     </div>
 
     @if(session('success'))
@@ -61,6 +63,7 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 text-right">
+                        @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.subscription-plans.edit', $plan) }}" class="text-blue-500 hover:text-blue-400 p-2" title="Editar">
                             <i class="fa-solid fa-pen"></i>
                         </a>
@@ -71,6 +74,9 @@
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </form>
+                        @else
+                        <span class="text-neutral-600 text-xs italic">Apenas Admin</span>
+                        @endif
                     </td>
                 </tr>
                 @empty

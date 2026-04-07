@@ -38,7 +38,7 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'is_admin' => 'required|boolean',
+            'role' => 'required|in:admin,editor,user',
         ]);
 
         // Forçar username minúsculo
@@ -50,7 +50,8 @@ class UserController extends Controller
             'username' => $validated['username'],
             'email' => $validated['email'],
             'password' => $validated['password'], // hashed automaticamente pelo cast do model
-            'is_admin' => $validated['is_admin'],
+            'role' => $validated['role'],
+            'is_admin' => $validated['role'] === 'admin',
         ]);
 
         return redirect()->route('admin.users.index')
@@ -67,18 +68,29 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'is_admin' => 'required|boolean',
+            'role' => 'nullable|in:admin,editor,user',
             'plan_type' => 'required|in:free,basic,premium',
             'password' => 'nullable|string|min:6',
         ]);
 
-        if ($request->filled('password')) {
-            $user->password = $request->password;
+        $currentUser = $request->user();
+
+        // Editor não pode alterar SENHA nem CARGO
+        if (!$currentUser->canChangeUserSensitiveData()) {
+            unset($validated['password'], $validated['role']);
+        }
+
+        if (isset($validated['password'])) {
+            $user->password = $validated['password'];
+        }
+
+        if (isset($validated['role'])) {
+            $user->role = $validated['role'];
+            $user->is_admin = $validated['role'] === 'admin';
         }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->is_admin = $validated['is_admin'];
         $user->plan_type = $validated['plan_type'];
         $user->save();
 
@@ -88,6 +100,10 @@ class UserController extends Controller
 
     public function ban(Request $request, User $user)
     {
+        if (!$request->user()->isAdmin()) {
+            return back()->with('error', 'Ação permitida apenas para administradores.');
+        }
+
         $user->update([
             'banned_at' => now(),
             'ban_reason' => $request->input('reason', 'Violação dos termos')
@@ -120,6 +136,10 @@ class UserController extends Controller
      */
     public function banDevice(Request $request, User $user)
     {
+        if (!$request->user()->isAdmin()) {
+            return back()->with('error', 'Ação permitida apenas para administradores.');
+        }
+
         $request->validate([
             'device_uuid' => 'required|string',
             'reason' => 'nullable|string'
@@ -142,8 +162,12 @@ class UserController extends Controller
     /**
      * Revoga apenas um token específico (Desconectar dispositivo).
      */
-    public function revokeToken(User $user, $tokenId)
+    public function revokeToken(Request $request, User $user, $tokenId)
     {
+        if (!$request->user()->isAdmin()) {
+            return back()->with('error', 'Ação permitida apenas para administradores.');
+        }
+
         $user->tokens()->where('id', $tokenId)->delete();
         return back()->with('success', 'Dispositivo desconectado com sucesso.');
     }

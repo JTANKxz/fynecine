@@ -78,10 +78,14 @@
                 </label>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-4">
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" id="adult" class="rounded accent-netflix w-5 h-5">
-                    <span class="text-sm">Incluir conteúdo adulto</span>
+                    <span class="text-sm">Adulto</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="importCast" class="rounded accent-netflix w-5 h-5" checked>
+                    <span class="text-sm">Importar Elenco</span>
                 </label>
             </div>
 
@@ -266,6 +270,8 @@
                 categoryId = 4;
             }
 
+            const importCast = document.getElementById("importCast").checked;
+
             const response = await fetch('/dashzin/tmdb/import', {
                 method: 'POST',
                 headers: {
@@ -276,7 +282,8 @@
                     tmdb_id: id,
                     type: type,
                     mode: mode,
-                    category_id: categoryId
+                    category_id: categoryId,
+                    import_cast: importCast
                 })
             });
 

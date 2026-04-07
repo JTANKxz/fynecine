@@ -208,8 +208,8 @@
             <a href="{{ route('admin.users.index') }}" class="text-netflix text-xs hover:underline font-bold">Ver todos →</a>
         </div>
         <div class="bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden">
-            <div class="table-container">
-                <table class="w-full text-left text-sm">
+            <div class="table-container overflow-x-auto">
+                <table class="w-full text-left text-sm min-w-[500px]">
                     <thead class="bg-neutral-800/50">
                         <tr>
                             <th class="p-3 text-xs text-neutral-400 uppercase">Usuário</th>

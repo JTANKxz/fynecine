@@ -37,7 +37,8 @@ class SearchController extends Controller
                     'year' => $movie->release_year,
                     'rating' => $movie->rating,
                     'poster' => $movie->poster_path,
-                    'backdrop' => $movie->backdrop_path
+                    'backdrop' => $movie->backdrop_path,
+                    'tag_text' => $movie->api_tag_text,
                 ];
             });
 
@@ -59,7 +60,8 @@ class SearchController extends Controller
                     'year' => $serie->first_air_year,
                     'rating' => $serie->rating,
                     'poster' => $serie->poster_path,
-                    'backdrop' => $serie->backdrop_path
+                    'backdrop' => $serie->backdrop_path,
+                    'tag_text' => $serie->api_tag_text,
                 ];
             });
 

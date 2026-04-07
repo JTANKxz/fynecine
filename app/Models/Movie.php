@@ -35,11 +35,19 @@ class Movie extends Model
         return $this->belongsTo(ContentCategory::class);
     }
     
-    protected $appends = ['type'];
+    protected $appends = ['type', 'api_tag_text'];
 
     public function getTypeAttribute()
     {
         return 'movie';
+    }
+
+    public function getApiTagTextAttribute()
+    {
+        if ($this->tag_expires_at && $this->tag_expires_at->isPast()) {
+            return null;
+        }
+        return $this->tag_text;
     }
 
     public function genres()

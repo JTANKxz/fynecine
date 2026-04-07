@@ -61,6 +61,7 @@ class HomeController extends Controller
 
                     'poster' => $content->poster_path,
                     'backdrop' => $content->backdrop_path,
+                    'tag_text' => $content->api_tag_text,
                 ];
             })->filter()->values();
 

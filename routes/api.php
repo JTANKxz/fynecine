@@ -64,6 +64,12 @@ Route::middleware('api.token')->group(function () {
     // Custom Home Sections (View All)
     Route::get('/sections/{id}', [HomeSectionController::class, 'show']);
 
+    // Gerenciamento de Dispositivos (Apenas Usuário Autenticado)
+    Route::middleware('auth:sanctum')->prefix('account/devices')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\DeviceController::class, 'index']);
+        Route::delete('/{id}', [\App\Http\Controllers\Api\DeviceController::class, 'destroy']);
+    });
+
     // Avatares
     Route::get('/avatars', [AvatarController::class, 'index']);
 

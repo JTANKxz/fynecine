@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Models\BannedDevice;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -24,7 +26,12 @@ class AuthController extends Controller
             'username'              => ['required', 'string', 'max:255', 'unique:users'],
             'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'              => ['required', 'string', 'min:8', 'confirmed'],
+            'device_uuid'           => ['required', 'string'],
+            'device_name'           => ['nullable', 'string'],
+            'device_type'           => ['nullable', 'string'],
         ]);
+
+        $this->checkDeviceBan($request->device_uuid);
 
         $user = User::create([
             'name'     => $validated['name'],
@@ -39,7 +46,9 @@ class AuthController extends Controller
             'is_main' => true,
         ]);
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        $tokenInstance = $user->createToken('api-token');
+        $this->setDeviceMetadata($tokenInstance->accessToken, $request);
+        $token = $tokenInstance->plainTextToken;
 
         return response()->json([
             'user'  => $user->refresh(),
@@ -57,7 +66,12 @@ class AuthController extends Controller
         $request->validate([
             'login'    => ['required', 'string'],
             'password' => ['required'],
+            'device_uuid' => ['required', 'string'],
+            'device_name' => ['nullable', 'string'],
+            'device_type' => ['nullable', 'string'],
         ]);
+
+        $this->checkDeviceBan($request->device_uuid);
 
         $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
@@ -73,7 +87,9 @@ class AuthController extends Controller
         // Revoga tokens antigos (opcional — mantém apenas 1 token ativo por vez)
         // $user->tokens()->delete();
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        $tokenInstance = $user->createToken('api-token');
+        $this->setDeviceMetadata($tokenInstance->accessToken, $request);
+        $token = $tokenInstance->plainTextToken;
 
         return response()->json([
             'user'  => $user,
@@ -105,5 +121,60 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json($request->user());
+    }
+
+    /**
+     * Verifica se o dispositivo está banido.
+     */
+    private function checkDeviceBan(string $uuid): void
+    {
+        $ban = BannedDevice::where('device_uuid', $uuid)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
+            ->first();
+
+        if ($ban) {
+            $msg = $ban->ban_reason ?: 'Este dispositivo foi banido da plataforma.';
+            if ($ban->expires_at) {
+                $msg .= ' Expira em: ' . $ban->expires_at->format('d/m/Y H:i');
+            }
+
+            abort(response()->json([
+                'status'  => false,
+                'message' => $msg,
+                'error_code' => 'DEVICE_BANNED'
+            ], 403));
+        }
+    }
+
+    /**
+     * Salva metadados no token.
+     */
+    private function setDeviceMetadata($token, Request $request): void
+    {
+        $ip = $request->ip();
+        $location = 'Localhost';
+
+        if ($ip !== '127.0.0.1' && $ip !== '::1') {
+            try {
+                $response = Http::get("http://ip-api.com/json/{$ip}?fields=status,city,regionName,country");
+                if ($response->successful() && $response['status'] === 'success') {
+                    $location = $response['city'] . ' / ' . $response['regionName'] . ' (' . $response['country'] . ')';
+                }
+            } catch (\Exception $e) {
+                $location = 'Localização Indisponível';
+            }
+        }
+
+        $token->update([
+            'device_uuid' => $request->device_uuid,
+            'device_name' => $request->device_name ?: 'Dispositivo Desconhecido',
+            'device_type' => $request->device_type ?: 'mobile',
+            'ip_address'  => $ip,
+            'user_agent'  => $request->userAgent(),
+            'location'    => $location,
+        ]);
     }
 }

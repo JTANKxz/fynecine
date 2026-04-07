@@ -74,6 +74,43 @@
             </div>
         </div>
 
+        <!-- MODO MANUTENÇÃO -->
+        <div class="bg-orange-900/10 border border-orange-900/30 p-6 rounded-xl mt-8">
+            <div class="flex items-start gap-4">
+                <div class="bg-orange-600 p-3 rounded-lg">
+                    <i class="fa-solid fa-screwdriver-wrench text-white text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-white font-bold text-lg mb-1 text-orange-500">Modo de Manutenção Global</h3>
+                            <p class="text-neutral-400 text-xs leading-relaxed">
+                                Quando ativo, todos os usuários verão apenas a tela de manutenção no aplicativo.
+                            </p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="maintenance_mode" value="1" {{ $config->maintenance_mode ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-14 h-7 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-600"></div>
+                            <span class="ml-3 text-xs font-bold text-orange-500 uppercase tracking-widest">{{ $config->maintenance_mode ? 'ATIVO' : 'DESLIGADO' }}</span>
+                        </label>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Título da Manutenção</label>
+                            <input type="text" name="maintenance_title" value="{{ old('maintenance_title', $config->maintenance_title) }}" placeholder="Ex: Manutenção em andamento"
+                                   class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Descrição da Manutenção</label>
+                            <textarea name="maintenance_description" rows="2" placeholder="Ex: Estamos realizando melhorias para sua experiência. Voltamos em breve!"
+                                      class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none text-sm">{{ old('maintenance_description', $config->maintenance_description) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="grid lg:grid-cols-2 gap-8">
             <div class="space-y-8">
             <!-- APP INFO -->

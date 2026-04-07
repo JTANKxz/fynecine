@@ -38,7 +38,7 @@
     {{-- Tabela de usuários --}}
     <div class="bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="w-full text-left text-sm min-w-[900px]">
                 <thead class="bg-neutral-800/50 text-neutral-400">
                     <tr>
                         <th class="p-4 font-semibold uppercase tracking-wider">Usuário</th>

@@ -60,7 +60,10 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $tokens = $user->tokens()->orderBy('last_used_at', 'desc')->get();
-        return view('admin.users.edit', compact('user', 'tokens'));
+        // Buscar UUIDs banidos
+        $bannedUuids = \App\Models\BannedDevice::pluck('device_uuid')->toArray();
+        
+        return view('admin.users.edit', compact('user', 'tokens', 'bannedUuids'));
     }
 
     public function update(Request $request, User $user)
@@ -158,6 +161,20 @@ class UserController extends Controller
         \App\Models\PersonalAccessToken::where('device_uuid', $request->device_uuid)->delete();
 
         return back()->with('success', 'Dispositivo banido com sucesso e sessões encerradas.');
+    }
+
+    /**
+     * Remove o UUID da lista negra.
+     */
+    public function unbanDevice(Request $request, User $user, $uuid)
+    {
+        if (!$request->user()->isAdmin()) {
+            return back()->with('error', 'Ação permitida apenas para administradores.');
+        }
+
+        \App\Models\BannedDevice::where('device_uuid', $uuid)->delete();
+
+        return back()->with('success', 'Dispositivo desbloqueado com sucesso.');
     }
 
     /**

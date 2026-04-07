@@ -74,6 +74,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/{user}/ban', [UserController::class, 'ban'])->name('ban');
         Route::post('/{user}/unban', [UserController::class, 'unban'])->name('unban');
         Route::post('/{user}/ban-device', [UserController::class, 'banDevice'])->name('ban-device');
+        Route::post('/{user}/unban-device/{uuid}', [UserController::class, 'unbanDevice'])->name('unban-device');
         Route::post('/{user}/revoke-token/{token}', [UserController::class, 'revokeToken'])->name('revoke-token');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('delete');
     });

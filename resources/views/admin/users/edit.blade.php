@@ -113,7 +113,12 @@
                     @forelse($tokens as $token)
                         <tr>
                             <td class="px-6 py-4">
-                                <div class="font-bold">{{ $token->device_name ?: 'Desconhecido' }}</div>
+                                <div class="flex items-center gap-2">
+                                    <div class="font-bold">{{ $token->device_name ?: 'Desconhecido' }}</div>
+                                    @if($token->device_uuid && in_array($token->device_uuid, $bannedUuids))
+                                        <span class="py-0.5 px-2 bg-red-600 text-[10px] font-bold rounded uppercase">Hardware Banido</span>
+                                    @endif
+                                </div>
                                 <div class="text-xs text-neutral-500 uppercase">{{ $token->device_type ?: 'mobile' }}</div>
                                 <div class="text-[10px] text-neutral-600 break-all">{{ $token->device_uuid }}</div>
                             </td>
@@ -136,17 +141,28 @@
                                         </button>
                                     </form>
 
-                                    {{-- Banir UUID --}}
+                                    {{-- Banir / Desbanir UUID --}}
                                     @if($token->device_uuid)
-                                        <form action="{{ route('admin.users.ban-device', $user->id) }}" method="POST" onsubmit="return confirm('Deseja banir este hardware permanentemente? O usuário não conseguirá acessar por este aparelho nem com outra conta.')">
-                                            @csrf
-                                            <input type="hidden" name="device_uuid" value="{{ $token->device_uuid }}">
-                                            <button type="submit" title="Banir Aparelho (UUID)" class="p-2 bg-red-900/30 hover:bg-red-600 rounded text-red-500 hover:text-white transition border border-red-900/50">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                </svg>
-                                            </button>
-                                        </form>
+                                        @if(in_array($token->device_uuid, $bannedUuids))
+                                            <form action="{{ route('admin.users.unban-device', [$user->id, $token->device_uuid]) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" title="Desbloquear Aparelho (Unban UUID)" class="p-2 bg-green-900/30 hover:bg-green-600 rounded text-green-500 hover:text-white transition border border-green-900/50">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('admin.users.ban-device', $user->id) }}" method="POST" onsubmit="return confirm('Deseja banir este hardware permanentemente? O usuário não conseguirá acessar por este aparelho nem com outra conta.')">
+                                                @csrf
+                                                <input type="hidden" name="device_uuid" value="{{ $token->device_uuid }}">
+                                                <button type="submit" title="Banir Aparelho (UUID)" class="p-2 bg-red-900/30 hover:bg-red-600 rounded text-red-500 hover:text-white transition border border-red-900/50">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
                                     @endif
                                 </div>
                             </td>

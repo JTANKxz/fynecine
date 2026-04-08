@@ -103,6 +103,8 @@ class SettingController extends Controller
             
             'bunny_security_key' => ['nullable', 'string', 'max:255'],
             'bunny_cdn_url' => ['nullable', 'string', 'max:255'],
+            'bunny_mp4_key' => ['nullable', 'string', 'max:255'],
+            'bunny_mp4_host' => ['nullable', 'string', 'max:255'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -208,6 +210,8 @@ class SettingController extends Controller
 
         $config->bunny_security_key = $request->bunny_security_key;
         $config->bunny_cdn_url = $request->bunny_cdn_url;
+        $config->bunny_mp4_key = $request->bunny_mp4_key;
+        $config->bunny_mp4_host = $request->bunny_mp4_host;
 
         $config->save();
 

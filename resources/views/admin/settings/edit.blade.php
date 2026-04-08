@@ -275,22 +275,42 @@
 
                 <!-- BUNNY CDN CONFIG -->
                 <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
-                    <h3 class="text-white font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-bolt text-yellow-400"></i> Bunny CDN (Token Auth)
+                    <h3 class="text-white font-bold flex items-center gap-2 text-yellow-500">
+                        <i class="fa-solid fa-bolt"></i> Bunny CDN (HLS / Stream)
                     </h3>
-                    <p class="text-[10px] text-neutral-500 leading-tight">Configurações globais para links do tipo <code>private</code>. A Security Key nunca é exposta ao app.</p>
+                    <p class="text-[10px] text-neutral-500 leading-tight">Configurações para o player de Stream (HLS). Formato de token no caminho.</p>
 
                     <div>
-                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Security Key (Token Authentication)</label>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Security Key (HLS)</label>
                         <input type="password" name="bunny_security_key" value="{{ old('bunny_security_key', $config->bunny_security_key) }}" 
-                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-yellow-500 outline-none font-mono text-sm" placeholder="Sua Security Key do Bunny">
+                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-yellow-500 outline-none font-mono text-sm" placeholder="Security Key para HLS">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Host CDN Padrão</label>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Host CDN HLS</label>
                         <input type="text" name="bunny_cdn_url" value="{{ old('bunny_cdn_url', $config->bunny_cdn_url) }}" 
-                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-yellow-500 outline-none text-sm font-mono" placeholder="ex: seu-cdn.b-cdn.net">
-                        <p class="text-[10px] text-neutral-600 mt-1">Usado se o link for inserido sem o host completo.</p>
+                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-yellow-500 outline-none text-sm font-mono" placeholder="ex: seu-hls.b-cdn.net">
+                    </div>
+                </div>
+
+                <!-- BUNNY CDN MP4 CONFIG -->
+                <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
+                    <h3 class="text-white font-bold flex items-center gap-2 text-blue-400">
+                        <i class="fa-solid fa-file-video"></i> Bunny CDN (MP4 VOD)
+                    </h3>
+                    <p class="text-[10px] text-neutral-500 leading-tight">Configurações para vídeos MP4 diretos. Formato de token via Query String.</p>
+
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Security Key (MP4)</label>
+                        <input type="password" name="bunny_mp4_key" value="{{ old('bunny_mp4_key', $config->bunny_mp4_key) }}" 
+                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm" placeholder="Security Key para MP4">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Host CDN MP4</label>
+                        <input type="text" name="bunny_mp4_host" value="{{ old('bunny_mp4_host', $config->bunny_mp4_host) }}" 
+                               class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono" placeholder="ex: seu-mp4.b-cdn.net">
+                        <p class="text-[10px] text-neutral-600 mt-1">Domínio padrão para links MP4 que não possuem host completo.</p>
                     </div>
                 </div>
 

@@ -11,6 +11,11 @@ class BunnyLinkService
         ?string $linkPath = null,
         ?int $expirationHours = 4
     ) {
+        // Se NÃO for uma URL do Bunny, retorna o link direto
+        if (!self::isBunnyUrl($url)) {
+            return $url;
+        }
+
         $config = AppConfig::getSettings();
         
         // Determina se é MP4 (via extensão ou se o link for apenas o nome do arquivo .mp4)
@@ -19,7 +24,7 @@ class BunnyLinkService
         if ($isMp4) {
             return self::signMp4Url($url, $expirationHours);
         }
-
+        
         // --- LÓGICA HLS (MANTER ORIGINAL) ---
         $securityKey = env('BUNNY_SECURITY_KEY', $config->bunny_security_key);
         if (!$securityKey) return $url;
@@ -54,15 +59,55 @@ class BunnyLinkService
     }
 
     /**
+     * Verifica se a URL pertence ao BunnyCDN configurado.
+     */
+    private static function isBunnyUrl(string $url): bool
+    {
+        $parsed = parse_url($url);
+        $host = $parsed['host'] ?? null;
+
+        // Se não tem host, assumimos que é um link relativo (nome do arquivo) para o nosso Bunny
+        if (!$host) return true;
+
+        $config = AppConfig::getSettings();
+        
+        // Hosts permitidos (limpando o protocolo se houver)
+        $hlsHost = preg_replace('/^https?:\/\//', '', rtrim($config->bunny_cdn_url, '/'));
+        $mp4Host = preg_replace('/^https?:\/\//', '', rtrim($config->bunny_mp4_host, '/'));
+
+        $allowedHosts = array_filter([$hlsHost, $mp4Host]);
+
+        foreach ($allowedHosts as $allowed) {
+            if (strtolower($host) === strtolower($allowed)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Lógica de assinatura para MP4 (Nova)
      */
     private static function signMp4Url(string $url, ?int $expirationHours = 4)
     {
-        // Key específica para MP4 solicitada pelo usuário
-        $securityKey = 'ea28117e-26b7-4b42-89fe-9d832a65362d';
+        // Se NÃO for uma URL do Bunny, retorna o link direto (redundância de segurança)
+        if (!self::isBunnyUrl($url)) {
+            return $url;
+        }
+
+        $config = AppConfig::getSettings();
+        $securityKey = $config->bunny_mp4_key;
+        
+        // Se não houver chave configurada, não conseguimos assinar, retorna o link original
+        if (!$securityKey) return $url;
+
+        $defaultHost = preg_replace('/^https?:\/\//', '', rtrim($config->bunny_mp4_host, '/'));
         
         $parsedUrl = parse_url($url);
-        $host = $parsedUrl['host'] ?? 'fynecinevods.b-cdn.net'; // Domínio fixo se não houver host
+        $host = $parsedUrl['host'] ?? $defaultHost;
+
+        if (empty($host)) return $url;
         $path = $parsedUrl['path'] ?? '';
 
         // Se o path não começar com /, corrige

@@ -70,6 +70,8 @@ class AppConfig extends Model
         'ads_rewarded_status',
         'bunny_security_key',
         'bunny_cdn_url',
+        'bunny_mp4_key',
+        'bunny_mp4_host',
     ];
 
     protected $casts = [

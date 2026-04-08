@@ -23,11 +23,13 @@ class Movie extends Model
         'age_rating',
         'content_category_id',
         'tag_text',
-        'tag_expires_at'
+        'tag_expires_at',
+        'use_autoembed'
     ];
 
     protected $casts = [
         'tag_expires_at' => 'datetime',
+        'use_autoembed' => 'boolean',
     ];
 
     public function contentCategory()

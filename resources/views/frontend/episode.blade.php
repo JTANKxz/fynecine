@@ -8,7 +8,7 @@
     @php
         $settings = \App\Models\AppConfig::getSettings();
         $autoEmbedUrl = null;
-        if($settings->is_autoembed_active && $serie->tmdb_id) {
+        if($settings->is_autoembed_active && $serie->tmdb_id && $serie->use_autoembed) {
             $autoEmbedUrl = str_replace(
                 ['{id}', '{s}', '{e}'], 
                 [$serie->tmdb_id, $season_number, $episode_number], 
@@ -22,7 +22,15 @@
         <div class="hero-overlay"></div>
         
         <!-- Center Play Button -->
-        <div class="hero-play-trigger" onclick="openPlayer('{{ $autoEmbedUrl ?? ($episode->playLinks->first()->link ?? '') }}')">
+        @php
+            $firstLink = $episode->links->first();
+            $firstUrl = $firstLink ? $firstLink->url : '';
+            if($firstLink && ($firstLink->type === 'private' || $firstLink->type === 'mp4')) {
+                $firstUrl = \App\Services\BunnyLinkService::generateSignedUrl($firstUrl, $firstLink->link_path, $firstLink->expiration_hours);
+            }
+            $finalTriggerUrl = $autoEmbedUrl ?? $firstUrl;
+        @endphp
+        <div class="hero-play-trigger" onclick="openPlayer('{{ $finalTriggerUrl }}')">
             <div class="play-icon-circle">
                 <i class="fas fa-play"></i>
             </div>
@@ -103,8 +111,14 @@
                     </button>
                 @endif
 
-                @foreach($episode->playLinks as $link)
-                    <button class="server-btn {{ !$autoEmbedUrl && $loop->first ? 'active' : '' }}" onclick="changeModalServer('{{ $link->link }}', this)">
+                @foreach($episode->links as $link)
+                    @php
+                        $linkUrl = $link->url;
+                        if($link->type === 'private' || $link->type === 'mp4') {
+                            $linkUrl = \App\Services\BunnyLinkService::generateSignedUrl($linkUrl, $link->link_path, $link->expiration_hours);
+                        }
+                    @endphp
+                    <button class="server-btn {{ !$autoEmbedUrl && $loop->first ? 'active' : '' }}" onclick="changeModalServer('{{ $linkUrl }}', this)">
                         {{ $link->name ?? 'Servidor ' . ($loop->index + 1) }}
                     </button>
                 @endforeach

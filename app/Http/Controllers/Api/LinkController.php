@@ -28,7 +28,7 @@ class LinkController extends Controller
         }
 
         $url = $link->url;
-        if ($link->type === 'private') {
+        if ($link->type === 'private' || $link->type === 'mp4') {
             $url = BunnyLinkService::generateSignedUrl(
                 $link->url, 
                 $link->link_path, 
@@ -63,7 +63,7 @@ class LinkController extends Controller
         }
 
         $url = $link->url;
-        if ($link->type === 'private') {
+        if ($link->type === 'private' || $link->type === 'mp4') {
             $url = BunnyLinkService::generateSignedUrl(
                 $link->url, 
                 $link->link_path, 
@@ -98,7 +98,7 @@ class LinkController extends Controller
         }
 
         $url = $link->url;
-        if ($link->type === 'private') {
+        if ($link->type === 'private' || $link->type === 'mp4') {
             $url = BunnyLinkService::generateSignedUrl(
                 $link->url, 
                 $link->link_path, 

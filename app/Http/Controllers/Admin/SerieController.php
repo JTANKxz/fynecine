@@ -330,4 +330,13 @@ class SerieController extends Controller
 
         return back()->with('success', 'Tag atualizada com sucesso!');
     }
+
+    public function updateSettings(Request $request, Serie $serie)
+    {
+        $serie->update([
+            'use_autoembed' => $request->has('use_autoembed')
+        ]);
+
+        return back()->with('success', 'Configurações atualizadas com sucesso!');
+    }
 }

@@ -11,7 +11,7 @@
             </a>
             <div>
                 <h2 class="text-xl font-bold">Gerenciador de Links: {{ $serie->name }}</h2>
-                <p class="text-xs text-neutral-500">Configure os links de cada episódio desta série.</p>
+                <p class="text-xs text-neutral-500">Configure os links de cada episódio desta série. <span class="text-netflix font-bold">(Links MP4 são assinados automaticamente via BunnyCDN)</span></p>
             </div>
         </div>
     </div>

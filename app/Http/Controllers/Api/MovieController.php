@@ -162,7 +162,7 @@ class MovieController extends Controller
                 ]);
             }
 
-            if ($config->autoembed_movies && $config->autoembed_movie_url) {
+            if ($config->autoembed_movies && $config->autoembed_movie_url && $movie->use_autoembed) {
                 $autoSub = $config->autoembed_movie_player_sub ?? 'free';
                 $url = str_replace('{tmdb_id}', $movie->tmdb_id, $config->autoembed_movie_url);
                 $playLinks->push([

@@ -125,6 +125,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::delete('/{movie}', [MovieController::class, 'destroy'])->name('delete');
         Route::patch('/{movie}/category', [MovieController::class, 'updateCategory'])->name('category.update');
         Route::patch('/{movie}/tag', [MovieController::class, 'updateTag'])->name('tag.update');
+        Route::patch('/{movie}/settings', [MovieController::class, 'updateSettings'])->name('settings.update');
 
         Route::get('/{movie}/links', [MovieController::class, 'links'])->name('links');
         Route::get('/{movie}/links/create', [MovieController::class, 'createLink'])->name('links.create');
@@ -146,6 +147,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::delete('/{serie}', [SerieController::class, 'destroy'])->name('delete');
         Route::patch('/{serie}/category', [SerieController::class, 'updateCategory'])->name('category.update');
         Route::patch('/{serie}/tag', [SerieController::class, 'updateTag'])->name('tag.update');
+        Route::patch('/{serie}/settings', [SerieController::class, 'updateSettings'])->name('settings.update');
         Route::get('/{serie}/seasons', [SerieController::class, 'seasons'])->name('seasons');
         Route::get('/seasons/{season}/episodes', [SerieController::class, 'episodes'])->name('episodes');
         Route::put('/seasons/{season}', [SerieController::class, 'updateSeason'])

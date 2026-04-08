@@ -7,7 +7,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
             <h2 class="text-xl font-bold">Gerenciador de Links: Filmes</h2>
-            <p class="text-xs text-neutral-500">Adicione ou edite players de filmes rapidamente.</p>
+            <p class="text-xs text-neutral-500">Adicione ou edite players de filmes rapidamente. <span class="text-netflix font-bold">(Links MP4 são assinados automaticamente via BunnyCDN)</span></p>
         </div>
 
         <form action="{{ route('admin.links.movies') }}" method="GET" class="flex gap-2 w-full md:w-auto">

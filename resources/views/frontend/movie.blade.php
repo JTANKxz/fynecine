@@ -8,7 +8,7 @@
     @php
         $settings = \App\Models\AppConfig::getSettings();
         $autoEmbedUrl = null;
-        if($settings->autoembed_movies && $movie->tmdb_id) {
+        if($settings->autoembed_movies && $movie->tmdb_id && $movie->use_autoembed) {
             $autoEmbedUrl = str_replace('{id}', $movie->tmdb_id, $settings->autoembed_movie_url);
         }
     @endphp
@@ -18,7 +18,15 @@
         <div class="hero-overlay"></div>
         
         <!-- Center Play Button -->
-        <div class="hero-play-trigger" onclick="openPlayer('{{ $autoEmbedUrl ?? ($movie->playLinks->first()->url ?? '') }}')">
+        @php
+            $firstLink = $movie->playLinks->first();
+            $firstUrl = $firstLink ? $firstLink->url : '';
+            if($firstLink && ($firstLink->type === 'private' || $firstLink->type === 'mp4')) {
+                $firstUrl = \App\Services\BunnyLinkService::generateSignedUrl($firstUrl, $firstLink->link_path, $firstLink->expiration_hours);
+            }
+            $finalTriggerUrl = $autoEmbedUrl ?? $firstUrl;
+        @endphp
+        <div class="hero-play-trigger" onclick="openPlayer('{{ $finalTriggerUrl }}')">
             <div class="play-icon-circle">
                 <i class="fas fa-play"></i>
             </div>
@@ -79,7 +87,13 @@
                 @endif
 
                 @foreach($movie->playLinks as $link)
-                    <button class="server-btn {{ !$autoEmbedUrl && $loop->first ? 'active' : '' }}" onclick="changeModalServer('{{ $link->url }}', this)">
+                    @php
+                        $linkUrl = $link->url;
+                        if($link->type === 'private' || $link->type === 'mp4') {
+                            $linkUrl = \App\Services\BunnyLinkService::generateSignedUrl($linkUrl, $link->link_path, $link->expiration_hours);
+                        }
+                    @endphp
+                    <button class="server-btn {{ !$autoEmbedUrl && $loop->first ? 'active' : '' }}" onclick="changeModalServer('{{ $linkUrl }}', this)">
                         {{ $link->name ?? 'Servidor ' . ($loop->index + 1) }}
                     </button>
                 @endforeach

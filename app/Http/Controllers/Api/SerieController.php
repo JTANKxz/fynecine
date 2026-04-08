@@ -232,7 +232,7 @@ class SerieController extends Controller
                                 ];
                             });
 
-                            if ($config->autoembed_series && $config->autoembed_serie_url) {
+                            if ($config->autoembed_series && $config->autoembed_serie_url && $serie->use_autoembed) {
                                 $autoSub = $config->autoembed_serie_player_sub ?? 'free';
                                 $embedUrl = str_replace(
                                     ['{tmdb_id}', '{season}', '{episode}'],

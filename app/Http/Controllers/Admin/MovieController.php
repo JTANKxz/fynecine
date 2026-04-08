@@ -197,4 +197,13 @@ class MovieController extends Controller
 
         return back()->with('success', 'Tag atualizada com sucesso!');
     }
+
+    public function updateSettings(Request $request, Movie $movie)
+    {
+        $movie->update([
+            'use_autoembed' => $request->has('use_autoembed')
+        ]);
+
+        return back()->with('success', 'Configurações atualizadas com sucesso!');
+    }
 }

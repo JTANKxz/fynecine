@@ -66,7 +66,7 @@
                                     <i class="fa-solid fa-bell"></i>
                                 </button>
 
-                                <button class="text-blue-500 hover:text-blue-400 mr-2">
+                                <button type="button" onclick="openSettingsModal({{ $movie->id }}, '{{ addslashes($movie->title) }}', {{ $movie->use_autoembed ? 'true' : 'false' }})" class="text-blue-500 hover:text-blue-400 mr-2" title="Configurações de Reprodução">
                                     <i class="fa-solid fa-edit"></i>
                                 </button>
 
@@ -210,12 +210,29 @@
         return true;
     }
 
+    function openSettingsModal(id, title, useAutoembed) {
+        document.getElementById('settingsContentTitle').textContent = title;
+        document.getElementById('useAutoembed').checked = useAutoembed;
+        
+        const form = document.getElementById('settingsForm');
+        form.action = `/dashzin/movies/${id}/settings`;
+        
+        document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+        document.getElementById('settingsModal').classList.add('hidden');
+    }
+
     // Fechar ao clicar fora
     document.getElementById('contentNotificationModal')?.addEventListener('click', function(e) {
         if (e.target === this) closeContentNotificationModal();
     });
     document.getElementById('tagModal')?.addEventListener('click', function(e) {
         if (e.target === this) closeTagModal();
+    });
+    document.getElementById('settingsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeSettingsModal();
     });
 </script>
 
@@ -256,6 +273,44 @@
                 </button>
                 <button type="submit" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition font-bold">
                     <i class="fa-solid fa-save mr-1"></i> Salvar Tag
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal de Configurações de Reprodução --}}
+<div id="settingsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-neutral-900 rounded-lg p-6 max-w-sm w-full border border-neutral-800 text-white">
+        <h3 class="text-lg font-bold mb-4">
+            <i class="fa-solid fa-gear mr-2 text-blue-500"></i> Configurações de Reprodução
+        </h3>
+
+        <form id="settingsForm" action="" method="POST">
+            @csrf
+            @method('PATCH')
+
+            <div class="mb-4">
+                <p class="text-xs text-neutral-500 mb-1">Filme:</p>
+                <p id="settingsContentTitle" class="font-bold text-sm"></p>
+            </div>
+
+            <div class="mb-6">
+                <label class="flex items-center gap-3 cursor-pointer p-3 bg-neutral-800 rounded border border-neutral-700 hover:border-blue-500 transition">
+                    <input type="checkbox" id="useAutoembed" name="use_autoembed" value="1" class="w-5 h-5 accent-blue-600 rounded">
+                    <div>
+                        <span class="block text-sm font-bold">Habilitar AutoEmbed</span>
+                        <span class="block text-[10px] text-neutral-500">Se desmarcado, este filme não usará players automáticos.</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="button" onclick="closeSettingsModal()" class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition font-bold">
+                    <i class="fa-solid fa-save mr-1"></i> Salvar
                 </button>
             </div>
         </form>

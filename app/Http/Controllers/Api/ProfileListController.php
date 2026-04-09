@@ -17,7 +17,7 @@ class ProfileListController extends Controller
      */
     private function getProfile(Request $request): Profile
     {
-        $profileId = $request->header('Profile-Id');
+        $profileId = $request->header('Profile-Id') ?: $request->header('X-Profile-Id');
         
         if (!$profileId) {
             abort(400, 'Header Profile-Id é obrigatório.');

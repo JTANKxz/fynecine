@@ -16,20 +16,25 @@ class CheckApiToken
      */
     public function handle(Request $request, Closure $next)
     {
-        
-        // Debug: Log the path
-        \Log::info('CheckApiToken Path: ' . $request->path());
+        // 1. PERMITE OPTIONS (CORS) SEMPRE
+        if ($request->isMethod('OPTIONS')) {
+            return $next($request);
+        }
 
-        // PULA TUDO DO PIX / MERCADO PAGO E LINKS DE PLAY SEM ERRO
         $uri = $request->getRequestUri();
+
+        // 2. PULA TUDO DO PIX / MERCADO PAGO E LINKS DE PLAY SEM ERRO
         if (str_contains($uri, 'mercadopago') || str_contains($uri, 'pix/status') || str_contains($uri, 'links/')) {
             return $next($request);
         }
 
-        $token = $request->header('X-API-Token');
-        $expectedToken = \App\Models\AppConfig::getSettings()->api_token_key;
+        // 3. VERIFICA TOKEN (Tratamento robusto)
+        $token = trim($request->header('X-API-Token') ?? '');
+        $expectedToken = trim(\App\Models\AppConfig::getSettings()->api_token_key ?? '');
 
-        if ($token !== $expectedToken) {
+        if (empty($expectedToken) || $token !== $expectedToken) {
+            \Log::warning("CheckApiToken Falhou: Recebido '{$token}', Esperado '{$expectedToken}' para URI: " . $request->path());
+            
             return response()->json([
                 'status' => false,
                 'message' => 'Acesso não autorizado. Chave de API inválida ou ausente.'

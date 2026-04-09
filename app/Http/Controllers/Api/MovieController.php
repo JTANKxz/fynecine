@@ -139,7 +139,7 @@ class MovieController extends Controller
         if (!$config->security_mode) {
             foreach ($movie->playLinks->sortBy('order') as $link) {
                 $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
-                if ($url && $link->type === 'private') {
+                if ($url && ($link->type === 'private' || $link->type === 'mp4')) {
                     $url = url("/api/links/movie/{$link->id}/play");
                 }
                 $playLinks->push([

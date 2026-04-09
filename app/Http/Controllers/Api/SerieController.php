@@ -209,7 +209,7 @@ class SerieController extends Controller
 
                             $links = $episode->links->sortBy('order')->map(function($link) use ($hasPlan) {
                                 $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
-                                if ($url && $link->type === 'private') {
+                                if ($url && ($link->type === 'private' || $link->type === 'mp4')) {
                                     $url = url("/api/links/episode/{$link->id}/play");
                                 }
                                 return [

@@ -55,7 +55,7 @@ class TvChannelController extends Controller
             foreach ($channel->links as $link) {
                 $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
                 
-                if ($url && $link->type === 'private') {
+                if ($url && ($link->type === 'private' || $link->type === 'mp4')) {
                     $url = url("/api/links/channel/{$link->id}/play");
                 }
 

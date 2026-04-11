@@ -180,10 +180,14 @@ class MovieController extends Controller
         $downloadLinks = collect();
         if (!$config->security_mode) {
             foreach ($movie->downloadLinks as $dl) {
+                $url = ($hasPlan || $dl->download_sub === 'free') ? $dl->url : null;
+                if ($url && ($dl->type === 'private' || $dl->type === 'mp4')) {
+                    $url = url("/api/links/movie/download/{$dl->id}");
+                }
                 $downloadLinks->push([
                     'id'           => $dl->id,
                     'name'         => $dl->name,
-                    'url'          => $hasPlan || $dl->download_sub === 'free' ? $dl->url : null,
+                    'url'          => $url,
                     'quality'      => $dl->quality,
                     'size'         => $dl->size,
                     'type'         => $dl->type,

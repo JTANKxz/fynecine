@@ -252,10 +252,14 @@ class SerieController extends Controller
 
                             // Download links do episódio filtrados por plano
                             foreach ($episode->downloadLinks as $dl) {
+                                $url = ($hasPlan || $dl->download_sub === 'free') ? $dl->url : null;
+                                if ($url && ($dl->type === 'private' || $dl->type === 'mp4')) {
+                                    $url = url("/api/links/episode/download/{$dl->id}");
+                                }
                                 $downloadLinks->push([
                                     'id'           => $dl->id,
                                     'name'         => $dl->name,
-                                    'url'          => $hasPlan || $dl->download_sub === 'free' ? $dl->url : null,
+                                    'url'          => $url,
                                     'quality'      => $dl->quality,
                                     'size'         => $dl->size,
                                     'type'         => $dl->type,

@@ -89,6 +89,10 @@ Route::middleware('api.token')->group(function () {
     Route::get('/links/channel/{link}/play', [LinkController::class, 'channelPlay']);
     Route::get('/links/event/{link}/play', [LinkController::class, 'eventPlay']);
 
+    // Links de Download (Geração de URL Assinada)
+    Route::get('/links/movie/download/{link}', [LinkController::class, 'movieDownload']);
+    Route::get('/links/episode/download/{link}', [LinkController::class, 'episodeDownload']);
+
     /*
     |--------------------------------------------------------------------------
     | Autenticação API (Sanctum — Bearer Token)

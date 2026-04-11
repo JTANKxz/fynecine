@@ -13,7 +13,14 @@ class EpisodeDownloadLink extends Model
         'size',
         'url',
         'type',
+        'link_path',
+        'expiration_hours',
         'download_sub',
         'order',
+    ];
+
+    protected $casts = [
+        'expiration_hours' => 'integer',
+        'order'            => 'integer',
     ];
 }

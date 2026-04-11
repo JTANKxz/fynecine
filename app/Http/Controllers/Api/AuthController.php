@@ -46,7 +46,10 @@ class AuthController extends Controller
         try {
             Mail::to($email)->send(new PasswordResetCodeMail($code));
         } catch (\Exception $e) {
-            \Log::error('SMTP ERROR API (Web): ' . $e->getMessage());
+            \Log::error('SMTP ERROR API: ' . $e->getMessage(), [
+                'exception' => $e,
+                'email' => $email
+            ]);
             return response()->json([
                 'status' => false,
                 'message' => 'Erro ao enviar e-mail. Verifique suas configurações de SMTP.',
@@ -57,9 +60,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Código de recuperação enviado com sucesso!',
-            'data' => [
-                'email' => $email
-            ]
+            'data' => new \stdClass()
         ]);
     }
 

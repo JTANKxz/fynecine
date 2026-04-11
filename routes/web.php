@@ -26,11 +26,13 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ChampionshipController;
 use App\Http\Controllers\Admin\TMDBController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\Public\PublicHomeController;
 use App\Http\Controllers\FrontendController;
 
 // Rotas Frontend (Públicas)
+Route::get('/', [PublicHomeController::class, 'index'])->name('home');
+
 Route::controller(FrontendController::class)->group(function() {
-    Route::get('/', 'index')->name('home');
     Route::get('/movie/{slug}', 'movie')->name('frontend.movie');
     Route::get('/series/{slug}', 'serie')->name('frontend.serie');
     Route::get('/series/{slug}/season/{season}/episode/{episode}', 'episode')->name('frontend.episode');

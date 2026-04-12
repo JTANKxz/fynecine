@@ -18,10 +18,11 @@ class BunnyLinkService
 
         $config = AppConfig::getSettings();
         
-        // Determina se é MP4 (via extensão ou se o link for apenas o nome do arquivo .mp4)
-        $isMp4 = str_ends_with(strtolower($url), '.mp4') || str_contains(strtolower($url), '.mp4?');
+        // Determina se é arquivo direto (MP4, MKV, etc)
+        $isDirectFile = str_ends_with(strtolower($url), '.mp4') || str_contains(strtolower($url), '.mp4?') ||
+                        str_ends_with(strtolower($url), '.mkv') || str_contains(strtolower($url), '.mkv?');
 
-        if ($isMp4) {
+        if ($isDirectFile) {
             return self::signMp4Url($url, $expirationHours, $linkPath);
         }
         

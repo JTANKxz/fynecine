@@ -22,7 +22,7 @@ class BunnyLinkService
         $isMp4 = str_ends_with(strtolower($url), '.mp4') || str_contains(strtolower($url), '.mp4?');
 
         if ($isMp4) {
-            return self::signMp4Url($url, $expirationHours);
+            return self::signMp4Url($url, $expirationHours, $linkPath);
         }
         
         // --- LÓGICA HLS (MANTER ORIGINAL) ---
@@ -47,7 +47,7 @@ class BunnyLinkService
         $videoId = $parts[0] ?? '';
         if (empty($videoId)) return $url;
 
-        $tokenPath = '/' . $videoId . '/';
+        $tokenPath = $linkPath ?: ('/' . $videoId . '/');
         $expires = time() + (($expirationHours ?? 4) * 3600);
         $parameterData = "token_path=" . $tokenPath;
         $userIp = '';
@@ -89,7 +89,7 @@ class BunnyLinkService
     /**
      * Lógica de assinatura para MP4 (Nova)
      */
-    private static function signMp4Url(string $url, ?int $expirationHours = 4)
+    private static function signMp4Url(string $url, ?int $expirationHours = 4, ?string $linkPath = null)
     {
         // Se NÃO for uma URL do Bunny, retorna o link direto (redundância de segurança)
         if (!self::isBunnyUrl($url)) {
@@ -125,7 +125,8 @@ class BunnyLinkService
         $parameterData = '';
 
         // Hashable Base: SecurityKey + path + expires + userIp + parameterData
-        $hashableBase = $securityKey . $path . $expires . $userIp . $parameterData;
+        $hashPath = $linkPath ?: $path;
+        $hashableBase = $securityKey . $hashPath . $expires . $userIp . $parameterData;
         
         $hash = hash('sha256', $hashableBase, true);
         

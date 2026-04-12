@@ -153,6 +153,8 @@ class LinkController extends Controller
             'headers' => !empty($headers) ? $headers : null,
             'cookies' => $link->cookie
         ]);
+    }
+
     /**
      * Gera link assinado para download de filme.
      */

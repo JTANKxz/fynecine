@@ -65,8 +65,12 @@
                                         <i class="fa-solid fa-bell"></i>
                                     </button>
 
-                                    <button type="button" onclick="openSettingsModal({{ $serie->id }}, '{{ addslashes($serie->name) }}', {{ $serie->use_autoembed ? 'true' : 'false' }})" class="text-blue-500 hover:text-blue-400 mr-2" title="Configurações de Reprodução">
-                                        <i class="fa-solid fa-edit"></i>
+                                    <a href="{{ route('admin.series.edit', $serie->id) }}" class="text-blue-500 hover:text-blue-400 mr-2" title="Editar Detalhes">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </a>
+
+                                    <button type="button" onclick="openSettingsModal({{ $serie->id }}, '{{ addslashes($serie->name) }}', {{ $serie->use_autoembed ? 'true' : 'false' }})" class="text-teal-500 hover:text-teal-400 mr-2" title="Configurações de Reprodução">
+                                        <i class="fa-solid fa-gear"></i>
                                     </button>
 
                                     <a href="{{ route('admin.series.seasons', $serie->id) }}"

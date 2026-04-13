@@ -339,4 +339,42 @@ class SerieController extends Controller
 
         return back()->with('success', 'Configurações atualizadas com sucesso!');
     }
+
+    public function edit(Serie $serie)
+    {
+        $categories = \App\Models\ContentCategory::where('has_dedicated_content', true)->get();
+        $genres = \App\Models\Genre::orderBy('name')->get();
+        return view('admin.series.edit', compact('serie', 'categories', 'genres'));
+    }
+
+    public function update(Request $request, Serie $serie)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:series,slug,' . $serie->id,
+            'first_air_year' => 'nullable|string|max:4',
+            'last_air_year' => 'nullable|string|max:4',
+            'number_of_seasons' => 'nullable|integer',
+            'number_of_episodes' => 'nullable|integer',
+            'rating' => 'nullable|numeric',
+            'overview' => 'nullable|string',
+            'poster_path' => 'nullable|string|max:500',
+            'backdrop_path' => 'nullable|string|max:500',
+            'trailer_key' => 'nullable|string|max:255',
+            'age_rating' => 'nullable|string|max:10',
+            'content_category_id' => 'nullable|exists:content_categories,id',
+            'genres' => 'nullable|array',
+            'genres.*' => 'exists:genres,id',
+        ]);
+
+        $serie->update($validated);
+
+        if ($request->has('genres')) {
+            $serie->genres()->sync($request->genres);
+        } else {
+            $serie->genres()->detach();
+        }
+
+        return redirect()->route('admin.series.index')->with('success', 'Série atualizada com sucesso!');
+    }
 }

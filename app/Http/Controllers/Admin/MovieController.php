@@ -206,4 +206,40 @@ class MovieController extends Controller
 
         return back()->with('success', 'Configurações atualizadas com sucesso!');
     }
+
+    public function edit(Movie $movie)
+    {
+        $categories = \App\Models\ContentCategory::where('has_dedicated_content', true)->get();
+        $genres = \App\Models\Genre::orderBy('name')->get();
+        return view('admin.movies.edit', compact('movie', 'categories', 'genres'));
+    }
+
+    public function update(Request $request, Movie $movie)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:movies,slug,' . $movie->id,
+            'release_year' => 'nullable|string|max:4',
+            'runtime' => 'nullable|integer',
+            'rating' => 'nullable|numeric',
+            'overview' => 'nullable|string',
+            'poster_path' => 'nullable|string|max:500',
+            'backdrop_path' => 'nullable|string|max:500',
+            'trailer_key' => 'nullable|string|max:255',
+            'age_rating' => 'nullable|string|max:10',
+            'content_category_id' => 'nullable|exists:content_categories,id',
+            'genres' => 'nullable|array',
+            'genres.*' => 'exists:genres,id',
+        ]);
+
+        $movie->update($validated);
+
+        if ($request->has('genres')) {
+            $movie->genres()->sync($request->genres);
+        } else {
+            $movie->genres()->detach();
+        }
+
+        return redirect()->route('admin.movies.index')->with('success', 'Filme atualizado com sucesso!');
+    }
 }

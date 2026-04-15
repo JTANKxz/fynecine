@@ -15,6 +15,7 @@ class SubscriptionPlan extends Model
         'duration_days',
         'features',
         'is_active',
+        'points_cost',
     ];
 
     protected $casts = [
@@ -22,5 +23,6 @@ class SubscriptionPlan extends Model
         'original_price' => 'decimal:2',
         'is_active' => 'boolean',
         'features' => 'array',
+        'points_cost' => 'integer',
     ];
 }

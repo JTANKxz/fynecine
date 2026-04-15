@@ -51,6 +51,7 @@ class SubscriptionPlanController extends Controller
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),
+            'points_cost' => $request->points_cost ?: null,
         ]);
 
         return redirect()->route('admin.subscription-plans.index')->with('success', 'Plano criado com sucesso!');
@@ -93,6 +94,7 @@ class SubscriptionPlanController extends Controller
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),
+            'points_cost' => $request->points_cost ?: null,
         ]);
 
         return redirect()->route('admin.subscription-plans.index')->with('success', 'Plano atualizado com sucesso!');

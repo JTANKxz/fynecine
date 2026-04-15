@@ -35,6 +35,7 @@ class User extends Authenticatable
         'plan_type',
         'plan_expires_at',
         'features',
+        'reward_points',
     ];
 
     protected $appends = [
@@ -134,6 +135,11 @@ class User extends Authenticatable
     public function coupons()
     {
         return $this->belongsToMany(Coupon::class, 'user_coupons');
+    }
+
+    public function rewardClaims()
+    {
+        return $this->hasMany(RewardClaim::class);
     }
 
     public function hasPlan(): bool

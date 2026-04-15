@@ -100,6 +100,13 @@
             </div>
 
             <div>
+                <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Custo em Pontos (Check-in Diário)</label>
+                <input type="number" name="points_cost" value="{{ old('points_cost', $subscriptionPlan->points_cost) }}" min="0" placeholder="Ex: 30"
+                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                <p class="text-[10px] text-neutral-500 mt-1">Opcional. Se preenchido, usuários poderão trocar pontos por este plano.</p>
+            </div>
+
+            <div>
                 <label class="flex items-center gap-3 cursor-pointer group pt-4 border-t border-neutral-800 mt-4">
                     <input type="checkbox" name="is_active" value="1" {{ old('is_active', $subscriptionPlan->is_active) ? 'checked' : '' }} class="w-5 h-5 accent-netflix rounded">
                     <span class="text-sm text-neutral-300 group-hover:text-white transition">Plano Ativo (Disponível para os usuários)</span>

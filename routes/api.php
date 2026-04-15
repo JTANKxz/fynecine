@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\NetworkController;
 use App\Http\Controllers\Api\HomeSectionController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\LinkController;
+use App\Http\Controllers\Api\RewardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('api.token')->group(function () {
@@ -93,6 +94,9 @@ Route::middleware('api.token')->group(function () {
     Route::get('/links/movie/download/{link}', [LinkController::class, 'movieDownload']);
     Route::get('/links/episode/download/{link}', [LinkController::class, 'episodeDownload']);
 
+    // Rewards — Status público (qualquer um vê as regras)
+    Route::get('/rewards/status', [RewardController::class, 'status']);
+
     /*
     |--------------------------------------------------------------------------
     | Autenticação API (Sanctum — Bearer Token)
@@ -163,6 +167,10 @@ Route::middleware('api.token')->group(function () {
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
         Route::post('/notifications/{id}/markread', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
         Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+
+        // Rewards — Claim e Redeem requerem auth
+        Route::post('/rewards/claim', [RewardController::class, 'claim']);
+        Route::post('/rewards/redeem', [RewardController::class, 'redeem']);
     });
 
     // Notificações — Listagem Pública (Internamente decide se mostra globais ou privadas)

@@ -33,7 +33,11 @@ class DashboardController extends Controller
             'events'        => Event::count(),
             'comments'      => Comment::count(),
             'teams'         => Team::count(),
-            'premium_users' => User::where('plan_type', '!=', 'free')->whereNotNull('plan_type')->count(),
+            'premium_users' => User::where('plan_type', '!=', 'free')
+                ->where(function($query) {
+                    $query->whereNull('plan_expires_at')
+                          ->orWhere('plan_expires_at', '>', now());
+                })->count(),
             'views_today'   => ContentView::whereDate('viewed_at', today())->count(),
             'views_week'    => ContentView::where('viewed_at', '>=', now()->subWeek())->count(),
         ];

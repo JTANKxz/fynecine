@@ -428,7 +428,25 @@
                 </div>
             </div>
 
-            <!-- LEGAL DOCUMENTS -->
+            <!-- REWARDS SYSTEM -->
+            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-gift text-netflix"></i> Sistema de Recompensas
+                </h3>
+                
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="block text-sm font-bold text-white mb-1">Check-in Diário Ativo</span>
+                        <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Ativa ou desativa o sistema de pontos e resgate por prêmios no aplicativo móvel.</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer scale-75">
+                        <input type="checkbox" name="rewards_status" value="1" {{ $config->rewards_status ? 'checked' : '' }} class="sr-only peer">
+                        <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- TV CHANNELS -->
             <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                 <h3 class="text-white font-bold flex items-center gap-2">
                     <i class="fa-solid fa-tv text-blue-500"></i> Canais de TV

@@ -100,6 +100,7 @@ class SettingController extends Controller
             'interstitial_interval' => ['nullable', 'integer', 'min:0'],
             'ads_native_status' => ['nullable', 'boolean'],
             'ads_rewarded_status' => ['nullable', 'boolean'],
+            'rewards_status' => ['nullable', 'boolean'],
             
             'bunny_security_key' => ['nullable', 'string', 'max:255'],
             'bunny_cdn_url' => ['nullable', 'string', 'max:255'],
@@ -131,6 +132,7 @@ class SettingController extends Controller
         $config->ads_interstitial_status = $request->has('ads_interstitial_status');
         $config->ads_native_status = $request->has('ads_native_status');
         $config->ads_rewarded_status = $request->has('ads_rewarded_status');
+        $config->rewards_status = $request->has('rewards_status');
 
         // Inputs text/enums
         $config->app_name = $request->app_name;

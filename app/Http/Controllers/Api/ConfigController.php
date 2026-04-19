@@ -64,8 +64,38 @@ class ConfigController extends Controller
             // Corporate and Multi-Embed
             'app_version' => $config->app_version,
             'contact_email' => $config->contact_email,
-            'autoembed_movie_sources' => array_values($config->autoembed_movie_sources ?? []),
-            'autoembed_serie_sources' => array_values($config->autoembed_serie_sources ?? []),
+            'autoembed_movie_sources' => collect($config->autoembed_movie_sources ?? [])->map(function($s) {
+                return [
+                    'id' => 'auto',
+                    'name' => $s['name'] ?? 'Auto Player',
+                    'url' => $s['url'] ?? '',
+                    'type' => $s['type'] ?? 'embed',
+                    'quality' => $s['quality'] ?? 'HD',
+                    'player_sub' => $s['player_sub'] ?? 'free',
+                    'headers' => [
+                        'user_agent' => $s['user_agent'] ?? null,
+                        'referer' => $s['referer'] ?? null,
+                        'origin' => $s['origin'] ?? null,
+                        'cookie' => $s['cookie'] ?? null,
+                    ]
+                ];
+            })->values(),
+            'autoembed_serie_sources' => collect($config->autoembed_serie_sources ?? [])->map(function($s) {
+                return [
+                    'id' => 'auto',
+                    'name' => $s['name'] ?? 'Auto Player',
+                    'url' => $s['url'] ?? '',
+                    'type' => $s['type'] ?? 'embed',
+                    'quality' => $s['quality'] ?? 'HD',
+                    'player_sub' => $s['player_sub'] ?? 'free',
+                    'headers' => [
+                        'user_agent' => $s['user_agent'] ?? null,
+                        'referer' => $s['referer'] ?? null,
+                        'origin' => $s['origin'] ?? null,
+                        'cookie' => $s['cookie'] ?? null,
+                    ]
+                ];
+            })->values(),
 
             // ========= ADS LOGIC: Disable for Basic/Premium =========
             'ads_banner_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_banner_status),

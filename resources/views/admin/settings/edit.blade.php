@@ -236,8 +236,21 @@
                                         <div class="grid grid-cols-2 gap-2">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][name]" value="{{ $source['name'] ?? '' }}" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][quality]" value="{{ $source['quality'] ?? '' }}" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
-                                            <input type="text" name="autoembed_movie_sources[{{$index}}][type]" value="{{ $source['type'] ?? '' }}" placeholder="Tipo" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <select name="autoembed_movie_sources[{{$index}}][type]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                                <option value="embed" {{ ($source['type'] ?? '') == 'embed' ? 'selected' : '' }}>Embed</option>
+                                                <option value="mp4" {{ ($source['type'] ?? '') == 'mp4' ? 'selected' : '' }}>MP4</option>
+                                                <option value="m3u8" {{ ($source['type'] ?? '') == 'm3u8' ? 'selected' : '' }}>M3U8</option>
+                                                <option value="mkv" {{ ($source['type'] ?? '') == 'mkv' ? 'selected' : '' }}>MKV</option>
+                                                <option value="custom" {{ ($source['type'] ?? '') == 'custom' ? 'selected' : '' }}>Custom</option>
+                                                <option value="private" {{ ($source['type'] ?? '') == 'private' ? 'selected' : '' }}>Private</option>
+                                            </select>
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][player_sub]" value="{{ $source['player_sub'] ?? '' }}" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][user_agent]" value="{{ $source['user_agent'] ?? '' }}" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][referer]" value="{{ $source['referer'] ?? '' }}" placeholder="Referer" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][origin]" value="{{ $source['origin'] ?? '' }}" placeholder="Origin" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][cookie]" value="{{ $source['cookie'] ?? '' }}" placeholder="Cookies" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                         </div>
                                     </div>
                                 @endforeach
@@ -263,8 +276,21 @@
                                         <div class="grid grid-cols-2 gap-2">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][name]" value="{{ $source['name'] ?? '' }}" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][quality]" value="{{ $source['quality'] ?? '' }}" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
-                                            <input type="text" name="autoembed_serie_sources[{{$index}}][type]" value="{{ $source['type'] ?? '' }}" placeholder="Tipo" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <select name="autoembed_serie_sources[{{$index}}][type]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                                <option value="embed" {{ ($source['type'] ?? '') == 'embed' ? 'selected' : '' }}>Embed</option>
+                                                <option value="mp4" {{ ($source['type'] ?? '') == 'mp4' ? 'selected' : '' }}>MP4</option>
+                                                <option value="m3u8" {{ ($source['type'] ?? '') == 'm3u8' ? 'selected' : '' }}>M3U8</option>
+                                                <option value="mkv" {{ ($source['type'] ?? '') == 'mkv' ? 'selected' : '' }}>MKV</option>
+                                                <option value="custom" {{ ($source['type'] ?? '') == 'custom' ? 'selected' : '' }}>Custom</option>
+                                                <option value="private" {{ ($source['type'] ?? '') == 'private' ? 'selected' : '' }}>Private</option>
+                                            </select>
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][player_sub]" value="{{ $source['player_sub'] ?? '' }}" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][user_agent]" value="{{ $source['user_agent'] ?? '' }}" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][referer]" value="{{ $source['referer'] ?? '' }}" placeholder="Referer" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][origin]" value="{{ $source['origin'] ?? '' }}" placeholder="Origin" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][cookie]" value="{{ $source['cookie'] ?? '' }}" placeholder="Cookies" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                         </div>
                                     </div>
                                 @endforeach
@@ -706,8 +732,21 @@
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" name="autoembed_${type}_sources[${index}][name]" value="Auto Player" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                     <input type="text" name="autoembed_${type}_sources[${index}][quality]" value="HD" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
-                    <input type="text" name="autoembed_${type}_sources[${index}][type]" value="embed" placeholder="Tipo" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                    <select name="autoembed_${type}_sources[${index}][type]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                        <option value="embed" selected>Embed</option>
+                        <option value="mp4">MP4</option>
+                        <option value="m3u8">M3U8</option>
+                        <option value="mkv">MKV</option>
+                        <option value="custom">Custom</option>
+                        <option value="private">Private</option>
+                    </select>
                     <input type="text" name="autoembed_${type}_sources[${index}][player_sub]" value="free" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
+                    <input type="text" name="autoembed_${type}_sources[${index}][user_agent]" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                    <input type="text" name="autoembed_${type}_sources[${index}][referer]" placeholder="Referer" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                    <input type="text" name="autoembed_${type}_sources[${index}][origin]" placeholder="Origin" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                    <input type="text" name="autoembed_${type}_sources[${index}][cookie]" placeholder="Cookies" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                 </div>
             </div>
         `;

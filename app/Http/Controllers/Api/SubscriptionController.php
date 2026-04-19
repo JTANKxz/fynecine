@@ -21,48 +21,8 @@ class SubscriptionController extends Controller
             ->get();
 
         $formattedPlans = $plans->map(function ($plan) {
-            $type = $plan->plan_type;
-            $features = collect($plan->features ?? []);
             
-            // Lista comparativa de benefícios (Sync total entre planos)
-            $comparisonFeatures = collect();
-
-            // 1. Jogos ao Vivo (O ponto chave)
-            $comparisonFeatures->push([
-                'name' => 'Jogos e Eventos Ao Vivo',
-                'included' => $type === 'premium'
-            ]);
-
-            // 2. Perfis
-            $maxProfiles = ($type === 'premium') ? 6 : (($type === 'basic') ? 3 : 1);
-            $comparisonFeatures->push([
-                'name' => "Até {$maxProfiles} perfis de usuário",
-                'included' => true
-            ]);
-
-            // 3. Quotas Diárias (Requests e Support)
-            $quota = ($type === 'premium') ? 5 : (($type === 'basic') ? 3 : 1);
-            $comparisonFeatures->push([
-                'name' => "{$quota} Pedidos de filmes diários",
-                'included' => true
-            ]);
-            $comparisonFeatures->push([
-                'name' => "{$quota} Suporte prioritário diário",
-                'included' => true
-            ]);
-
-            // 4. Anúncios
-            $comparisonFeatures->push([
-                'name' => 'Navegação Sem anúncios',
-                'included' => $features->contains('no_ads')
-            ]);
-
-            // 5. Canais
-            $comparisonFeatures->push([
-                'name' => 'Canais de TV (IPTV)',
-                'included' => $features->contains('premium_channels')
-            ]);
-
+            // Features now handled by formatPlanFeatures
             return [
                 'id' => $plan->id,
                 'name' => $plan->name,
@@ -74,7 +34,7 @@ class SubscriptionController extends Controller
                     ? round((1 - ($plan->price / $plan->original_price)) * 100) 
                     : 0,
                 'duration_days' => $plan->duration_days,
-                'features' => $comparisonFeatures->values(),
+                'features' => $this->formatPlanFeatures($plan->plan_type, $plan->features ?? []),
                 'raw_features' => $plan->features
             ];
         });
@@ -94,7 +54,8 @@ class SubscriptionController extends Controller
         $user = $request->user();
         
         // 1. Busca cupom válido ignorando case
-        $coupon = Coupon::where('code', $request->code)->first();
+        $code = strtoupper($request->code);
+        $coupon = Coupon::where('code', $code)->first();
 
         if (!$coupon) {
             return response()->json(['message' => 'Cupom inválido ou inexistente.'], 404);
@@ -139,7 +100,55 @@ class SubscriptionController extends Controller
             'message' => "Cupom ativado com sucesso! Você agora é {$planType}.",
             'plan_type' => $user->plan_type,
             'expires_at' => $user->plan_expires_at,
-            'features' => $user->features
+            'features' => $this->formatPlanFeatures($planType, $features)
         ]);
+    }
+
+    /**
+     * Formata os benefícios do plano no padrão esperado pelo App.
+     */
+    private function formatPlanFeatures(string $type, array $features): array
+    {
+        $features = collect($features);
+        $comparisonFeatures = collect();
+
+        // 1. Jogos ao Vivo (O ponto chave)
+        $comparisonFeatures->push([
+            'name' => 'Jogos e Eventos Ao Vivo',
+            'included' => $type === 'premium'
+        ]);
+
+        // 2. Perfis
+        $maxProfiles = ($type === 'premium') ? 6 : (($type === 'basic') ? 3 : 1);
+        $comparisonFeatures->push([
+            'name' => "Até {$maxProfiles} perfis de usuário",
+            'included' => true
+        ]);
+
+        // 3. Quotas Diárias (Requests e Support)
+        $quota = ($type === 'premium') ? 5 : (($type === 'basic') ? 3 : 1);
+        $comparisonFeatures->push([
+            'name' => "{$quota} Pedidos de filmes diários",
+            'included' => true
+        ]);
+
+        $comparisonFeatures->push([
+            'name' => "{$quota} Suporte prioritário diário",
+            'included' => true
+        ]);
+
+        // 4. Anúncios
+        $comparisonFeatures->push([
+            'name' => 'Navegação Sem anúncios',
+            'included' => $features->contains('no_ads') || $type === 'premium'
+        ]);
+
+        // 5. Canais
+        $comparisonFeatures->push([
+            'name' => 'Canais de TV (IPTV)',
+            'included' => $features->contains('premium_channels') || $type === 'premium'
+        ]);
+
+        return $comparisonFeatures->values()->toArray();
     }
 }

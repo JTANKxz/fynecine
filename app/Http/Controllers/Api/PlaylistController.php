@@ -31,15 +31,28 @@ class PlaylistController extends Controller
             }])
             ->latest()
             ->get()
-            ->map(function ($playlist, $index) use ($user) {
+            ->map(function ($playlist, $index) use ($request, $user) {
                 // Lógica de bloqueio: se não for premium e for acima da 3ª playlist
                 $isLocked = !$user->hasPlan && $index >= 3;
+
+                $checkId = $request->query('item_id');
+                $checkType = $request->query('item_type');
+                $isAdded = false;
+
+                if ($checkId && $checkType) {
+                    $class = $checkType === 'movie' ? Movie::class : Serie::class;
+                    $isAdded = $playlist->items()
+                        ->where('listable_id', $checkId)
+                        ->where('listable_type', $class)
+                        ->exists();
+                }
 
                 return [
                     'id' => $playlist->id,
                     'name' => $playlist->name,
                     'is_locked' => $isLocked,
                     'items_count' => $playlist->items()->count(),
+                    'is_added' => $isAdded,
                     'collage_posters' => $playlist->items->map(function ($item) {
                         return $item->listable ? ($item->listable->poster ?? $item->listable->poster_path) : null;
                     })->filter()->values(),
@@ -140,6 +153,24 @@ class PlaylistController extends Controller
         ]);
 
         return response()->json(['in_playlist' => true, 'message' => 'Adicionado à playlist.'], 201);
+    }
+
+    public function batchDestroyItems(Request $request): JsonResponse
+    {
+        $profile = $this->getProfile($request);
+        
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer'
+        ]);
+
+        // Deletar apenas se pertencerem a playlists do perfil logado
+        PlaylistItem::whereIn('id', $request->ids)
+            ->whereHas('playlist', function($q) use ($profile) {
+                $q->where('profile_id', $profile->id);
+            })->delete();
+
+        return response()->json(['message' => 'Itens removidos com sucesso.']);
     }
 
     public function destroy(Request $request, int $id): JsonResponse

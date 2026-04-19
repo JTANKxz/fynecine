@@ -27,6 +27,10 @@ class ConfigController extends Controller
             'force_login' => (bool) $config->force_login,
             'show_onboarding' => (bool) $config->show_onboarding,
             
+            'maintenance_mode' => (bool) $config->maintenance_mode,
+            'maintenance_title' => $config->maintenance_title,
+            'maintenance_description' => $config->maintenance_description,
+            
             'update_type' => $config->update_type,
             'update_status' => (bool) $config->update_status,
             'update_url' => $config->update_url,

@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\HomeSectionController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\RewardController;
+use App\Http\Controllers\Api\PlaylistController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('api.token')->group(function () {
@@ -136,6 +137,15 @@ Route::middleware('api.token')->group(function () {
             Route::post('/toggle', [ProfileListController::class, 'toggle']);
             Route::get('/check',   [ProfileListController::class, 'check']);
             Route::delete('/{id}', [ProfileListController::class, 'destroy']);
+        });
+
+        // Playlists Customizadas
+        Route::prefix('playlists')->group(function () {
+            Route::get('/',            [PlaylistController::class, 'index']);
+            Route::post('/',           [PlaylistController::class, 'store']);
+            Route::get('/{id}',        [PlaylistController::class, 'show']);
+            Route::post('/items',      [PlaylistController::class, 'toggleItem']);
+            Route::delete('/{id}',     [PlaylistController::class, 'destroy']);
         });
 
         // Assinaturas e Cupons

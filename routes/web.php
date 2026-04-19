@@ -111,12 +111,6 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
     Route::post('requests/{request}/autoimport', [RequestController::class, 'autoImport'])->name('requests.autoimport');
     Route::post('requests/{request}/respond', [RequestController::class, 'respond'])->name('requests.respond');
 
-    Route::prefix('tickets')->name('tickets.')->group(function () {
-        Route::get('/', [TicketController::class, 'index'])->name('index');
-        Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
-        Route::post('/{ticket}/respond', [TicketController::class, 'respond'])->name('respond');
-        Route::delete('/{ticket}', [TicketController::class, 'delete'])->name('delete');
-    });
 
     Route::prefix('movies')->name('movies.')->group(function () {
         Route::get('/', [MovieController::class, 'index'])->name('index');
@@ -217,7 +211,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/', [TvChannelController::class, 'store'])->name('store');
         Route::get('/{channel}/edit', [TvChannelController::class, 'edit'])->name('edit');
         Route::put('/{channel}', [TvChannelController::class, 'update'])->name('update');
-        Route::delete('/{channel}', [TvChannelController::class, 'delete'])->name('delete');
+        Route::delete('/{channel}', [TvChannelController::class, 'destroy'])->name('delete');
 
         // Links do canal
         Route::get('/{channel}/links', [TvChannelController::class, 'links'])->name('links');
@@ -234,7 +228,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/', [TvChannelCategoryController::class, 'store'])->name('store');
         Route::get('/{category}/edit', [TvChannelCategoryController::class, 'edit'])->name('edit');
         Route::put('/{category}', [TvChannelCategoryController::class, 'update'])->name('update');
-        Route::delete('/{category}', [TvChannelCategoryController::class, 'delete'])->name('delete');
+        Route::delete('/{category}', [TvChannelCategoryController::class, 'destroy'])->name('delete');
     });
 
     // ========== SEÇÕES DA HOME ==========
@@ -274,6 +268,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::get('/', [TicketController::class, 'index'])->name('index');
         Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
         Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('delete');
+        Route::post('/{ticket}/respond', [TicketController::class, 'respond'])->name('respond');
     });
 
     // ========== AVATARES ==========

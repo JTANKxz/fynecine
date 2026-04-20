@@ -45,6 +45,7 @@ Route::middleware('api.token')->group(function () {
     Route::get('/{type}/{idOrSlug}/comments', [CommentController::class, 'index'])->where('type', 'movies|series');
     Route::get('/genres', [GenreController::class, 'index']);
     Route::get('/genres/{idOrSlug}', [GenreController::class, 'show']);
+    Route::get('/cast/{idOrSlug}', [\App\Http\Controllers\Api\CastController::class, 'show']);
     Route::get('/search', [SearchController::class, 'index']);
 
     // TV ao Vivo (Canais)

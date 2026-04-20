@@ -334,7 +334,8 @@ class SerieController extends Controller
     public function updateSettings(Request $request, Serie $serie)
     {
         $serie->update([
-            'use_autoembed' => $request->has('use_autoembed')
+            'use_autoembed' => $request->has('use_autoembed'),
+            'excluded_autoembeds' => $request->excluded_autoembeds ?? []
         ]);
 
         return back()->with('success', 'Configurações atualizadas com sucesso!');

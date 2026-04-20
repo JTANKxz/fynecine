@@ -24,12 +24,14 @@ class Movie extends Model
         'content_category_id',
         'tag_text',
         'tag_expires_at',
-        'use_autoembed'
+        'use_autoembed',
+        'excluded_autoembeds'
     ];
 
     protected $casts = [
         'tag_expires_at' => 'datetime',
         'use_autoembed' => 'boolean',
+        'excluded_autoembeds' => 'array',
     ];
 
     public function contentCategory()

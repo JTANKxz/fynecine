@@ -232,22 +232,43 @@ class SerieController extends Controller
                                 ];
                             });
 
-                            if ($config->autoembed_series && $config->autoembed_serie_url && $serie->use_autoembed) {
-                                $autoSub = $config->autoembed_serie_player_sub ?? 'free';
-                                $embedUrl = str_replace(
-                                    ['{tmdb_id}', '{season}', '{episode}'],
-                                    [$serie->tmdb_id, $season->season_number, $episode->episode_number],
-                                    $config->autoembed_serie_url
-                                );
+                            if ($config->autoembed_series && $serie->use_autoembed) {
+                                $excluded = $serie->excluded_autoembeds ?? [];
                                 
-                                $links->push([
-                                    'id' => 'auto',
-                                    'name' => $config->autoembed_serie_name ?? 'Auto Player',
-                                    'url' => $hasPlan || $autoSub === 'free' ? $embedUrl : null,
-                                    'type' => $config->autoembed_serie_type ?? 'embed',
-                                    'quality' => $config->autoembed_serie_quality ?? 'HD',
-                                    'player_sub' => $autoSub
-                                ]);
+                                $autoSources = collect($config->autoembed_serie_sources ?? [])->map(function($s) use ($serie, $season, $episode) {
+                                    $autoSub = $s['player_sub'] ?? 'free';
+                                    return [
+                                        'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
+                                        'name' => $s['name'] ?? 'Auto Player',
+                                        'url' => str_replace(
+                                            ['{tmdb_id}', '{season}', '{episode}'],
+                                            [$serie->tmdb_id, $season->season_number, $episode->episode_number],
+                                            $s['url'] ?? ''
+                                        ),
+                                        'type' => $s['type'] ?? 'embed',
+                                        'quality' => $s['quality'] ?? 'HD',
+                                        'player_sub' => $autoSub,
+                                        'headers' => [
+                                            'user_agent' => $s['user_agent'] ?? null,
+                                            'referer' => $s['referer'] ?? null,
+                                            'origin' => $s['origin'] ?? null,
+                                            'cookie' => $s['cookie'] ?? null,
+                                        ]
+                                    ];
+                                });
+
+                                foreach ($autoSources as $autoSource) {
+                                    // Filter if ID is in excluded list
+                                    if (!in_array($autoSource['id'], $excluded)) {
+                                        $url = ($hasPlan || $autoSource['player_sub'] === 'free') ? $autoSource['url'] : null;
+                                        $autoSource['url'] = $url;
+                                        $links->push($autoSource);
+                                    }
+                                }
+
+                                // Also set embedUrl for legacy compatibility if needed
+                                $firstLink = $links->where('id', 'auto')->first() ?? $links->last();
+                                if ($firstLink) $embedUrl = $firstLink['url'];
                             }
 
                             // Download links do episódio filtrados por plano

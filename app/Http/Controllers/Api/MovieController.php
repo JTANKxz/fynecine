@@ -162,17 +162,35 @@ class MovieController extends Controller
                 ]);
             }
 
-            if ($config->autoembed_movies && $config->autoembed_movie_url && $movie->use_autoembed) {
-                $autoSub = $config->autoembed_movie_player_sub ?? 'free';
-                $url = str_replace('{tmdb_id}', $movie->tmdb_id, $config->autoembed_movie_url);
-                $playLinks->push([
-                    'id' => 'auto', 
-                    'name' => $config->autoembed_movie_name ?? 'Auto Player', 
-                    'url' => $hasPlan || $autoSub === 'free' ? $url : null, 
-                    'type' => $config->autoembed_movie_type ?? 'embed',
-                    'quality' => $config->autoembed_movie_quality ?? 'HD',
-                    'player_sub' => $autoSub
-                ]);
+            if ($config->autoembed_movies && $movie->use_autoembed) {
+                $excluded = $movie->excluded_autoembeds ?? [];
+                
+                $autoSources = collect($config->autoembed_movie_sources ?? [])->map(function($s) use ($movie) {
+                    $autoSub = $s['player_sub'] ?? 'free';
+                    return [
+                        'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
+                        'name' => $s['name'] ?? 'Auto Player',
+                        'url' => str_replace('{tmdb_id}', $movie->tmdb_id, $s['url'] ?? ''),
+                        'type' => $s['type'] ?? 'embed',
+                        'quality' => $s['quality'] ?? 'HD',
+                        'player_sub' => $autoSub,
+                        'headers' => [
+                            'user_agent' => $s['user_agent'] ?? null,
+                            'referer' => $s['referer'] ?? null,
+                            'origin' => $s['origin'] ?? null,
+                            'cookie' => $s['cookie'] ?? null,
+                        ]
+                    ];
+                });
+
+                foreach ($autoSources as $autoSource) {
+                    // Filter if ID is in excluded list
+                    if (!in_array($autoSource['id'], $excluded)) {
+                        $url = ($hasPlan || $autoSource['player_sub'] === 'free') ? $autoSource['url'] : null;
+                        $autoSource['url'] = $url;
+                        $playLinks->push($autoSource);
+                    }
+                }
             }
         }
 

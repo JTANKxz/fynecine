@@ -66,7 +66,7 @@ class ConfigController extends Controller
             'contact_email' => $config->contact_email,
             'autoembed_movie_sources' => collect($config->autoembed_movie_sources ?? [])->map(function($s) {
                 return [
-                    'id' => 'auto',
+                    'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
                     'name' => $s['name'] ?? 'Auto Player',
                     'url' => $s['url'] ?? '',
                     'type' => $s['type'] ?? 'embed',
@@ -82,7 +82,7 @@ class ConfigController extends Controller
             })->values(),
             'autoembed_serie_sources' => collect($config->autoembed_serie_sources ?? [])->map(function($s) {
                 return [
-                    'id' => 'auto',
+                    'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
                     'name' => $s['name'] ?? 'Auto Player',
                     'url' => $s['url'] ?? '',
                     'type' => $s['type'] ?? 'embed',

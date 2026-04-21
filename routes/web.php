@@ -333,7 +333,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('galleries/{gallery}/media', [AdultGalleryController::class, 'addMedia'])->name('galleries.media.add');
         Route::delete('galleries/media/{media}', [AdultGalleryController::class, 'removeMedia'])->name('galleries.media.remove');
         
-        Route::resource('media', AdultMediaController::class)->names('media');
+        Route::resource('media', AdultMediaController::class)->names('media')->parameters(['media' => 'media']);
 
         Route::resource('home-sections', AdultHomeSectionController::class)->names('home-sections');
         Route::get('home-sections/{section}/items', [AdultHomeSectionController::class, 'manageItems'])->name('home-sections.items');

@@ -35,14 +35,10 @@ class HomeController extends Controller
                     $itemView = 'models';
                     break;
                 case 'video_grid':
-                    $galleries = AdultGallery::where('is_active', true)->whereIn('type', ['video', 'both'])->orderByDesc('id')->limit($section->limit)->get();
-                    $media = AdultMedia::whereNull('adult_gallery_id')->where('is_active', true)->where('type', 'video')->orderByDesc('id')->limit($section->limit)->get();
-                    $items = $galleries->concat($media)->sortByDesc('created_at')->take($section->limit)->values();
+                    $items = AdultGallery::where('is_active', true)->whereIn('type', ['video', 'both'])->orderByDesc('id')->limit($section->limit)->get();
                     break;
                 case 'photo_grid':
-                    $galleries = AdultGallery::where('is_active', true)->whereIn('type', ['photo', 'both'])->orderByDesc('id')->limit($section->limit)->get();
-                    $media = AdultMedia::whereNull('adult_gallery_id')->where('is_active', true)->where('type', 'image')->orderByDesc('id')->limit($section->limit)->get();
-                    $items = $galleries->concat($media)->sortByDesc('created_at')->take($section->limit)->values();
+                    $items = AdultGallery::where('is_active', true)->whereIn('type', ['photo', 'both'])->orderByDesc('id')->limit($section->limit)->get();
                     break;
                 case 'collections':
                     $items = AdultCollection::where('is_active', true)

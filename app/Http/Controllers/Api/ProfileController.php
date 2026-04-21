@@ -118,11 +118,17 @@ class ProfileController extends Controller
             'name'    => ['sometimes', 'string', 'max:50'],
             'avatar'  => ['nullable', 'string', 'max:255'],
             'is_kids' => ['boolean'],
-            'pin'     => ['nullable', 'string', 'size:4']
+            'pin'     => ['nullable', 'string', 'size:4'],
+            'is_adult_enabled' => ['boolean'],
+            'adult_pin' => ['nullable', 'string', 'size:4']
         ]);
 
         if ($request->has('pin')) {
             $validated['pin'] = $request->pin;
+        }
+
+        if ($request->has('adult_pin')) {
+            $validated['adult_pin'] = $request->adult_pin;
         }
 
         $profile->update($validated);
@@ -183,6 +189,26 @@ class ProfileController extends Controller
 
         if ((string) $profile->pin !== (string) $request->pin) {
             return response()->json(['message' => 'PIN incorreto. Tente novamente.'], 403);
+        }
+
+        return response()->json(['message' => 'Acesso autorizado.', 'profile_id' => $profile->id]);
+    }
+
+    /**
+     * Verifica o PIN Adulto do perfil selecionado.
+     * POST /api/profiles/{id}/verify-adult-pin
+     */
+    public function verifyAdultPin(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'pin' => ['required', 'string', 'size:4']
+        ]);
+
+        $user = $request->user();
+        $profile = $user->profiles()->findOrFail($id);
+
+        if ((string) $profile->adult_pin !== (string) $request->pin) {
+            return response()->json(['message' => 'PIN Adulto incorreto.'], 403);
         }
 
         return response()->json(['message' => 'Acesso autorizado.', 'profile_id' => $profile->id]);

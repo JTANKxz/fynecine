@@ -127,6 +127,7 @@ Route::middleware('api.token')->group(function () {
         // Perfis (Netflix Style - Max 5)
         Route::apiResource('profiles', ProfileController::class);
         Route::post('/profiles/{id}/verify-pin', [ProfileController::class, 'verifyPin']);
+        Route::post('/profiles/{id}/verify-adult-pin', [ProfileController::class, 'verifyAdultPin']);
 
         // Conta (Titular)
         Route::post('/account/update', [\App\Http\Controllers\Api\AccountController::class, 'update']);

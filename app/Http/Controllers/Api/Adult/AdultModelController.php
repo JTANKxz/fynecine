@@ -20,6 +20,8 @@ class AdultModelController extends Controller
             ->orWhere('slug', $idOrSlug)
             ->with(['galleries' => function($q) {
                 $q->where('is_active', true)->orderBy('order');
+            }, 'media' => function($q) {
+                $q->where('is_active', true)->whereNull('adult_gallery_id')->orderBy('order');
             }])
             ->firstOrFail();
 

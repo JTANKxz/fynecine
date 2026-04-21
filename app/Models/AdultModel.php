@@ -16,4 +16,9 @@ class AdultModel extends Model
     {
         return $this->hasMany(AdultGallery::class, 'adult_model_id');
     }
+
+    public function media()
+    {
+        return $this->hasMany(AdultMedia::class, 'adult_model_id');
+    }
 }

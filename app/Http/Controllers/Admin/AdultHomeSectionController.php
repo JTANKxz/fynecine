@@ -34,7 +34,7 @@ class AdultHomeSectionController extends Controller
             'is_active' => $request->has('is_active')
         ]);
 
-        return redirect()->route('admin.adult-home-sections.index')->with('success', 'Seção criada com sucesso.');
+        return redirect()->route('admin.adult.home-sections.index')->with('success', 'Seção criada com sucesso.');
     }
 
     public function edit(AdultHomeSection $adult_home_section)
@@ -57,13 +57,13 @@ class AdultHomeSectionController extends Controller
             'is_active' => $request->has('is_active')
         ]);
 
-        return redirect()->route('admin.adult-home-sections.index')->with('success', 'Seção atualizada com sucesso.');
+        return redirect()->route('admin.adult.home-sections.index')->with('success', 'Seção atualizada com sucesso.');
     }
 
     public function destroy(AdultHomeSection $adult_home_section)
     {
         $adult_home_section->delete();
-        return redirect()->route('admin.adult-home-sections.index')->with('success', 'Seção removida com sucesso.');
+        return redirect()->route('admin.adult.home-sections.index')->with('success', 'Seção removida com sucesso.');
     }
 
     public function toggle(AdultHomeSection $section)

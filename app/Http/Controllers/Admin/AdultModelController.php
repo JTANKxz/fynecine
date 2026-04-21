@@ -39,7 +39,7 @@ class AdultModelController extends Controller
             'is_active' => $request->has('is_active')
         ]);
 
-        return redirect()->route('admin.adult-models.index')->with('success', 'Modelo criada com sucesso.');
+        return redirect()->route('admin.adult.models.index')->with('success', 'Modelo criada com sucesso.');
     }
 
     public function edit(AdultModel $adult_model)
@@ -66,12 +66,12 @@ class AdultModelController extends Controller
             'is_active' => $request->has('is_active')
         ]);
 
-        return redirect()->route('admin.adult-models.index')->with('success', 'Modelo atualizada com sucesso.');
+        return redirect()->route('admin.adult.models.index')->with('success', 'Modelo atualizada com sucesso.');
     }
 
     public function destroy(AdultModel $adult_model)
     {
         $adult_model->delete();
-        return redirect()->route('admin.adult-models.index')->with('success', 'Modelo removida com sucesso.');
+        return redirect()->route('admin.adult.models.index')->with('success', 'Modelo removida com sucesso.');
     }
 }

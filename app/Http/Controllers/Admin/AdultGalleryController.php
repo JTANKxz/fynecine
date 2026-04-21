@@ -45,7 +45,7 @@ class AdultGalleryController extends Controller
             'order' => $request->order ?? 0,
         ]);
 
-        return redirect()->route('admin.adult-galleries.index')->with('success', 'Galeria criada com sucesso.');
+        return redirect()->route('admin.adult.galleries.index')->with('success', 'Galeria criada com sucesso.');
     }
 
     public function edit(AdultGallery $adult_gallery)
@@ -79,13 +79,13 @@ class AdultGalleryController extends Controller
             'order' => $request->order ?? 0,
         ]);
 
-        return redirect()->route('admin.adult-galleries.index')->with('success', 'Galeria atualizada com sucesso.');
+        return redirect()->route('admin.adult.galleries.index')->with('success', 'Galeria atualizada com sucesso.');
     }
 
     public function destroy(AdultGallery $adult_gallery)
     {
         $adult_gallery->delete();
-        return redirect()->route('admin.adult-galleries.index')->with('success', 'Galeria removida com sucesso.');
+        return redirect()->route('admin.adult.galleries.index')->with('success', 'Galeria removida com sucesso.');
     }
 
     // Gerenciamento de Mídia

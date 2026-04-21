@@ -36,7 +36,7 @@ class AdultCategoryController extends Controller
             'is_active' => $request->has('is_active')
         ]);
 
-        return redirect()->route('admin.adult-categories.index')->with('success', 'Categoria criada com sucesso.');
+        return redirect()->route('admin.adult.categories.index')->with('success', 'Categoria criada com sucesso.');
     }
 
     public function edit(AdultCategory $adult_category)
@@ -60,12 +60,12 @@ class AdultCategoryController extends Controller
             'is_active' => $request->has('is_active')
         ]);
 
-        return redirect()->route('admin.adult-categories.index')->with('success', 'Categoria atualizada com sucesso.');
+        return redirect()->route('admin.adult.categories.index')->with('success', 'Categoria atualizada com sucesso.');
     }
 
     public function destroy(AdultCategory $adult_category)
     {
         $adult_category->delete();
-        return redirect()->route('admin.adult-categories.index')->with('success', 'Categoria removida com sucesso.');
+        return redirect()->route('admin.adult.categories.index')->with('success', 'Categoria removida com sucesso.');
     }
 }

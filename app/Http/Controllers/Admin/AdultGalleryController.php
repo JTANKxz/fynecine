@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdultGallery;
 use App\Models\AdultModel;
 use App\Models\AdultCategory;
+use App\Models\AdultCollection;
 use App\Models\AdultMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -22,7 +23,8 @@ class AdultGalleryController extends Controller
     {
         $models = AdultModel::where('is_active', true)->get();
         $categories = AdultCategory::where('is_active', true)->get();
-        return view('admin.adult.galleries.create', compact('models', 'categories'));
+        $collections = AdultCollection::where('is_active', true)->get();
+        return view('admin.adult.galleries.create', compact('models', 'categories', 'collections'));
     }
 
     public function store(Request $request)
@@ -30,6 +32,9 @@ class AdultGalleryController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:photo,video,both',
+            'adult_model_id' => 'nullable|exists:adult_models,id',
+            'adult_category_id' => 'nullable|exists:adult_categories,id',
+            'adult_collection_id' => 'nullable|exists:adult_collections,id',
         ]);
 
         AdultGallery::create([
@@ -38,8 +43,8 @@ class AdultGalleryController extends Controller
             'description' => $request->description,
             'adult_model_id' => $request->adult_model_id,
             'adult_category_id' => $request->adult_category_id,
+            'adult_collection_id' => $request->adult_collection_id,
             'type' => $request->type,
-            'collection' => $request->collection,
             'cover_url' => $request->cover_url,
             'is_active' => $request->has('is_active'),
             'order' => $request->order ?? 0,
@@ -52,10 +57,12 @@ class AdultGalleryController extends Controller
     {
         $models = AdultModel::where('is_active', true)->get();
         $categories = AdultCategory::where('is_active', true)->get();
+        $collections = AdultCollection::where('is_active', true)->get();
         return view('admin.adult.galleries.edit', [
             'gallery' => $gallery,
             'models' => $models,
-            'categories' => $categories
+            'categories' => $categories,
+            'collections' => $collections
         ]);
     }
 
@@ -64,6 +71,9 @@ class AdultGalleryController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:photo,video,both',
+            'adult_model_id' => 'nullable|exists:adult_models,id',
+            'adult_category_id' => 'nullable|exists:adult_categories,id',
+            'adult_collection_id' => 'nullable|exists:adult_collections,id',
         ]);
 
         $gallery->update([
@@ -72,8 +82,8 @@ class AdultGalleryController extends Controller
             'description' => $request->description,
             'adult_model_id' => $request->adult_model_id,
             'adult_category_id' => $request->adult_category_id,
+            'adult_collection_id' => $request->adult_collection_id,
             'type' => $request->type,
-            'collection' => $request->collection,
             'cover_url' => $request->cover_url,
             'is_active' => $request->has('is_active'),
             'order' => $request->order ?? 0,

@@ -357,9 +357,17 @@
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.models.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-person-dress w-4 mr-1"></i> Modelos
                     </a>
+                    <a href="{{ route('admin.adult.collections.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.collections.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-layer-group w-4 mr-1"></i> Coleções
+                    </a>
                     <a href="{{ route('admin.adult.galleries.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.galleries.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
-                        <i class="fa-solid fa-photo-film w-4 mr-1"></i> Galerias e Mídias
+                        <i class="fa-solid fa-photo-film w-4 mr-1"></i> Galerias
+                    </a>
+                    <a href="{{ route('admin.adult.media.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.media.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-images w-4 mr-1"></i> Mídias Avulsas
                     </a>
                     <a href="{{ route('admin.adult.home-sections.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.home-sections.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">

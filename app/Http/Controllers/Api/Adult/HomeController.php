@@ -7,6 +7,8 @@ use App\Models\AdultHomeSection;
 use App\Models\AdultGallery;
 use App\Models\AdultModel;
 use App\Models\AdultCategory;
+use App\Models\AdultCollection;
+use App\Models\AdultMedia;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -16,15 +18,17 @@ class HomeController extends Controller
         $sections = AdultHomeSection::where('is_active', true)->orderBy('order')->get();
         
         $data = $sections->map(function ($section) {
-            $items = [];
-            $itemView = 'default'; // can be used by android to determine layout
+            $items = collect();
+            $itemView = 'default';
             
             switch ($section->type) {
                 case 'trending':
                     $items = AdultGallery::where('is_active', true)->orderByDesc('created_at')->limit($section->limit)->get();
                     break;
                 case 'recent':
-                    $items = AdultGallery::where('is_active', true)->orderByDesc('id')->limit($section->limit)->get();
+                    $galleries = AdultGallery::where('is_active', true)->orderByDesc('id')->limit($section->limit)->get();
+                    $media = AdultMedia::whereNull('adult_gallery_id')->where('is_active', true)->orderByDesc('id')->limit($section->limit)->get();
+                    $items = $galleries->concat($media)->sortByDesc('created_at')->take($section->limit)->values();
                     break;
                 case 'models_carousel':
                     $items = AdultModel::where('is_active', true)->limit($section->limit)->get();
@@ -37,11 +41,9 @@ class HomeController extends Controller
                     $items = AdultGallery::where('is_active', true)->whereIn('type', ['photo', 'both'])->orderByDesc('id')->limit($section->limit)->get();
                     break;
                 case 'collections':
-                    // Group by collection names that are not null
-                    $items = AdultGallery::where('is_active', true)
-                        ->whereNotNull('collection')
-                        ->select('collection', \DB::raw('count(*) as count'), \DB::raw('MAX(cover_url) as cover_url'))
-                        ->groupBy('collection')
+                    $items = AdultCollection::where('is_active', true)
+                        ->withCount('galleries')
+                        ->orderBy('order')
                         ->get();
                     $itemView = 'collections';
                     break;
@@ -50,7 +52,10 @@ class HomeController extends Controller
                     $itemView = 'categories';
                     break;
                 case 'custom':
-                    $items = AdultGallery::where('is_active', true)->limit($section->limit)->get();
+                    $manualItems = $section->manualItems()->orderBy('order')->get();
+                    $items = $manualItems->map(function($pivot) {
+                        return $pivot->target;
+                    })->filter();
                     break;
                 default:
                     $items = AdultGallery::where('is_active', true)->limit($section->limit)->get();

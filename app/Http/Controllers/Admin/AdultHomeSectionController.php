@@ -4,6 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdultHomeSection;
+use App\Models\AdultHomeSectionItem;
+use App\Models\AdultGallery;
+use App\Models\AdultMedia;
+use App\Models\AdultModel;
+use App\Models\AdultCollection;
 use Illuminate\Http\Request;
 
 class AdultHomeSectionController extends Controller
@@ -71,5 +76,38 @@ class AdultHomeSectionController extends Controller
         $section->is_active = !$section->is_active;
         $section->save();
         return response()->json(['status' => true, 'is_active' => $section->is_active]);
+    }
+
+    public function manageItems(AdultHomeSection $section)
+    {
+        $items = $section->manualItems;
+        $galleries = AdultGallery::orderBy('title')->get();
+        $media = AdultMedia::whereNull('adult_gallery_id')->orderBy('id', 'desc')->get();
+        $models = AdultModel::orderBy('name')->get();
+        $collections = AdultCollection::orderBy('title')->get();
+
+        return view('admin.adult.home-sections.manage-items', compact('section', 'items', 'galleries', 'media', 'models', 'collections'));
+    }
+
+    public function addItem(Request $request, AdultHomeSection $section)
+    {
+        $request->validate([
+            'item_type' => 'required|in:gallery,media,model,collection',
+            'item_id' => 'required|integer'
+        ]);
+
+        $section->manualItems()->create([
+            'item_type' => $request->item_type,
+            'item_id' => $request->item_id,
+            'order' => $request->order ?? 0
+        ]);
+
+        return back()->with('success', 'Item adicionado à seção.');
+    }
+
+    public function removeItem(AdultHomeSectionItem $item)
+    {
+        $item->delete();
+        return back()->with('success', 'Item removido da seção.');
     }
 }

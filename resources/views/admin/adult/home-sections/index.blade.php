@@ -41,9 +41,14 @@
                         {{ $section->is_active ? 'Ativo' : 'Inativo' }}
                     </span>
                 </td>
-                <td class="p-4 text-right space-x-2">
+                <td class="p-4 text-right flex items-center justify-end space-x-3">
+                    @if($section->type === 'custom')
+                        <a href="{{ route('admin.adult.home-sections.items', $section->id) }}" class="text-netflix hover:text-white text-xs font-bold bg-netflix/10 px-2 py-1 rounded border border-netflix/20 transition flex items-center gap-1">
+                            <i class="fa-solid fa-list-check"></i> Itens
+                        </a>
+                    @endif
                     <a href="{{ route('admin.adult.home-sections.edit', $section->id) }}" class="text-neutral-400 hover:text-blue-400 transition">
-                        <i class="fa-solid fa-edit"></i>
+                        <i class="fa-solid fa-edit text-lg"></i>
                     </a>
                     <form action="{{ route('admin.adult.home-sections.destroy', $section->id) }}" method="POST" class="inline">
                         @csrf

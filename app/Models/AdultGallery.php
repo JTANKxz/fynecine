@@ -7,9 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class AdultGallery extends Model
 {
     protected $fillable = [
-        'adult_model_id', 'adult_category_id', 'title', 'slug', 
-        'description', 'cover_url', 'type', 'collection', 'is_active', 'order'
+        'adult_model_id', 'adult_category_id', 'adult_collection_id', 'title', 'slug', 
+        'description', 'cover_url', 'type', 'is_active', 'order'
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'order' => 'integer'
+    ];
+
+    public function collection()
+    {
+        return $this->belongsTo(AdultCollection::class, 'adult_collection_id');
+    }
 
     public function model()
     {

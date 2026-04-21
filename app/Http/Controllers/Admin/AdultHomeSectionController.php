@@ -23,7 +23,7 @@ class AdultHomeSectionController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:trending,recent,models,galleries,categories,custom',
+            'type' => 'required|in:trending,recent,models_carousel,video_grid,photo_grid,collections,categories_grid,custom',
         ]);
 
         AdultHomeSection::create([
@@ -37,19 +37,19 @@ class AdultHomeSectionController extends Controller
         return redirect()->route('admin.adult.home-sections.index')->with('success', 'Seção criada com sucesso.');
     }
 
-    public function edit(AdultHomeSection $adult_home_section)
+    public function edit(AdultHomeSection $section)
     {
-        return view('admin.adult.home-sections.edit', ['section' => $adult_home_section]);
+        return view('admin.adult.home-sections.edit', ['section' => $section]);
     }
 
-    public function update(Request $request, AdultHomeSection $adult_home_section)
+    public function update(Request $request, AdultHomeSection $section)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:trending,recent,models,galleries,categories,custom',
+            'type' => 'required|in:trending,recent,models_carousel,video_grid,photo_grid,collections,categories_grid,custom',
         ]);
 
-        $adult_home_section->update([
+        $section->update([
             'title' => $request->title,
             'type' => $request->type,
             'order' => $request->order ?? 0,
@@ -60,9 +60,9 @@ class AdultHomeSectionController extends Controller
         return redirect()->route('admin.adult.home-sections.index')->with('success', 'Seção atualizada com sucesso.');
     }
 
-    public function destroy(AdultHomeSection $adult_home_section)
+    public function destroy(AdultHomeSection $section)
     {
-        $adult_home_section->delete();
+        $section->delete();
         return redirect()->route('admin.adult.home-sections.index')->with('success', 'Seção removida com sucesso.');
     }
 

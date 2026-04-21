@@ -42,12 +42,12 @@ class AdultModelController extends Controller
         return redirect()->route('admin.adult.models.index')->with('success', 'Modelo criada com sucesso.');
     }
 
-    public function edit(AdultModel $adult_model)
+    public function edit(AdultModel $model)
     {
-        return view('admin.adult.models.edit', ['model' => $adult_model]);
+        return view('admin.adult.models.edit', ['model' => $model]);
     }
 
-    public function update(Request $request, AdultModel $adult_model)
+    public function update(Request $request, AdultModel $model)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -55,7 +55,7 @@ class AdultModelController extends Controller
             'cover_url' => 'nullable|url',
         ]);
 
-        $adult_model->update([
+        $model->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'biography' => $request->biography,
@@ -69,9 +69,9 @@ class AdultModelController extends Controller
         return redirect()->route('admin.adult.models.index')->with('success', 'Modelo atualizada com sucesso.');
     }
 
-    public function destroy(AdultModel $adult_model)
+    public function destroy(AdultModel $model)
     {
-        $adult_model->delete();
+        $model->delete();
         return redirect()->route('admin.adult.models.index')->with('success', 'Modelo removida com sucesso.');
     }
 }

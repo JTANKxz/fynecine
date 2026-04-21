@@ -48,27 +48,27 @@ class AdultGalleryController extends Controller
         return redirect()->route('admin.adult.galleries.index')->with('success', 'Galeria criada com sucesso.');
     }
 
-    public function edit(AdultGallery $adult_gallery)
+    public function edit(AdultGallery $gallery)
     {
         $models = AdultModel::where('is_active', true)->get();
         $categories = AdultCategory::where('is_active', true)->get();
         return view('admin.adult.galleries.edit', [
-            'gallery' => $adult_gallery,
+            'gallery' => $gallery,
             'models' => $models,
             'categories' => $categories
         ]);
     }
 
-    public function update(Request $request, AdultGallery $adult_gallery)
+    public function update(Request $request, AdultGallery $gallery)
     {
         $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:photo,video,both',
         ]);
 
-        $adult_gallery->update([
+        $gallery->update([
             'title' => $request->title,
-            'slug' => Str::slug($request->title) . '-' . substr($adult_gallery->slug, -5), // Manter final se possível ou regenerar
+            'slug' => Str::slug($request->title) . '-' . substr($gallery->slug, -5), // Manter final se possível ou regenerar
             'description' => $request->description,
             'adult_model_id' => $request->adult_model_id,
             'adult_category_id' => $request->adult_category_id,
@@ -82,9 +82,9 @@ class AdultGalleryController extends Controller
         return redirect()->route('admin.adult.galleries.index')->with('success', 'Galeria atualizada com sucesso.');
     }
 
-    public function destroy(AdultGallery $adult_gallery)
+    public function destroy(AdultGallery $gallery)
     {
-        $adult_gallery->delete();
+        $gallery->delete();
         return redirect()->route('admin.adult.galleries.index')->with('success', 'Galeria removida com sucesso.');
     }
 

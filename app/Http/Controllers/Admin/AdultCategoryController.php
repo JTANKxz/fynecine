@@ -39,12 +39,12 @@ class AdultCategoryController extends Controller
         return redirect()->route('admin.adult.categories.index')->with('success', 'Categoria criada com sucesso.');
     }
 
-    public function edit(AdultCategory $adult_category)
+    public function edit(AdultCategory $category)
     {
-        return view('admin.adult.categories.edit', ['category' => $adult_category]);
+        return view('admin.adult.categories.edit', ['category' => $category]);
     }
 
-    public function update(Request $request, AdultCategory $adult_category)
+    public function update(Request $request, AdultCategory $category)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -52,7 +52,7 @@ class AdultCategoryController extends Controller
             'order' => 'integer'
         ]);
 
-        $adult_category->update([
+        $category->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'icon' => $request->icon,
@@ -63,9 +63,9 @@ class AdultCategoryController extends Controller
         return redirect()->route('admin.adult.categories.index')->with('success', 'Categoria atualizada com sucesso.');
     }
 
-    public function destroy(AdultCategory $adult_category)
+    public function destroy(AdultCategory $category)
     {
-        $adult_category->delete();
+        $category->delete();
         return redirect()->route('admin.adult.categories.index')->with('success', 'Categoria removida com sucesso.');
     }
 }

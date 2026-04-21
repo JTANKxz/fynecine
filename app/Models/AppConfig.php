@@ -73,6 +73,7 @@ class AppConfig extends Model
         'bunny_mp4_key',
         'rewards_status',
         'bunny_mp4_host',
+        'is_adult_active',
     ];
 
     protected $casts = [
@@ -100,6 +101,7 @@ class AppConfig extends Model
         'ads_native_status' => 'boolean',
         'ads_rewarded_status' => 'boolean',
         'rewards_status' => 'boolean',
+        'is_adult_active' => 'boolean',
         'interstitial_interval' => 'integer',
     ];
 

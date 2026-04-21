@@ -21,6 +21,10 @@ use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\InAppNotificationController;
 use App\Http\Controllers\Admin\PushNotificationController;
 use App\Http\Controllers\Admin\ContentCategoryController;
+use App\Http\Controllers\Admin\AdultCategoryController;
+use App\Http\Controllers\Admin\AdultModelController;
+use App\Http\Controllers\Admin\AdultGalleryController;
+use App\Http\Controllers\Admin\AdultHomeSectionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ChampionshipController;
@@ -79,6 +83,7 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::post('/{user}/unban-device/{uuid}', [UserController::class, 'unbanDevice'])->name('unban-device');
         Route::post('/{user}/revoke-token/{token}', [UserController::class, 'revokeToken'])->name('revoke-token');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('delete');
+        Route::patch('/{user}/profiles', [UserController::class, 'updateProfiles'])->name('profiles.update');
     });
     Route::prefix('sliders')->name('sliders.')->group(function () {
         Route::get('/', [SliderController::class, 'index'])->name('index');
@@ -312,6 +317,19 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::delete('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'destroy'])->name('destroy');
         Route::patch('/{note}/pin', [\App\Http\Controllers\Admin\AdminNoteController::class, 'togglePin'])->name('pin');
         Route::patch('/{note}/task', [\App\Http\Controllers\Admin\AdminNoteController::class, 'toggleTask'])->name('toggle-task');
+    });
+
+    // ========== MODO ADULTO ==========
+    Route::prefix('adult')->name('adult.')->group(function () {
+        Route::resource('categories', AdultCategoryController::class)->names('categories');
+        Route::resource('models', AdultModelController::class)->names('models');
+        
+        Route::resource('galleries', AdultGalleryController::class)->names('galleries');
+        Route::get('galleries/{gallery}/media', [AdultGalleryController::class, 'media'])->name('galleries.media');
+        Route::post('galleries/{gallery}/media', [AdultGalleryController::class, 'addMedia'])->name('galleries.media.add');
+        Route::delete('media/{media}', [AdultGalleryController::class, 'removeMedia'])->name('galleries.media.remove');
+        
+        Route::resource('home-sections', AdultHomeSectionController::class)->names('home-sections');
     });
 
 });

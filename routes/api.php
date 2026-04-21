@@ -183,6 +183,16 @@ Route::middleware('api.token')->group(function () {
         // Rewards — Claim e Redeem requerem auth
         Route::post('/rewards/claim', [RewardController::class, 'claim']);
         Route::post('/rewards/redeem', [RewardController::class, 'redeem']);
+
+        // ========== MODO ADULTO API ==========
+        Route::prefix('adult')->group(function () {
+            Route::get('/home', [\App\Http\Controllers\Api\Adult\HomeController::class, 'index']);
+            Route::get('/models', [\App\Http\Controllers\Api\Adult\AdultModelController::class, 'index']);
+            Route::get('/models/{idOrSlug}', [\App\Http\Controllers\Api\Adult\AdultModelController::class, 'show']);
+            Route::get('/galleries', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'index']);
+            Route::get('/galleries/{idOrSlug}', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'show']);
+            Route::get('/categories', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'categories']);
+        });
     });
 
     // Notificações — Listagem Pública (Internamente decide se mostra globais ou privadas)

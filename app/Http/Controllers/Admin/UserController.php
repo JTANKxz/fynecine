@@ -62,6 +62,7 @@ class UserController extends Controller
         $tokens = $user->tokens()->orderBy('last_used_at', 'desc')->get();
         // Buscar UUIDs banidos
         $bannedUuids = \App\Models\BannedDevice::pluck('device_uuid')->toArray();
+        $user->load('profiles');
         
         return view('admin.users.edit', compact('user', 'tokens', 'bannedUuids'));
     }
@@ -207,5 +208,22 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Usuário deletado com sucesso!');
+    }
+
+    public function updateProfiles(Request $request, User $user)
+    {
+        $profilesData = $request->input('profiles', []);
+
+        foreach ($profilesData as $profileId => $data) {
+            $profile = $user->profiles()->find($profileId);
+            if ($profile) {
+                $profile->update([
+                    'is_adult_enabled' => isset($data['is_adult_enabled']),
+                    'adult_pin' => $data['adult_pin'] ?? null,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Configurações dos perfis atualizadas!');
     }
 }

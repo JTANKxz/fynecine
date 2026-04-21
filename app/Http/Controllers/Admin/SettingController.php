@@ -106,6 +106,7 @@ class SettingController extends Controller
             'bunny_cdn_url' => ['nullable', 'string', 'max:255'],
             'bunny_mp4_key' => ['nullable', 'string', 'max:255'],
             'bunny_mp4_host' => ['nullable', 'string', 'max:255'],
+            'is_adult_active' => ['nullable', 'boolean'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -131,6 +132,7 @@ class SettingController extends Controller
         $config->ads_banner_status = $request->has('ads_banner_status');
         $config->ads_interstitial_status = $request->has('ads_interstitial_status');
         $config->ads_native_status = $request->has('ads_native_status');
+        $config->is_adult_active = $request->has('is_adult_active');
         $config->ads_rewarded_status = $request->has('ads_rewarded_status');
         $config->rewards_status = $request->has('rewards_status');
 

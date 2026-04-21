@@ -472,6 +472,30 @@
                 </div>
             </div>
 
+            <!-- ADULT MODE -->
+            <div class="bg-purple-900/10 border border-purple-900/30 p-6 rounded-xl">
+                <div class="flex items-start gap-4">
+                    <div class="bg-purple-600 p-3 rounded-lg">
+                        <i class="fa-solid fa-explicit text-white text-xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-1 text-purple-400">Modo Adulto Global</h3>
+                                <p class="text-neutral-400 text-xs leading-relaxed">
+                                    Habilita a seção de modelos e galerias no aplicativo para perfis autorizados.
+                                </p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_adult_active" value="1" {{ $config->is_adult_active ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                                <span class="ml-3 text-xs font-bold text-purple-400 uppercase tracking-widest">{{ $config->is_adult_active ? 'LIGADO' : 'DESLIGADO' }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TV CHANNELS -->
             <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                 <h3 class="text-white font-bold flex items-center gap-2">

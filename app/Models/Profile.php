@@ -14,16 +14,20 @@ class Profile extends Model
         'avatar',
         'is_kids',
         'pin',
-        'is_main'
+        'is_main',
+        'is_adult_enabled',
+        'adult_pin'
     ];
 
     protected $casts = [
         'is_kids' => 'boolean',
         'is_main' => 'boolean',
+        'is_adult_enabled' => 'boolean',
     ];
 
     protected $hidden = [
-        'pin'
+        'pin',
+        'adult_pin'
     ];
 
     protected $appends = [

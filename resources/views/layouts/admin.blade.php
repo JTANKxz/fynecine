@@ -341,6 +341,33 @@
                 </a>
             </div>
 
+            {{-- Modo Adulto --}}
+            <div class="space-y-1">
+                <button onclick="toggleSubmenu('adultSubmenu')"
+                    class="w-full text-left p-3 rounded hover:bg-neutral-800 flex items-center justify-between {{ request()->is('dashzin/adult*') ? 'text-netflix' : '' }}">
+                    <span><i class="fa-solid fa-explicit mr-2"></i> Modo Adulto</span>
+                    <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-adultSubmenu"></i>
+                </button>
+                <div id="adultSubmenu" class="{{ request()->is('dashzin/adult*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.adult.categories.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.categories.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-tags w-4 mr-1"></i> Categorias
+                    </a>
+                    <a href="{{ route('admin.adult.models.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.models.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-person-dress w-4 mr-1"></i> Modelos
+                    </a>
+                    <a href="{{ route('admin.adult.galleries.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.galleries.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-photo-film w-4 mr-1"></i> Galerias e Mídias
+                    </a>
+                    <a href="{{ route('admin.adult.home-sections.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.home-sections.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-table-columns w-4 mr-1"></i> Seções Home Adulta
+                    </a>
+                </div>
+            </div>
+
             {{-- Categorias --}}
             <div>
                 <a href="{{ route('admin.categories.index') }}"

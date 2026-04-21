@@ -75,6 +75,70 @@
         </div>
     </form>
 
+    </form>
+
+    {{-- Gerenciamento de Perfis --}}
+    <div class="mt-8 bg-neutral-900 p-6 rounded-lg border border-neutral-800">
+        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-users text-blue-500"></i> Perfis do Usuário
+        </h3>
+        <p class="text-sm text-neutral-400 mb-6 font-medium italic">Configure o PIN e acesso ao modo adulto por perfil.</p>
+
+        <form action="{{ route('admin.users.profiles.update', $user->id) }}" method="POST">
+            @csrf
+            @method('PATCH')
+            
+            <div class="space-y-4">
+                @foreach($user->profiles as $profile)
+                <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-800 hover:border-neutral-700 transition flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-netflix/20 border border-netflix/30 flex items-center justify-center overflow-hidden">
+                            @if($profile->avatar)
+                                <img src="{{ $profile->avatar }}" class="w-full h-full object-cover">
+                            @else
+                                <i class="fa-solid fa-user text-netflix text-xl"></i>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-lg">{{ $profile->name }}</div>
+                            <div class="text-[10px] text-neutral-500 uppercase tracking-widest">{{ $profile->id }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-6">
+                        {{-- Modo Adulto --}}
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-bold text-neutral-500 uppercase">Modo Adulto</span>
+                            <label class="relative inline-flex items-center cursor-pointer scale-90 -ml-1">
+                                <input type="checkbox" name="profiles[{{ $profile->id }}][is_adult_enabled]" value="1" {{ $profile->is_adult_enabled ? 'checked' : '' }} class="sr-only peer">
+                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                            </label>
+                        </div>
+
+                        {{-- PIN Adulto --}}
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-bold text-neutral-500 uppercase">PIN Adulto (4 Dígitos)</span>
+                            <input type="text" name="profiles[{{ $profile->id }}][adult_pin]" value="{{ $profile->adult_pin }}" 
+                                   maxlength="4" placeholder="0000"
+                                   class="bg-black border border-neutral-800 text-purple-400 font-mono text-sm rounded px-3 py-1.5 focus:border-purple-500 outline-none w-24 text-center">
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            @if($user->profiles->count() > 0)
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition transform active:scale-95 shadow-lg shadow-blue-900/20">
+                    <i class="fa-solid fa-save mr-2"></i> Atualizar Configurações de Perfis
+                </button>
+            </div>
+            @else
+            <p class="text-center text-neutral-500 py-4 italic">Nenhum perfil criado para este usuário ainda.</p>
+            @endif
+        </form>
+    </div>
+
     @if(Auth::user()->isAdmin())
     <div class="mt-8">
         <div class="mb-4 flex items-center justify-between">

@@ -104,6 +104,7 @@ class ConfigController extends Controller
             'ads_interstitial_type' => $config->ads_interstitial_type,
             'ads_native_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_native_status),
             'ads_rewarded_status' => (bool) (\Auth::guard('sanctum')->user()?->hasPlan() ? false : $config->ads_rewarded_status),
+            'is_adult_active' => (bool) $config->is_adult_active,
             // ========================================================
             
             'admob_app_id' => $config->admob_app_id,

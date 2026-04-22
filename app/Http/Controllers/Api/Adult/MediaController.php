@@ -26,22 +26,8 @@ class MediaController extends Controller
         $relatedMedia = AdultMedia::where('id', '!=', $media->id)
             ->where('is_active', true)
             ->where('type', 'video')
-            ->when($modelId, function($q) use ($modelId) {
-                return $q->whereHas('gallery', function($sq) use ($modelId) {
-                    $sq->where('adult_model_id', $modelId);
-                });
-            })
-            ->orWhere(function($q) use ($media, $categoryId) {
-                $q->where('id', '!=', $media->id)
-                    ->where('is_active', true)
-                    ->where('type', 'video')
-                    ->when($categoryId, function($sq) use ($categoryId) {
-                        return $sq->whereHas('gallery', function($ssq) use ($categoryId) {
-                            $ssq->where('adult_category_id', $categoryId);
-                        });
-                    });
-            })
-            ->orderByRaw($modelId ? "FIELD(adult_gallery_id, (SELECT id FROM adult_galleries WHERE adult_model_id = $modelId)) DESC" : "id DESC")
+            ->whereNull('adult_gallery_id')
+            ->orderByDesc('id')
             ->limit(12)
             ->get();
 

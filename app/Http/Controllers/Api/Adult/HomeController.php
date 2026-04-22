@@ -35,11 +35,11 @@ class HomeController extends Controller
                     $itemView = 'models';
                     break;
                 case 'video_grid':
-                    $items = AdultMedia::where('is_active', true)->where('type', 'video')->orderByDesc('id')->limit($section->limit)->get();
+                    $items = AdultMedia::where('is_active', true)->where('type', 'video')->whereNull('adult_gallery_id')->orderByDesc('id')->limit($section->limit)->get();
                     $itemView = 'video_grid';
                     break;
                 case 'photo_grid':
-                    $items = AdultMedia::where('is_active', true)->where('type', 'image')->orderByDesc('id')->limit($section->limit)->get();
+                    $items = AdultMedia::where('is_active', true)->where('type', 'image')->whereNull('adult_gallery_id')->orderByDesc('id')->limit($section->limit)->get();
                     $itemView = 'photo_grid';
                     break;
                 case 'galleries_grid':

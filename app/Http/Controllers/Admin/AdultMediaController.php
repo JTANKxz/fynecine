@@ -44,6 +44,7 @@ class AdultMediaController extends Controller
             'url' => $request->url,
             'type' => $request->type,
             'player_type' => $request->player_type ?? 'direct',
+            'thumbnail' => $request->thumbnail,
             'order' => $request->order ?? 0,
             'is_active' => $request->has('is_active')
         ]);

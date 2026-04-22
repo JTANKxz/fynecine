@@ -50,11 +50,18 @@
         <input type="text" name="title" id="title" value="{{ $media->title }}" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix">
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div>
-            <label for="url" class="block text-sm font-medium text-neutral-400 mb-1">URL (Mídia/Embed)</label>
-            <input type="text" name="url" id="url" value="{{ $media->url }}" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix" required>
-        </div>
+    <div class="mb-4">
+        <label for="url" class="block text-sm font-medium text-neutral-400 mb-1">URL (Mídia/Embed)</label>
+        <input type="text" name="url" id="url" value="{{ $media->url }}" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix" required>
+    </div>
+
+    <div class="mb-4">
+        <label for="thumbnail" class="block text-sm font-medium text-neutral-400 mb-1">URL da Thumbnail (Opcional)</label>
+        <input type="text" name="thumbnail" id="thumbnail" value="{{ $media->thumbnail }}" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix">
+        <p class="text-xs text-neutral-500 mt-1">Se vazio, o app tentará capturar do vídeo ou usará a foto da modelo.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
             <label for="type" class="block text-sm font-medium text-neutral-400 mb-1">Tipo</label>
             <select name="type" id="type" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix">

@@ -10,6 +10,20 @@ use Illuminate\Http\Request;
 
 class MediaController extends Controller
 {
+    public function index(Request $request)
+    {
+        $type = $request->get('type', 'video'); // video or image
+        $perPage = $request->get('per_page', 24);
+
+        $media = AdultMedia::where('is_active', true)
+            ->where('type', $type)
+            ->whereNull('adult_gallery_id')
+            ->orderByDesc('id')
+            ->paginate($perPage);
+
+        return response()->json($media);
+    }
+
     public function show($id)
     {
         $media = AdultMedia::with(['gallery.model', 'gallery.category'])->findOrFail($id);

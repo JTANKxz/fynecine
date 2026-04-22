@@ -53,8 +53,8 @@
         <input type="text" name="title" id="title" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix">
     </div>
 
-    <div class="grid grid-cols-3 gap-4 mb-4">
-        <div class="col-span-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
             <label for="url" class="block text-sm font-medium text-neutral-400 mb-1">URL (Mídia/Embed)</label>
             <input type="text" name="url" id="url" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix" required>
         </div>
@@ -65,7 +65,26 @@
                 <option value="video">Vídeo</option>
             </select>
         </div>
+        <div id="player_type_container" class="hidden">
+            <label for="player_type" class="block text-sm font-medium text-neutral-400 mb-1">Tipo de Player</label>
+            <select name="player_type" id="player_type" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix">
+                <option value="direct">Direto (MP4/HLS)</option>
+                <option value="embed">Embed (Iframe/WebView)</option>
+                <option value="sniffer">Sniffer (Detectar em Site)</option>
+            </select>
+        </div>
     </div>
+
+    <script>
+        document.getElementById('type').addEventListener('change', function() {
+            const container = document.getElementById('player_type_container');
+            if (this.value === 'video') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        });
+    </script>
 
     <div class="grid grid-cols-2 gap-4 mb-6">
         <div>

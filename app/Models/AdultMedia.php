@@ -8,7 +8,7 @@ class AdultMedia extends Model
 {
     protected $fillable = [
         'adult_gallery_id', 'adult_model_id', 'adult_category_id', 
-        'title', 'url', 'type', 'is_active', 'order'
+        'title', 'url', 'type', 'player_type', 'is_active', 'order'
     ];
 
     protected $casts = [

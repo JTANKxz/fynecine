@@ -192,6 +192,7 @@ Route::middleware('api.token')->group(function () {
             Route::get('/models/{idOrSlug}', [\App\Http\Controllers\Api\Adult\AdultModelController::class, 'show']);
             Route::get('/galleries', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'index']);
             Route::get('/galleries/{idOrSlug}', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'show']);
+            Route::get('/media/{id}', [\App\Http\Controllers\Api\Adult\MediaController::class, 'show']);
             Route::get('/categories', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'categories']);
         });
     });

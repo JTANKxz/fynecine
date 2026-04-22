@@ -29,8 +29,9 @@
                     <option value="trending" {{ (isset($section) && $section->type == 'trending') ? 'selected' : '' }}>Bombando (Trending)</option>
                     <option value="recent" {{ (isset($section) && $section->type == 'recent') ? 'selected' : '' }}>Adicionados Recentemente</option>
                     <option value="models_carousel" {{ (isset($section) && $section->type == 'models_carousel') ? 'selected' : '' }}>Modelos (Scroll Lateral)</option>
-                    <option value="video_grid" {{ (isset($section) && $section->type == 'video_grid') ? 'selected' : '' }}>Grid de Vídeos</option>
-                    <option value="photo_grid" {{ (isset($section) && $section->type == 'photo_grid') ? 'selected' : '' }}>Grid de Fotos</option>
+                    <option value="video_grid" {{ (isset($section) && $section->type == 'video_grid') ? 'selected' : '' }}>Grid de Vídeos (Mídia Direta)</option>
+                    <option value="photo_grid" {{ (isset($section) && $section->type == 'photo_grid') ? 'selected' : '' }}>Grid de Fotos (Mídia Direta)</option>
+                    <option value="galleries_grid" {{ (isset($section) && $section->type == 'galleries_grid') ? 'selected' : '' }}>Grid de Galerias</option>
                     <option value="collections" {{ (isset($section) && $section->type == 'collections') ? 'selected' : '' }}>Coleções (OnlyFans, Privacy, etc)</option>
                     <option value="categories_grid" {{ (isset($section) && $section->type == 'categories_grid') ? 'selected' : '' }}>Grid de Categorias</option>
                     <option value="custom" {{ (isset($section) && $section->type == 'custom') ? 'selected' : '' }}>Customizado (Manual)</option>

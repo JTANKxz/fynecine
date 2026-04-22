@@ -28,7 +28,7 @@ class AdultHomeSectionController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:trending,recent,models_carousel,video_grid,photo_grid,collections,categories_grid,custom',
+            'type' => 'required|in:trending,recent,models_carousel,video_grid,photo_grid,galleries_grid,collections,categories_grid,custom',
         ]);
 
         AdultHomeSection::create([
@@ -51,7 +51,7 @@ class AdultHomeSectionController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'type' => 'required|in:trending,recent,models_carousel,video_grid,photo_grid,collections,categories_grid,custom',
+            'type' => 'required|in:trending,recent,models_carousel,video_grid,photo_grid,galleries_grid,collections,categories_grid,custom',
         ]);
 
         $home_section->update([

@@ -32,12 +32,18 @@ class Profile extends Model
 
     protected $appends = [
         'has_pin',
+        'has_adult_pin',
         'avatar_url',
     ];
 
     public function getHasPinAttribute(): bool
     {
         return !empty($this->pin);
+    }
+
+    public function getHasAdultPinAttribute(): bool
+    {
+        return !empty($this->adult_pin);
     }
 
     public function getAvatarUrlAttribute(): ?string

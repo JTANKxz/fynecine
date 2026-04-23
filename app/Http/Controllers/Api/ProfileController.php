@@ -117,10 +117,10 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name'    => ['sometimes', 'string', 'max:50'],
             'avatar'  => ['nullable', 'string', 'max:255'],
-            'is_kids' => ['boolean'],
-            'pin'     => ['nullable', 'string', 'size:4'],
-            'is_adult_enabled' => ['boolean'],
-            'adult_pin' => ['nullable', 'string', 'size:4']
+            'is_kids' => ['sometimes', 'boolean'],
+            'pin'     => ['sometimes', 'nullable', 'string', 'size:4'],
+            'is_adult_enabled' => ['sometimes', 'boolean'],
+            'adult_pin' => ['sometimes', 'nullable', 'string', 'size:4']
         ]);
 
         if ($request->has('pin')) {
@@ -132,6 +132,7 @@ class ProfileController extends Controller
         }
 
         $profile->update($validated);
+        $profile->refresh();
 
         return response()->json($profile);
     }

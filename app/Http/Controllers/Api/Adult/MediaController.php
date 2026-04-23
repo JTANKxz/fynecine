@@ -29,25 +29,30 @@ class MediaController extends Controller
         $media = AdultMedia::with(['gallery.model', 'gallery.category'])->findOrFail($id);
         
         // Get model and category from gallery if available
-        $modelId = $media->gallery ? $media->gallery->adult_model_id : null;
-        $categoryId = $media->gallery ? $media->gallery->adult_category_id : null;
+        $modelId = $media->adult_model_id ?: ($media->gallery ? $media->gallery->adult_model_id : null);
+        $categoryId = $media->adult_category_id ?: ($media->gallery ? $media->gallery->adult_category_id : null);
         
-        // Related media strategy: 
-        // 1. Other media from the same model
-        // 2. Media from the same category
-        // 3. Recent media
-        
-        $relatedMedia = AdultMedia::where('id', '!=', $media->id)
+        $relatedQuery = AdultMedia::where('id', '!=', $media->id)
             ->where('is_active', true)
-            ->where('type', 'video')
-            ->whereNull('adult_gallery_id')
-            ->orderByDesc('id')
-            ->limit(12)
+            ->where('type', 'video');
+
+        if ($categoryId) {
+            $relatedQuery->where(function($q) use ($categoryId) {
+                $q->where('adult_category_id', $categoryId)
+                  ->orWhereHas('gallery', function($g) use ($categoryId) {
+                      $g->where('adult_category_id', $categoryId);
+                  });
+            });
+        }
+
+        $relatedMedia = $relatedQuery->orderByDesc('id')
+            ->limit(20)
             ->get();
 
         return response()->json([
             'media' => $media,
             'model' => $media->gallery ? $media->gallery->model : null,
+            'category' => $media->gallery ? $media->gallery->category : null,
             'related_media' => $relatedMedia
         ]);
     }

@@ -81,13 +81,27 @@
         </div>
     </div>
 
+    <div id="proportion_container" class="mb-4 hidden">
+        <label for="proportion" class="block text-sm font-medium text-neutral-400 mb-1">Proporção (Aspect Ratio)</label>
+        <select name="proportion" id="proportion" class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2 text-white focus:outline-none focus:border-netflix">
+            <option value="16:9">Horizontal (16:9)</option>
+            <option value="9:16">Vertical / Reels (9:16)</option>
+            <option value="4:3">Quadrado/Antigo (4:3)</option>
+            <option value="1:1">Quadrado (1:1)</option>
+        </select>
+        <p class="text-xs text-neutral-500 mt-1">Isso define como o modal será aberto no App.</p>
+    </div>
+
     <script>
         document.getElementById('type').addEventListener('change', function() {
-            const container = document.getElementById('player_type_container');
+            const playerContainer = document.getElementById('player_type_container');
+            const proportionContainer = document.getElementById('proportion_container');
             if (this.value === 'video') {
-                container.classList.remove('hidden');
+                playerContainer.classList.remove('hidden');
+                proportionContainer.classList.remove('hidden');
             } else {
-                container.classList.add('hidden');
+                playerContainer.classList.add('hidden');
+                proportionContainer.classList.add('hidden');
             }
         });
     </script>

@@ -45,6 +45,7 @@ class AdultMediaController extends Controller
             'type' => $request->type,
             'player_type' => $request->player_type ?? 'direct',
             'thumbnail' => $request->thumbnail,
+            'proportion' => $request->proportion ?? '16:9',
             'order' => $request->order ?? 0,
             'is_active' => $request->has('is_active')
         ]);
@@ -82,6 +83,8 @@ class AdultMediaController extends Controller
             'url' => $request->url,
             'type' => $request->type,
             'player_type' => $request->player_type ?? 'direct',
+            'thumbnail' => $request->thumbnail,
+            'proportion' => $request->proportion ?? '16:9',
             'order' => $request->order ?? 0,
             'is_active' => $request->has('is_active')
         ]);

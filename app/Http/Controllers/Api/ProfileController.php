@@ -60,7 +60,9 @@ class ProfileController extends Controller
             'name'    => ['required', 'string', 'max:50'],
             'avatar'  => ['nullable', 'string', 'max:255'],
             'is_kids' => ['boolean'],
-            'pin'     => ['nullable', 'string', 'size:4']
+            'pin'     => ['nullable', 'string', 'size:4'],
+            'is_adult_enabled' => ['boolean'],
+            'adult_pin' => ['nullable', 'string', 'size:4']
         ]);
 
         $user = $request->user();
@@ -73,7 +75,7 @@ class ProfileController extends Controller
             ], 403);
         }
 
-        $profileData = $request->only('name', 'avatar', 'is_kids', 'pin');
+        $profileData = $request->only('name', 'avatar', 'is_kids', 'pin', 'is_adult_enabled', 'adult_pin');
         if ($currentCount === 0) {
             $profileData['is_main'] = true;
         }

@@ -24,6 +24,7 @@ class EpisodeLink extends Model
         'referer',
         'origin',
         'cookie',
+        'subtitle_url',
     ];
 
     public function episode()

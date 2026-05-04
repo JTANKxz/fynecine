@@ -55,6 +55,7 @@ class LinkController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
+            'subtitle_url' => 'nullable|string',
         ]);
 
         $movie->playLinks()->create($validated);
@@ -77,6 +78,7 @@ class LinkController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
+            'subtitle_url' => 'nullable|string',
         ]);
 
         $link->update($validated);
@@ -124,6 +126,7 @@ class LinkController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
+            'subtitle_url' => 'nullable|string',
         ])->validate();
 
         $episode->links()->create($validated);
@@ -159,6 +162,7 @@ class LinkController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
+            'subtitle_url' => 'nullable|string',
         ])->validate();
 
         $link->update($validated);

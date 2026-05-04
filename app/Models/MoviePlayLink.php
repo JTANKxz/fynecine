@@ -20,6 +20,7 @@ class MoviePlayLink extends Model
         'referer',
         'origin',
         'cookie',
+        'subtitle_url',
     ];
     
     protected $casts = [

@@ -30,6 +30,7 @@ class SubscriptionController extends Controller
                 'plan_category' => $plan->plan_category,
                 'price' => $plan->price,
                 'original_price' => $plan->original_price,
+                'first_time_discount' => $plan->first_time_discount,
                 'discount_percentage' => $plan->original_price > $plan->price 
                     ? round((1 - ($plan->price / $plan->original_price)) * 100) 
                     : 0,
@@ -109,45 +110,42 @@ class SubscriptionController extends Controller
      */
     private function formatPlanFeatures(string $type, array $features): array
     {
-        $features = collect($features);
         $comparisonFeatures = collect();
 
-        // 1. Jogos ao Vivo (O ponto chave)
-        $comparisonFeatures->push([
-            'name' => 'Jogos e Eventos Ao Vivo',
-            'included' => $type === 'premium'
-        ]);
-
-        // 2. Perfis
-        $maxProfiles = ($type === 'premium') ? 6 : (($type === 'basic') ? 3 : 1);
-        $comparisonFeatures->push([
-            'name' => "Até {$maxProfiles} perfis de usuário",
-            'included' => true
-        ]);
-
-        // 3. Quotas Diárias (Requests e Support)
-        $quota = ($type === 'premium') ? 5 : (($type === 'basic') ? 3 : 1);
-        $comparisonFeatures->push([
-            'name' => "{$quota} Pedidos de filmes diários",
-            'included' => true
-        ]);
-
-        $comparisonFeatures->push([
-            'name' => "{$quota} Suporte prioritário diário",
-            'included' => true
-        ]);
-
-        // 4. Anúncios
-        $comparisonFeatures->push([
-            'name' => 'Navegação Sem anúncios',
-            'included' => $features->contains('no_ads') || $type === 'premium'
-        ]);
-
-        // 5. Canais
-        $comparisonFeatures->push([
-            'name' => 'Canais de TV (IPTV)',
-            'included' => $features->contains('premium_channels') || $type === 'premium'
-        ]);
+        foreach ($features as $feature) {
+            // Handle new JSON format (Array of associative arrays)
+            if (is_array($feature) && isset($feature['name'])) {
+                $comparisonFeatures->push([
+                    'name' => $feature['name'],
+                    'included' => (bool) ($feature['included'] ?? false)
+                ]);
+            } 
+            // Handle legacy format (Array of strings)
+            else if (is_string($feature)) {
+                $name = $feature;
+                if ($feature === 'no_ads') $name = 'Assistir Sem Anúncios';
+                else if ($feature === 'priority_support') $name = 'Suporte Prioritário';
+                else if ($feature === 'priority_requests') $name = 'Fazer Pedidos (TMDB)';
+                else if ($feature === 'premium_channels') $name = 'Canais de TV Fechada VIP';
+                
+                $comparisonFeatures->push([
+                    'name' => $name,
+                    'included' => true
+                ]);
+            }
+        }
+        
+        // If the features are completely empty (maybe not configured yet), fallback to a basic structure
+        if ($comparisonFeatures->isEmpty()) {
+            $comparisonFeatures->push([
+                'name' => 'Catálogo Completo',
+                'included' => true
+            ]);
+            $comparisonFeatures->push([
+                'name' => 'Navegação Sem Anúncios',
+                'included' => $type === 'premium'
+            ]);
+        }
 
         return $comparisonFeatures->values()->toArray();
     }

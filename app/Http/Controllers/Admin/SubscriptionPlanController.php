@@ -33,14 +33,17 @@ class SubscriptionPlanController extends Controller
             'plan_category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
+            'first_time_discount' => 'nullable|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
+            'features' => 'nullable|array',
         ]);
 
-        $features = [];
-        if ($request->has('feature_no_ads')) $features[] = 'no_ads';
-        if ($request->has('feature_priority_support')) $features[] = 'priority_support';
-        if ($request->has('feature_priority_requests')) $features[] = 'priority_requests';
-        if ($request->has('feature_premium_channels')) $features[] = 'premium_channels';
+        $features = collect($request->input('features', []))->map(function($feature) {
+            return [
+                'name' => $feature['name'] ?? '',
+                'included' => isset($feature['included']) && $feature['included'] == '1'
+            ];
+        })->filter(fn($f) => !empty($f['name']))->values()->toArray();
 
         SubscriptionPlan::create([
             'name' => $request->name,
@@ -48,6 +51,7 @@ class SubscriptionPlanController extends Controller
             'plan_category' => $request->plan_category,
             'price' => $request->price,
             'original_price' => $request->original_price,
+            'first_time_discount' => $request->first_time_discount ?: 0,
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),
@@ -76,14 +80,17 @@ class SubscriptionPlanController extends Controller
             'plan_category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
+            'first_time_discount' => 'nullable|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
+            'features' => 'nullable|array',
         ]);
 
-        $features = [];
-        if ($request->has('feature_no_ads')) $features[] = 'no_ads';
-        if ($request->has('feature_priority_support')) $features[] = 'priority_support';
-        if ($request->has('feature_priority_requests')) $features[] = 'priority_requests';
-        if ($request->has('feature_premium_channels')) $features[] = 'premium_channels';
+        $features = collect($request->input('features', []))->map(function($feature) {
+            return [
+                'name' => $feature['name'] ?? '',
+                'included' => isset($feature['included']) && $feature['included'] == '1'
+            ];
+        })->filter(fn($f) => !empty($f['name']))->values()->toArray();
 
         $subscriptionPlan->update([
             'name' => $request->name,
@@ -91,6 +98,7 @@ class SubscriptionPlanController extends Controller
             'plan_category' => $request->plan_category,
             'price' => $request->price,
             'original_price' => $request->original_price,
+            'first_time_discount' => $request->first_time_discount ?: 0,
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),

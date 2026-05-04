@@ -70,6 +70,7 @@
                         </div>
 
                         <div class="advanced-fields hidden grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-neutral-800/50">
+                            <input type="text" name="subtitle_url" placeholder="URL da Legenda (.vtt/.srt)" class="col-span-full bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none mb-1">
                             <input type="text" name="user_agent" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
                             <input type="text" name="referer" placeholder="Referer (ex: https://site.com)" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
                             <input type="text" name="origin" placeholder="Origin" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-[10px] outline-none">
@@ -118,6 +119,7 @@
                                     </div>
 
                                     <div class="advanced-fields hidden space-y-1 mt-1 pt-1 border-t border-neutral-800/50">
+                                        <input type="text" name="subtitle_url" value="{{ $link->subtitle_url }}" placeholder="URL da Legenda (.vtt/.srt)" class="w-full bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded mb-1">
                                         <div class="grid grid-cols-2 gap-1">
                                             <input type="text" name="user_agent" value="{{ $link->user_agent }}" placeholder="User-Agent" class="bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded">
                                             <input type="text" name="referer" value="{{ $link->referer }}" placeholder="Referer" class="bg-black/20 text-[8px] text-neutral-400 outline-none px-1 py-0.5 rounded">

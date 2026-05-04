@@ -85,6 +85,7 @@
                                     </div>
 
                                     <div class="advanced-fields hidden grid grid-cols-2 lg:grid-cols-4 gap-2 pt-2 border-t border-neutral-800/50">
+                                        <input type="text" name="subtitle_url" value="{{ old('subtitle_url') }}" placeholder="URL da Legenda (.vtt/.srt)" class="col-span-full bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none mb-1">
                                         <input type="text" name="user_agent" value="{{ old('user_agent') }}" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                         <input type="text" name="referer" value="{{ old('referer') }}" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                         <input type="text" name="origin" value="{{ old('origin') }}" placeholder="Origin" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
@@ -166,6 +167,7 @@
                                             </div>
 
                                             <div class="advanced-fields hidden space-y-2 p-2 bg-black/30 rounded">
+                                                <input type="text" name="subtitle_url" value="{{ old('subtitle_url', $link->subtitle_url) }}" placeholder="URL da Legenda (.vtt/.srt)" class="w-full bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none mb-1">
                                                 <div class="grid grid-cols-2 gap-2">
                                                     <input type="text" name="user_agent" value="{{ old('user_agent', $link->user_agent) }}" placeholder="User-Agent" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">
                                                     <input type="text" name="referer" value="{{ old('referer', $link->referer) }}" placeholder="Referer" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">

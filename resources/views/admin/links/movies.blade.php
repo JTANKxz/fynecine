@@ -61,7 +61,7 @@
                             </select>
                             
                             <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1 rounded text-[10px] hover:bg-neutral-700 transition">
-                                <i class="fa-solid fa-gears mr-1"></i> HEADERS
+                                <i class="fa-solid fa-gears mr-1"></i> AVANÇADO
                             </button>
 
                             <button type="submit" class="bg-netflix text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-700 transition">
@@ -109,7 +109,7 @@
                                         </select>
                                         
                                         <button type="button" onclick="toggleAdvanced(this)" class="text-[8px] text-neutral-500 hover:text-white uppercase">
-                                            Advanced
+                                            AVANÇADO
                                         </button>
 
                                         <select name="player_sub" class="bg-transparent border-none text-[9px] p-0 outline-none {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-400' }}">

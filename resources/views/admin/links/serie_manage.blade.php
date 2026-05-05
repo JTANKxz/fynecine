@@ -75,8 +75,8 @@
                                             </select>
                                         </div>
 
-                                        <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1.5 rounded text-[10px] hover:bg-neutral-700 transition">
-                                            <i class="fa-solid fa-gears mr-1"></i> HEADERS
+                                        <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1 rounded text-[10px] hover:bg-neutral-700 transition">
+                                            <i class="fa-solid fa-gears mr-1"></i> AVANÇADO
                                         </button>
 
                                         <button type="submit" class="bg-netflix text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-red-700 transition shadow-lg">
@@ -162,7 +162,7 @@
 
                                             <div class="flex items-center gap-2 pt-1 border-t border-neutral-800/50">
                                                 <button type="button" onclick="toggleAdvanced(this)" class="text-[8px] text-neutral-500 hover:text-white uppercase font-bold">
-                                                    <i class="fa-solid fa-gears mr-1"></i> Headers / Skips
+                                                    <i class="fa-solid fa-gears mr-1"></i> AVANÇADO
                                                 </button>
                                             </div>
 

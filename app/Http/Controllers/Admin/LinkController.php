@@ -103,7 +103,7 @@ class LinkController extends Controller
         $data = $request->all();
         
         // Converte tempos mm:ss para segundos
-        foreach (['skip_intro_start', 'skip_intro_end', 'skip_ending_start', 'skip_ending_end'] as $field) {
+        foreach (['skip_intro_start', 'skip_intro_end', 'skip_ending_start', 'skip_ending_end', 'skip_recap_start', 'skip_recap_end'] as $field) {
             if ($request->filled($field)) {
                 $data[$field] = $this->parseTimeToSeconds($request->input($field));
             }
@@ -120,6 +120,8 @@ class LinkController extends Controller
             'skip_intro_end' => 'nullable|integer',
             'skip_ending_start' => 'nullable|integer',
             'skip_ending_end' => 'nullable|integer',
+            'skip_recap_start' => 'nullable|integer',
+            'skip_recap_end' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
             'expiration_hours' => 'nullable|integer|min:1',
             'user_agent' => 'nullable|string',
@@ -139,7 +141,7 @@ class LinkController extends Controller
         $data = $request->all();
 
         // Converte tempos mm:ss para segundos
-        foreach (['skip_intro_start', 'skip_intro_end', 'skip_ending_start', 'skip_ending_end'] as $field) {
+        foreach (['skip_intro_start', 'skip_intro_end', 'skip_ending_start', 'skip_ending_end', 'skip_recap_start', 'skip_recap_end'] as $field) {
             if ($request->filled($field)) {
                 $data[$field] = $this->parseTimeToSeconds($request->input($field));
             }
@@ -156,6 +158,8 @@ class LinkController extends Controller
             'skip_intro_end' => 'nullable|integer',
             'skip_ending_start' => 'nullable|integer',
             'skip_ending_end' => 'nullable|integer',
+            'skip_recap_start' => 'nullable|integer',
+            'skip_recap_end' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
             'expiration_hours' => 'nullable|integer|min:1',
             'user_agent' => 'nullable|string',

@@ -92,9 +92,17 @@
                                         <input type="text" name="cookie" value="{{ old('cookie') }}" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                     </div>
 
-                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                                    <div class="grid grid-cols-2 lg:grid-cols-6 gap-2">
                                         <div class="flex flex-col">
-                                            <input type="text" name="skip_intro_start" value="{{ old('skip_intro_start') }}" placeholder="Intro Início (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            <input type="text" name="skip_recap_start" value="{{ old('skip_recap_start') }}" placeholder="Resumo Ini (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            @error('skip_recap_start') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <input type="text" name="skip_recap_end" value="{{ old('skip_recap_end') }}" placeholder="Resumo Fim (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            @error('skip_recap_end') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <input type="text" name="skip_intro_start" value="{{ old('skip_intro_start') }}" placeholder="Intro Ini (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
                                             @error('skip_intro_start') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="flex flex-col">
@@ -102,7 +110,7 @@
                                             @error('skip_intro_end') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="flex flex-col">
-                                            <input type="text" name="skip_ending_start" value="{{ old('skip_ending_start') }}" placeholder="Fim Início (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
+                                            <input type="text" name="skip_ending_start" value="{{ old('skip_ending_start') }}" placeholder="Fim Ini (mm:ss)" class="bg-neutral-800 rounded px-2 py-1 text-[9px] w-full outline-none">
                                             @error('skip_ending_start') <span class="text-[7px] text-red-500 mt-0.5">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="flex flex-col">
@@ -175,7 +183,14 @@
                                                     <input type="text" name="cookie" value="{{ old('cookie', $link->cookie) }}" placeholder="Cookies" class="bg-neutral-800 border-none rounded px-2 py-1 text-[9px] text-neutral-400 outline-none">
                                                 </div>
 
-                                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                                <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
+                                                    <div>
+                                                        <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Resumo (mm:ss)</label>
+                                                        <div class="flex gap-1">
+                                                            <input type="text" name="skip_recap_start" value="{{ old('skip_recap_start', $link->skip_recap_start ? gmdate('i:s', $link->skip_recap_start) : '') }}" placeholder="Início" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full outline-none">
+                                                            <input type="text" name="skip_recap_end" value="{{ old('skip_recap_end', $link->skip_recap_end ? gmdate('i:s', $link->skip_recap_end) : '') }}" placeholder="Fim" class="bg-neutral-800 border-none rounded px-1.5 py-1 text-[8px] w-full outline-none">
+                                                        </div>
+                                                    </div>
                                                     <div>
                                                         <label class="block text-[8px] text-neutral-600 uppercase font-bold mb-1">Abertura (mm:ss)</label>
                                                         <div class="flex gap-1">

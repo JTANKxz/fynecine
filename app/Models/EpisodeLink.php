@@ -25,6 +25,8 @@ class EpisodeLink extends Model
         'origin',
         'cookie',
         'subtitle_url',
+        'skip_recap_start',
+        'skip_recap_end',
     ];
 
     public function episode()

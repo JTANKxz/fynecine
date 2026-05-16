@@ -51,28 +51,35 @@ class SerieController extends Controller
 
         /*
         =========================
-        ORDENAÇÃO
+        ORDENAÇÃO E FILTROS
         =========================
         */
 
+        if ($request->filled('year')) {
+            $query->where('first_air_year', $request->year);
+        }
+
+        $order = $request->get('order', 'desc');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'desc';
+        }
+
         if ($request->filled('sort')) {
-
             switch ($request->sort) {
-
                 case 'rating':
-                    $query->orderBy('rating', 'desc');
+                    $query->orderBy('rating', $order);
                     break;
-
                 case 'year':
-                    $query->orderBy('first_air_year', 'desc');
+                    $query->orderBy('first_air_year', $order);
                     break;
-
+                case 'title':
+                    $query->orderBy('name', $order);
+                    break;
                 default:
-                    $query->latest();
+                    $query->orderBy('id', $order);
             }
-
         } else {
-            $query->latest();
+            $query->orderBy('id', $order);
         }
 
         /*

@@ -35,16 +35,49 @@ class NetworkController extends Controller
             ->where('content_type', 'series')
             ->pluck('content_id');
 
-        $movies = \App\Models\Movie::whereIn('id', $movieIds)->latest()->limit(5000)->get()->map(function($m) {
+        $order = $request->get('order', 'desc');
+        if (!in_array($order, ['asc', 'desc'])) { $order = 'desc'; }
+        
+        $sort = $request->get('sort', 'rating');
+        $year = $request->get('year');
+
+        $movieQuery = \App\Models\Movie::whereIn('id', $movieIds);
+        if ($year) {
+            $movieQuery->where('release_year', $year);
+        }
+        $movies = $movieQuery->get()->map(function($m) {
             $m->display_type = 'movie';
+            $m->year = $m->release_year;
             return $m;
         });
-        $series = \App\Models\Serie::whereIn('id', $serieIds)->latest()->limit(5000)->get()->map(function($s) {
+
+        $serieQuery = \App\Models\Serie::whereIn('id', $serieIds);
+        if ($year) {
+            $serieQuery->where('first_air_year', $year);
+        }
+        $series = $serieQuery->get()->map(function($s) {
             $s->display_type = 'series';
+            $s->year = $s->first_air_year;
+            $s->title = $s->name; // For title sort consistency
             return $s;
         });
 
-        $content = $movies->concat($series)->sortByDesc('created_at')->values();
+        $content = $movies->concat($series);
+        
+        switch ($sort) {
+            case 'year':
+                $content = ($order === 'asc') ? $content->sortBy('year') : $content->sortByDesc('year');
+                break;
+            case 'title':
+                $content = ($order === 'asc') ? $content->sortBy('title') : $content->sortByDesc('title');
+                break;
+            case 'rating':
+            default:
+                $content = ($order === 'asc') ? $content->sortBy('rating') : $content->sortByDesc('rating');
+                break;
+        }
+
+        $content = $content->values();
         $paginated = $content->slice(($page - 1) * $perPage, $perPage)->values();
 
         return response()->json([

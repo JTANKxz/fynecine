@@ -36,6 +36,8 @@ class AvatarController extends Controller
             'avatar_category_id' => 'required|exists:avatar_categories,id',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'image_url' => 'nullable|url',
+            'is_default' => 'nullable|boolean',
+            'is_kids' => 'nullable|boolean',
         ]);
 
         if (!$request->hasFile('image_file') && !$request->image_url) {
@@ -50,9 +52,18 @@ class AvatarController extends Controller
             $imagePath = $file->storeAs('avatars', $filename, 'public');
         }
 
+        if ($request->is_default) {
+            Avatar::where('is_default', true)->update(['is_default' => false]);
+        }
+        if ($request->is_kids) {
+            Avatar::where('is_kids', true)->update(['is_kids' => false]);
+        }
+
         Avatar::create([
             'avatar_category_id' => $request->avatar_category_id,
             'image' => $imagePath,
+            'is_default' => $request->boolean('is_default'),
+            'is_kids' => $request->boolean('is_kids'),
         ]);
 
         return redirect()->route('admin.avatars.index')
@@ -71,6 +82,8 @@ class AvatarController extends Controller
             'avatar_category_id' => 'required|exists:avatar_categories,id',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'image_url' => 'nullable|url',
+            'is_default' => 'nullable|boolean',
+            'is_kids' => 'nullable|boolean',
         ]);
 
         $imagePath = $avatar->image;
@@ -92,9 +105,18 @@ class AvatarController extends Controller
             $imagePath = $request->image_url;
         }
 
+        if ($request->is_default) {
+            Avatar::where('id', '!=', $avatar->id)->where('is_default', true)->update(['is_default' => false]);
+        }
+        if ($request->is_kids) {
+            Avatar::where('id', '!=', $avatar->id)->where('is_kids', true)->update(['is_kids' => false]);
+        }
+
         $avatar->update([
             'avatar_category_id' => $request->avatar_category_id,
             'image' => $imagePath,
+            'is_default' => $request->boolean('is_default'),
+            'is_kids' => $request->boolean('is_kids'),
         ]);
 
         return redirect()->route('admin.avatars.index')

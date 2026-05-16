@@ -54,28 +54,35 @@ class MovieController extends Controller
 
         /*
         =========================
-        ORDENAÇÃO
+        ORDENAÇÃO E FILTROS
         =========================
         */
 
+        if ($request->filled('year')) {
+            $query->where('release_year', $request->year);
+        }
+
+        $order = $request->get('order', 'desc');
+        if (!in_array($order, ['asc', 'desc'])) {
+            $order = 'desc';
+        }
+
         if ($request->filled('sort')) {
-
             switch ($request->sort) {
-
                 case 'rating':
-                    $query->orderBy('rating', 'desc');
+                    $query->orderBy('rating', $order);
                     break;
-
                 case 'year':
-                    $query->orderBy('release_year', 'desc');
+                    $query->orderBy('release_year', $order);
                     break;
-
+                case 'title':
+                    $query->orderBy('title', $order);
+                    break;
                 default:
-                    $query->latest();
+                    $query->orderBy('id', $order);
             }
-
         } else {
-            $query->latest();
+            $query->orderBy('id', $order);
         }
 
         /*

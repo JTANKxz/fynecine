@@ -75,7 +75,32 @@ class ProfileController extends Controller
             ], 403);
         }
 
-        $profileData = $request->only('name', 'avatar', 'is_kids', 'pin', 'is_adult_enabled', 'adult_pin');
+        $isKids = $request->boolean('is_kids');
+        $profileData = $request->only('avatar', 'is_kids', 'pin', 'is_adult_enabled', 'adult_pin');
+        
+        if ($isKids) {
+            $profileData['name'] = 'Kids';
+            $kidsAvatar = \App\Models\Avatar::where('is_kids', true)->first();
+            if ($kidsAvatar) {
+                $profileData['avatar'] = $kidsAvatar->image;
+            }
+        } else {
+            // Se o app enviar nome, usa ele. Senão, gera Perfil X
+            if ($request->has('name') && !empty($request->name)) {
+                $profileData['name'] = $request->name;
+            } else {
+                $profileData['name'] = 'Perfil ' . ($currentCount + 1);
+            }
+            
+            // Avatar padrão se não enviado
+            if (empty($profileData['avatar'])) {
+                $defaultAvatar = \App\Models\Avatar::where('is_default', true)->first();
+                if ($defaultAvatar) {
+                    $profileData['avatar'] = $defaultAvatar->image;
+                }
+            }
+        }
+
         if ($currentCount === 0) {
             $profileData['is_main'] = true;
         }

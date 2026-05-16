@@ -16,7 +16,7 @@ class AvatarCategoryController extends Controller
             $query->where('name', 'like', "%{$request->search}%");
         }
 
-        $categories = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+        $categories = $query->orderBy('display_order', 'asc')->orderBy('name', 'asc')->paginate(10)->withQueryString();
 
         return view('admin.avatar-categories.index', compact('categories'));
     }
@@ -30,6 +30,7 @@ class AvatarCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'display_order' => 'nullable|integer',
         ]);
 
         AvatarCategory::create($validated);
@@ -47,6 +48,7 @@ class AvatarCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'display_order' => 'nullable|integer',
         ]);
 
         $avatar_category->update($validated);

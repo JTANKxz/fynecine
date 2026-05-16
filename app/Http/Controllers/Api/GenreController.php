@@ -24,17 +24,27 @@ class GenreController extends Controller
             $genre = Genre::where('slug', $idOrSlug)->firstOrFail();
         }
 
+        $order = $request->get('order', 'desc');
+        if (!in_array($order, ['asc', 'desc'])) { $order = 'desc'; }
+        
+        $sort = $request->get('sort', 'rating');
+        $year = $request->get('year');
+
         /*
         =========================
         FILMES DO GENERO
         =========================
         */
 
-        $movies = Movie::whereHas('genres', function ($q) use ($genre) {
+        $movieQuery = Movie::whereHas('genres', function ($q) use ($genre) {
             $q->where('genres.id', $genre->id);
-        })
-        ->get()
-        ->map(function ($movie) {
+        });
+
+        if ($year) {
+            $movieQuery->where('release_year', $year);
+        }
+
+        $movies = $movieQuery->get()->map(function ($movie) {
             return [
                 'id' => $movie->id,
                 'slug' => $movie->slug,
@@ -43,7 +53,8 @@ class GenreController extends Controller
                 'rating' => $movie->rating,
                 'year' => $movie->release_year,
                 'poster' => $movie->poster_path,
-                'backdrop' => $movie->backdrop_path
+                'backdrop' => $movie->backdrop_path,
+                'created_at' => $movie->created_at
             ];
         });
 
@@ -53,12 +64,15 @@ class GenreController extends Controller
         =========================
         */
 
-        $series = Serie::whereHas('genres', function ($q) use ($genre) {
-            // 🔥 CORRIGIDO AQUI
+        $serieQuery = Serie::whereHas('genres', function ($q) use ($genre) {
             $q->where('genres.id', $genre->id);
-        })
-        ->get()
-        ->map(function ($serie) {
+        });
+
+        if ($year) {
+            $serieQuery->where('first_air_year', $year);
+        }
+
+        $series = $serieQuery->get()->map(function ($serie) {
             return [
                 'id' => $serie->id,
                 'slug' => $serie->slug,
@@ -67,17 +81,33 @@ class GenreController extends Controller
                 'rating' => $serie->rating,
                 'year' => $serie->first_air_year,
                 'poster' => $serie->poster_path,
-                'backdrop' => $serie->backdrop_path
+                'backdrop' => $serie->backdrop_path,
+                'created_at' => $serie->created_at
             ];
         });
 
         /*
         =========================
-        JUNTA TUDO
+        JUNTA E ORDENA
         =========================
         */
 
-        $content = $movies->concat($series)->sortByDesc('rating')->values();
+        $content = $movies->concat($series);
+        
+        switch ($sort) {
+            case 'year':
+                $content = ($order === 'asc') ? $content->sortBy('year') : $content->sortByDesc('year');
+                break;
+            case 'title':
+                $content = ($order === 'asc') ? $content->sortBy('title') : $content->sortByDesc('title');
+                break;
+            case 'rating':
+            default:
+                $content = ($order === 'asc') ? $content->sortBy('rating') : $content->sortByDesc('rating');
+                break;
+        }
+
+        $content = $content->values();
 
         /*
         =========================

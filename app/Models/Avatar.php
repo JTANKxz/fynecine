@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\Storage;
 
 class Avatar extends Model
 {
-    protected $fillable = ['avatar_category_id', 'image'];
+    protected $fillable = ['avatar_category_id', 'image', 'is_default', 'is_kids'];
+
+    protected $casts = [
+        'is_default' => 'boolean',
+        'is_kids' => 'boolean',
+    ];
 
     public function category(): BelongsTo
     {

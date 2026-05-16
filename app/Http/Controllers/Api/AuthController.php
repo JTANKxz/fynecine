@@ -174,10 +174,13 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Criar perfil padrão (Principal) para o novo usuário
+        // Criar perfil padrão (Perfil 1) para o novo usuário
+        $defaultAvatar = \App\Models\Avatar::where('is_default', true)->first();
+        
         $user->profiles()->create([
-            'name'    => 'Principal',
+            'name'    => 'Perfil 1',
             'is_main' => true,
+            'avatar'  => $defaultAvatar ? $defaultAvatar->image : null,
         ]);
 
         $tokenInstance = $user->createToken('api-token');

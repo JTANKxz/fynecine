@@ -15,7 +15,7 @@ class AvatarController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = AvatarCategory::with('avatars')->orderBy('name')->get();
+        $categories = AvatarCategory::with('avatars')->orderBy('display_order', 'asc')->orderBy('name', 'asc')->get();
 
         $data = $categories->map(function ($category) {
             return [

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AvatarCategory extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'display_order'];
 
     public function avatars(): HasMany
     {

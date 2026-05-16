@@ -74,6 +74,13 @@ class AppConfig extends Model
         'rewards_status',
         'bunny_mp4_host',
         'is_adult_active',
+        'default_avatar_p1',
+        'default_avatar_p2',
+        'default_avatar_p3',
+        'default_avatar_p4',
+        'default_avatar_p5',
+        'default_avatar_p6',
+        'default_avatar_kids',
     ];
 
     protected $casts = [
@@ -103,6 +110,13 @@ class AppConfig extends Model
         'rewards_status' => 'boolean',
         'is_adult_active' => 'boolean',
         'interstitial_interval' => 'integer',
+        'default_avatar_p1' => 'integer',
+        'default_avatar_p2' => 'integer',
+        'default_avatar_p3' => 'integer',
+        'default_avatar_p4' => 'integer',
+        'default_avatar_p5' => 'integer',
+        'default_avatar_p6' => 'integer',
+        'default_avatar_kids' => 'integer',
     ];
 
     /**

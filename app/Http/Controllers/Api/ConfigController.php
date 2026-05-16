@@ -122,8 +122,25 @@ class ConfigController extends Controller
                 (filter_var($config->custom_interstitial_media, FILTER_VALIDATE_URL) ? $config->custom_interstitial_media : asset('storage/' . $config->custom_interstitial_media)) : null,
             'custom_interstitial_link' => $config->custom_interstitial_link,
             'interstitial_interval' => (int) $config->interstitial_interval,
+
+            'default_avatars' => [
+                'p1' => $this->getAvatarUrl($config->default_avatar_p1),
+                'p2' => $this->getAvatarUrl($config->default_avatar_p2),
+                'p3' => $this->getAvatarUrl($config->default_avatar_p3),
+                'p4' => $this->getAvatarUrl($config->default_avatar_p4),
+                'p5' => $this->getAvatarUrl($config->default_avatar_p5),
+                'p6' => $this->getAvatarUrl($config->default_avatar_p6),
+                'kids' => $this->getAvatarUrl($config->default_avatar_kids),
+            ],
         ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
           ->header('Pragma', 'no-cache')
           ->header('Expires', '0');
+    }
+
+    private function getAvatarUrl($id)
+    {
+        if (!$id) return null;
+        $avatar = \App\Models\Avatar::find($id);
+        return $avatar ? $avatar->image_url : null;
     }
 }

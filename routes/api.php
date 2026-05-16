@@ -146,6 +146,7 @@ Route::middleware('api.token')->group(function () {
             Route::get('/',            [PlaylistController::class, 'index']);
             Route::post('/',           [PlaylistController::class, 'store']);
             Route::get('/{id}',        [PlaylistController::class, 'show']);
+            Route::put('/{id}',        [PlaylistController::class, 'update']);
             Route::post('/items',      [PlaylistController::class, 'toggleItem']);
             Route::delete('/items',    [PlaylistController::class, 'batchDestroyItems']);
             Route::delete('/{id}',     [PlaylistController::class, 'destroy']);

@@ -12,7 +12,8 @@ class SettingController extends Controller
     public function edit()
     {
         $config = AppConfig::getSettings();
-        return view('admin.settings.edit', compact('config'));
+        $avatars = \App\Models\Avatar::orderBy('id', 'desc')->get();
+        return view('admin.settings.edit', compact('config', 'avatars'));
     }
 
     public function update(Request $request)
@@ -107,6 +108,13 @@ class SettingController extends Controller
             'bunny_mp4_key' => ['nullable', 'string', 'max:255'],
             'bunny_mp4_host' => ['nullable', 'string', 'max:255'],
             'is_adult_active' => ['nullable', 'boolean'],
+            'default_avatar_p1' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_p2' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_p3' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_p4' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_p5' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_p6' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_kids' => ['nullable', 'integer', 'exists:avatars,id'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -216,6 +224,14 @@ class SettingController extends Controller
         $config->bunny_cdn_url = $request->bunny_cdn_url;
         $config->bunny_mp4_key = $request->bunny_mp4_key;
         $config->bunny_mp4_host = $request->bunny_mp4_host;
+
+        $config->default_avatar_p1 = $request->default_avatar_p1;
+        $config->default_avatar_p2 = $request->default_avatar_p2;
+        $config->default_avatar_p3 = $request->default_avatar_p3;
+        $config->default_avatar_p4 = $request->default_avatar_p4;
+        $config->default_avatar_p5 = $request->default_avatar_p5;
+        $config->default_avatar_p6 = $request->default_avatar_p6;
+        $config->default_avatar_kids = $request->default_avatar_kids;
 
         $config->save();
 

@@ -85,6 +85,18 @@ class PlaylistController extends Controller
         return response()->json($playlist, 201);
     }
 
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $profile = $this->getProfile($request);
+        $playlist = Playlist::where('id', $id)->where('profile_id', $profile->id)->firstOrFail();
+
+        $request->validate(['name' => 'required|string|max:100']);
+
+        $playlist->update(['name' => $request->name]);
+
+        return response()->json($playlist);
+    }
+
     public function show(Request $request, int $id): JsonResponse
     {
         $profile = $this->getProfile($request);

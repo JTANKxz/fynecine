@@ -77,12 +77,20 @@ class ProfileController extends Controller
 
         $isKids = $request->boolean('is_kids');
         $profileData = $request->only('avatar', 'is_kids', 'pin', 'is_adult_enabled', 'adult_pin');
+        $config = \App\Models\AppConfig::getSettings();
         
         if ($isKids) {
             $profileData['name'] = 'Kids';
-            $kidsAvatar = \App\Models\Avatar::where('is_kids', true)->first();
-            if ($kidsAvatar) {
-                $profileData['avatar'] = $kidsAvatar->image;
+            if (empty($profileData['avatar'])) {
+                $kidsAvatar = \App\Models\Avatar::find($config->default_avatar_kids);
+                if ($kidsAvatar) {
+                    $profileData['avatar'] = $kidsAvatar->image;
+                } else {
+                    $kidsAvatarFallback = \App\Models\Avatar::where('is_kids', true)->first();
+                    if ($kidsAvatarFallback) {
+                        $profileData['avatar'] = $kidsAvatarFallback->image;
+                    }
+                }
             }
         } else {
             // Se o app enviar nome, usa ele. Senão, gera Perfil X
@@ -94,9 +102,18 @@ class ProfileController extends Controller
             
             // Avatar padrão se não enviado
             if (empty($profileData['avatar'])) {
-                $defaultAvatar = \App\Models\Avatar::where('is_default', true)->first();
+                $slot = $currentCount + 1;
+                $column = "default_avatar_p{$slot}";
+                $defaultAvatarId = $config->$column;
+                
+                $defaultAvatar = \App\Models\Avatar::find($defaultAvatarId);
                 if ($defaultAvatar) {
                     $profileData['avatar'] = $defaultAvatar->image;
+                } else {
+                    $defaultAvatarFallback = \App\Models\Avatar::where('is_default', true)->first();
+                    if ($defaultAvatarFallback) {
+                        $profileData['avatar'] = $defaultAvatarFallback->image;
+                    }
                 }
             }
         }

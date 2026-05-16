@@ -100,10 +100,51 @@
                 <p class="text-[10px] text-neutral-500 mt-1">Opcional. Se preenchido, usuários poderão trocar pontos por este plano.</p>
             </div>
 
-            <div>
-                <label class="flex items-center gap-3 cursor-pointer group pt-4 border-t border-neutral-800 mt-4">
+            <!-- PROMOÇÃO / OFERTA -->
+            <div class="bg-neutral-800/30 p-6 rounded-xl border border-neutral-700/50 space-y-6">
+                <h3 class="text-white font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-tag text-netflix"></i> Promoção / Oferta de Tempo Limitado
+                </h3>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Preço Promocional (R$)</label>
+                        <input type="number" step="0.01" name="offer_price" value="{{ old('offer_price') }}"
+                               class="w-full bg-neutral-900 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                        <p class="text-[10px] text-neutral-500 mt-1">Se preenchido, este preço substituirá o preço normal durante o período.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Válido Até</label>
+                        <input type="datetime-local" name="offer_expires_at" value="{{ old('offer_expires_at') }}"
+                               class="w-full bg-neutral-900 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                        <p class="text-[10px] text-neutral-500 mt-1">Data e hora que a promoção encerra (Timer no App).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Label de Desconto (Badge)</label>
+                        <input type="text" name="discount_label" value="{{ old('discount_label') }}" placeholder="Ex: 50% OFF"
+                               class="w-full bg-neutral-900 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-netflix outline-none">
+                        <p class="text-[10px] text-neutral-500 mt-1">Texto exibido na etiqueta de desconto.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-4 pt-4 border-t border-neutral-800 mt-4">
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="is_popular" value="1" {{ old('is_popular') ? 'checked' : '' }} class="w-5 h-5 accent-yellow-500 rounded">
+                    <div class="flex flex-col">
+                        <span class="text-sm text-neutral-300 group-hover:text-white transition">Marcar como "Popular"</span>
+                        <span class="text-[10px] text-neutral-500">Exibe o selo de destaque no plano no aplicativo.</span>
+                    </div>
+                </label>
+
+                <label class="flex items-center gap-3 cursor-pointer group">
                     <input type="checkbox" name="is_active" value="1" checked class="w-5 h-5 accent-netflix rounded">
-                    <span class="text-sm text-neutral-300 group-hover:text-white transition">Plano Ativo (Disponível para os usuários)</span>
+                    <div class="flex flex-col">
+                        <span class="text-sm text-neutral-300 group-hover:text-white transition">Plano Ativo</span>
+                        <span class="text-[10px] text-neutral-500">Disponível para os usuários visualizarem e assinarem.</span>
+                    </div>
                 </label>
             </div>
 

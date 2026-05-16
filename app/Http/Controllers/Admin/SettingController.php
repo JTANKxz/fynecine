@@ -115,6 +115,7 @@ class SettingController extends Controller
             'default_avatar_p5' => ['nullable', 'integer', 'exists:avatars,id'],
             'default_avatar_p6' => ['nullable', 'integer', 'exists:avatars,id'],
             'default_avatar_kids' => ['nullable', 'integer', 'exists:avatars,id'],
+            'default_avatar_kids_url' => ['nullable', 'string'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -232,6 +233,7 @@ class SettingController extends Controller
         $config->default_avatar_p5 = $request->default_avatar_p5;
         $config->default_avatar_p6 = $request->default_avatar_p6;
         $config->default_avatar_kids = $request->default_avatar_kids;
+        $config->default_avatar_kids_url = $request->default_avatar_kids_url;
 
         $config->save();
 

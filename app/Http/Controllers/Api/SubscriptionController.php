@@ -30,6 +30,10 @@ class SubscriptionController extends Controller
                 'plan_category' => $plan->plan_category,
                 'price' => $plan->price,
                 'original_price' => $plan->original_price,
+                'offer_price' => $plan->offer_price,
+                'offer_expires_at' => $plan->offer_expires_at,
+                'discount_label' => $plan->discount_label,
+                'is_popular' => (bool) $plan->is_popular,
                 'first_time_discount' => $plan->first_time_discount,
                 'discount_percentage' => $plan->original_price > $plan->price 
                     ? round((1 - ($plan->price / $plan->original_price)) * 100) 

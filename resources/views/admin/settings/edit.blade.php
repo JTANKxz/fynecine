@@ -565,18 +565,32 @@
 
                 <div class="bg-purple-900/10 p-4 rounded-xl border border-purple-900/30">
                     <label class="block text-[10px] font-bold text-purple-400 uppercase mb-3">Perfil Kids (Crianças)</label>
-                    <select name="default_avatar_kids" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-2 py-2 outline-none focus:ring-1 focus:ring-purple-500">
-                        <option value="">Sem Padrão</option>
-                        @foreach($avatars->where('is_kids', true) as $avatar)
-                            <option value="{{ $avatar->id }}" {{ $config->default_avatar_kids == $avatar->id ? 'selected' : '' }}>
-                                {{ $avatar->category->name ?? 'Avatar' }} #{{ $avatar->id }}
-                            </option>
-                        @endforeach
-                    </select>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <span class="block text-[8px] text-neutral-500 uppercase mb-1">Selecionar Avatar</span>
+                            <select name="default_avatar_kids" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-2 py-2 outline-none focus:ring-1 focus:ring-purple-500">
+                                <option value="">Sem Padrão</option>
+                                @foreach($avatars->where('is_kids', true) as $avatar)
+                                    <option value="{{ $avatar->id }}" {{ $config->default_avatar_kids == $avatar->id ? 'selected' : '' }}>
+                                        {{ $avatar->category->name ?? 'Avatar' }} #{{ $avatar->id }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <span class="block text-[8px] text-neutral-500 uppercase mb-1">Ou URL Direta (Avatar Único)</span>
+                            <input type="text" name="default_avatar_kids_url" value="{{ old('default_avatar_kids_url', $config->default_avatar_kids_url) }}" 
+                                   placeholder="https://sua-imagem.com/kids.png"
+                                   class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-2 py-2 outline-none focus:ring-1 focus:ring-purple-500">
+                        </div>
+                    </div>
+
                     @php $currentKidsAvatar = $avatars->where('id', $config->default_avatar_kids)->first(); @endphp
-                    @if($currentKidsAvatar)
-                        <div class="mt-3 flex justify-center">
-                            <img src="{{ $currentKidsAvatar->image_url }}" class="w-12 h-12 rounded-full object-cover border-2 border-purple-500/30">
+                    @if($currentKidsAvatar || $config->default_avatar_kids_url)
+                        <div class="mt-4 flex justify-center">
+                            <img src="{{ $config->default_avatar_kids_url ?: $currentKidsAvatar->image_url }}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-500/30">
                         </div>
                     @endif
                 </div>

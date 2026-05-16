@@ -81,4 +81,94 @@ class SearchController extends Controller
             'data' => $results
         ]);
     }
+    public function suggestions(Request $request)
+    {
+        $limit = 12;
+
+        /*
+        =========================
+        MAIS VISTOS DA SEMANA (Geral)
+        =========================
+        */
+        $trendingWeek = \App\Models\ContentView::select('content_id', 'content_type')
+            ->selectRaw('COUNT(*) as views_count')
+            ->where('viewed_at', '>=', now()->subWeek())
+            ->groupBy('content_id', 'content_type')
+            ->orderByDesc('views_count')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $content = $item->content_type === 'movie' 
+                    ? Movie::find($item->content_id) 
+                    : Serie::find($item->content_id);
+                
+                return $content ? $this->formatItem($content) : null;
+            })->filter()->values();
+
+        /*
+        =========================
+        MAIS VISTOS - FILMES
+        =========================
+        */
+        $trendingMovies = \App\Models\ContentView::select('content_id')
+            ->selectRaw('COUNT(*) as views_count')
+            ->where('content_type', 'movie')
+            ->groupBy('content_id')
+            ->orderByDesc('views_count')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $movie = Movie::find($item->content_id);
+                return $movie ? $this->formatItem($movie) : null;
+            })->filter()->values();
+
+        /*
+        =========================
+        MAIS VISTOS - SERIES
+        =========================
+        */
+        $trendingSeries = \App\Models\ContentView::select('content_id')
+            ->selectRaw('COUNT(*) as views_count')
+            ->where('content_type', 'series')
+            ->groupBy('content_id')
+            ->orderByDesc('views_count')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $serie = Serie::find($item->content_id);
+                return $serie ? $this->formatItem($serie) : null;
+            })->filter()->values();
+
+        return response()->json([
+            [
+                'title' => 'Mais Vistos da Semana',
+                'items' => $trendingWeek
+            ],
+            [
+                'title' => 'Filmes em Alta',
+                'items' => $trendingMovies
+            ],
+            [
+                'title' => 'Séries em Alta',
+                'items' => $trendingSeries
+            ]
+        ]);
+    }
+
+    private function formatItem($item)
+    {
+        $isMovie = $item instanceof Movie;
+        return [
+            'id' => $item->id,
+            'slug' => $item->slug,
+            'title' => $isMovie ? $item->title : $item->name,
+            'type' => $isMovie ? 'movie' : 'series',
+            'year' => $isMovie ? $item->release_year : $item->first_air_year,
+            'rating' => $item->rating,
+            'poster' => $item->poster_path,
+            'backdrop' => $item->backdrop_path,
+            'tag_text' => $item->api_tag_text,
+            'age_rating' => $item->age_rating,
+        ];
+    }
 }

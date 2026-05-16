@@ -36,6 +36,9 @@ class SubscriptionPlanController extends Controller
             'first_time_discount' => 'nullable|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
             'features' => 'nullable|array',
+            'offer_price' => 'nullable|numeric|min:0',
+            'offer_expires_at' => 'nullable|date',
+            'discount_label' => 'nullable|string|max:50',
         ]);
 
         $features = collect($request->input('features', []))->map(function($feature) {
@@ -55,6 +58,10 @@ class SubscriptionPlanController extends Controller
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),
+            'is_popular' => $request->has('is_popular'),
+            'offer_price' => $request->offer_price,
+            'offer_expires_at' => $request->offer_expires_at,
+            'discount_label' => $request->discount_label,
             'points_cost' => $request->points_cost ?: null,
         ]);
 
@@ -83,6 +90,9 @@ class SubscriptionPlanController extends Controller
             'first_time_discount' => 'nullable|numeric|min:0',
             'duration_days' => 'required|integer|min:1',
             'features' => 'nullable|array',
+            'offer_price' => 'nullable|numeric|min:0',
+            'offer_expires_at' => 'nullable|date',
+            'discount_label' => 'nullable|string|max:50',
         ]);
 
         $features = collect($request->input('features', []))->map(function($feature) {
@@ -102,6 +112,10 @@ class SubscriptionPlanController extends Controller
             'duration_days' => $request->duration_days,
             'features' => !empty($features) ? $features : null,
             'is_active' => $request->has('is_active'),
+            'is_popular' => $request->has('is_popular'),
+            'offer_price' => $request->offer_price,
+            'offer_expires_at' => $request->offer_expires_at,
+            'discount_label' => $request->discount_label,
             'points_cost' => $request->points_cost ?: null,
         ]);
 

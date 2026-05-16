@@ -130,7 +130,7 @@ class ConfigController extends Controller
                 'p4' => $this->getAvatarUrl($config->default_avatar_p4),
                 'p5' => $this->getAvatarUrl($config->default_avatar_p5),
                 'p6' => $this->getAvatarUrl($config->default_avatar_p6),
-                'kids' => $this->getAvatarUrl($config->default_avatar_kids),
+                'kids' => $config->default_avatar_kids_url ?: $this->getAvatarUrl($config->default_avatar_kids),
             ],
         ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
           ->header('Pragma', 'no-cache')

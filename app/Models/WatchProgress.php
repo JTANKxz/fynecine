@@ -21,6 +21,7 @@ class WatchProgress extends Model
         'series_id',
         'link_id',
         'link_type',
+        'link_url',
     ];
 
     protected $casts = [
@@ -79,6 +80,7 @@ class WatchProgress extends Model
                     'quality' => $l->quality,
                     'player_sub' => $l->player_sub,
                 ]),
+                'last_link_url' => $this->link_url,
             ];
         } elseif ($this->content_type === 'episode') {
             $episode = $this->episode;
@@ -109,9 +111,11 @@ class WatchProgress extends Model
                     'skip_ending' => [
                         'start' => $l->skip_ending_start,
                         'end' => $l->skip_ending_end,
-                    ]
+                    ],
+                    'link_url' => $this->link_url
                 ]),
                 'next_episode' => $this->getNextEpisodeMetadata($episode),
+                'last_link_url' => $this->link_url,
             ];
         }
         return null;
@@ -190,7 +194,8 @@ class WatchProgress extends Model
         ?int $episodeId = null,
         ?int $seriesId = null,
         ?string $linkId = null,
-        ?string $linkType = null
+        ?string $linkType = null,
+        ?string $linkUrl = null
     ): ?self {
         // Não salva se progresso < 30 segundos
         if ($progress < 30) {
@@ -228,6 +233,7 @@ class WatchProgress extends Model
                 'series_id' => $seriesId,
                 'link_id' => $linkId,
                 'link_type' => $linkType,
+                'link_url' => $linkUrl,
                 'updated_at' => now(),
             ]
         );

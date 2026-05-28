@@ -47,6 +47,7 @@
                         <option value="embed" {{ old('type', $link->type) == 'embed' ? 'selected' : '' }}>Embed (Iframe/Webview)</option>
                         <option value="direct" {{ old('type', $link->type) == 'direct' ? 'selected' : '' }}>Direct (Player Interno)</option>
                         <option value="m3u8" {{ old('type', $link->type) == 'm3u8' ? 'selected' : '' }}>M3U8 (HLS)</option>
+                        <option value="css" {{ old('type', $link->type) == 'css' ? 'selected' : '' }}>CSS (.css)</option>
                         <option value="mp4" {{ old('type', $link->type) == 'mp4' ? 'selected' : '' }}>MP4</option>
                         <option value="mkv" {{ old('type', $link->type) == 'mkv' ? 'selected' : '' }}>MKV</option>
                         <option value="custom" {{ old('type', $link->type) == 'custom' ? 'selected' : '' }}>Custom (Sniffer)</option>

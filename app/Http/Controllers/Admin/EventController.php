@@ -120,7 +120,7 @@ class EventController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'nullable|string',
-            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom,private',
+            'type' => 'required|in:embed,direct,m3u8,css,mp4,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'link_path' => 'nullable|string',
             'expiration_hours' => 'nullable|integer',
@@ -146,7 +146,7 @@ class EventController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'nullable|string',
-            'type' => 'required|in:embed,direct,m3u8,mp4,mkv,custom,private',
+            'type' => 'required|in:embed,direct,m3u8,css,mp4,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
             'link_path' => 'nullable|string',
             'expiration_hours' => 'nullable|integer',

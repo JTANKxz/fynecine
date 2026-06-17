@@ -30,8 +30,6 @@ class User extends Authenticatable
         'ban_reason',
         'banned_at',
         'avatar',
-        'subscription_plan_id',
-        'subscription_expires_at',
         'plan_type',
         'plan_expires_at',
         'features',

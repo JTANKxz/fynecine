@@ -48,7 +48,6 @@ class UserController extends Controller
 
         $planExpiresAt = null;
         $features = [];
-        $subscriptionPlanId = null;
 
         if ($validated['plan_type'] !== 'free') {
             $days = intval($request->input('premium_days', 0));
@@ -61,7 +60,6 @@ class UserController extends Controller
                 ->first();
             if ($plan) {
                 $features = $plan->features ?? [];
-                $subscriptionPlanId = $plan->id;
             }
         }
 
@@ -76,7 +74,6 @@ class UserController extends Controller
             'plan_type' => $validated['plan_type'],
             'plan_expires_at' => $planExpiresAt,
             'features' => $features,
-            'subscription_plan_id' => $subscriptionPlanId,
         ]);
 
         return redirect()->route('admin.users.index')
@@ -128,7 +125,6 @@ class UserController extends Controller
             if ($user->plan_type === 'free') {
                 $user->plan_expires_at = null;
                 $user->features = [];
-                $user->subscription_plan_id = null;
             } else {
                 $days = intval($validated['premium_days'] ?? 0);
                 if ($days > 0) {
@@ -142,10 +138,8 @@ class UserController extends Controller
                     ->first();
                 if ($plan) {
                     $user->features = $plan->features ?? [];
-                    $user->subscription_plan_id = $plan->id;
                 } else {
                     $user->features = [];
-                    $user->subscription_plan_id = null;
                 }
             }
         }

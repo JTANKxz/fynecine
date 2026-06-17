@@ -124,7 +124,7 @@ class NotificationController extends Controller
         $isInApp = $request->boolean('send_in_app', true);
         $isPush = $request->boolean('send_push', false);
 
-        // Criar notificação
+        // Criar notificação'
 
         $notificationData = [
             'title' => $contentType === 'movie'

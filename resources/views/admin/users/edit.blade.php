@@ -44,14 +44,37 @@
 
             <div>
                 <label class="block text-sm font-medium text-neutral-400 mb-2">Plano de Assinatura</label>
+                @if(Auth::user()->canChangeUserSensitiveData())
                 <select name="plan_type" class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-netflix outline-none">
                     <option value="free" {{ $user->plan_type === 'free' ? 'selected' : '' }}>Free (Grátis)</option>
                     <option value="basic" {{ $user->plan_type === 'basic' ? 'selected' : '' }}>Basic (Básico)</option>
                     <option value="premium" {{ $user->plan_type === 'premium' ? 'selected' : '' }}>Premium (VIP)</option>
                 </select>
+                @else
+                <input type="text" class="w-full bg-neutral-800 border border-neutral-700 text-neutral-400 rounded px-4 py-2 outline-none cursor-not-allowed" value="{{ ucfirst($user->plan_type) }}" readonly>
+                <input type="hidden" name="plan_type" value="{{ $user->plan_type }}">
+                @endif
                 @error('plan_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
+
+        @if(Auth::user()->canChangeUserSensitiveData())
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-neutral-400 mb-2">Dias de Premium (0 = expira hoje / sem dias)</label>
+                <input type="number" name="premium_days" value="{{ old('premium_days', $user->plan_expires_at && $user->plan_expires_at->isFuture() ? now()->diffInDays($user->plan_expires_at) : 0) }}" 
+                       class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-netflix outline-none"
+                       min="0" placeholder="Ex: 30">
+                @error('premium_days') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-neutral-400 mb-2">Expiração do Plano (Leitura)</label>
+                <input type="text" class="w-full bg-neutral-800 border border-neutral-700 text-neutral-400 rounded px-4 py-2 outline-none cursor-not-allowed" 
+                       value="{{ $user->plan_expires_at ? $user->plan_expires_at->format('d/m/Y H:i') : 'Sem expiração' }}" readonly>
+            </div>
+        </div>
+        @endif
 
         @if(Auth::user()->canChangeUserSensitiveData())
         <div class="grid md:grid-cols-1 gap-6">

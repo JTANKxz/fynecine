@@ -43,6 +43,24 @@
                         <option value="editor">Editor (Conteúdo)</option>
                         <option value="admin">Administrador (Total)</option>
                     </select>
+                    @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Plano de Assinatura</label>
+                    <select name="plan_type"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
+                        <option value="free" selected>Free (Grátis)</option>
+                        <option value="basic">Basic (Básico)</option>
+                        <option value="premium">Premium (VIP)</option>
+                    </select>
+                    @error('plan_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Dias de Premium</label>
+                    <input type="number" name="premium_days" value="0" min="0"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="Ex: 30">
+                    @error('premium_days') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 

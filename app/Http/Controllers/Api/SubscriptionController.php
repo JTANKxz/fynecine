@@ -83,8 +83,34 @@ class SubscriptionController extends Controller
         $planFeatures = $coupon->subscription_plan_id ? ($coupon->subscriptionPlan->features ?? []) : [];
         $couponFeatures = $coupon->features ?? [];
         
-        // Combina os dois arrays e remove duplicatas
-        $features = array_unique(array_merge($planFeatures, $couponFeatures));
+        // Combina os dois arrays e remove duplicatas de forma segura para evitar erro de 'Array to string conversion'
+        $mergedFeatures = array_merge($planFeatures, $couponFeatures);
+        $seen = [];
+        foreach ($mergedFeatures as $feature) {
+            if (is_array($feature) && isset($feature['name'])) {
+                $name = $feature['name'];
+                $included = (bool)($feature['included'] ?? false);
+                if (!isset($seen[$name])) {
+                    $seen[$name] = $feature;
+                } else {
+                    if (is_array($seen[$name])) {
+                        $seen[$name]['included'] = ($seen[$name]['included'] ?? false) || $included;
+                    } else {
+                        $seen[$name] = $feature;
+                    }
+                }
+            } else if (is_string($feature)) {
+                if (!isset($seen[$feature])) {
+                    $seen[$feature] = $feature;
+                }
+            } else {
+                $serialized = json_encode($feature);
+                if (!isset($seen[$serialized])) {
+                    $seen[$serialized] = $feature;
+                }
+            }
+        }
+        $features = array_values($seen);
 
         $currentExpires = $user->plan_expires_at && $user->plan_expires_at->isFuture()
             ? $user->plan_expires_at

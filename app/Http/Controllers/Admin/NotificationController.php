@@ -125,13 +125,16 @@ class NotificationController extends Controller
         $isPush = $request->boolean('send_push', false);
 
         // Criar notificação
+
         $notificationData = [
-            'title' => "Novo $contentType disponível: $title",
-            'content' => "Assista agora!",
+            'title' => $contentType === 'movie'
+                ? 'Novo filme disponível!'
+                : 'Nova série disponível!',
+            'content' => "Assista agora: $title",
             'image_url' => $image,
             'big_picture_url' => $image,
             'action_type' => $actionType,
-            'action_value' => (string)$contentId,
+            'action_value' => (string) $contentId,
             'is_global' => $request->input('segment') === 'all',
             'user_id' => null,
             'segment' => $request->input('segment'),
@@ -244,19 +247,19 @@ class NotificationController extends Controller
             case 'premium':
             case 'basic':
             case 'free':
-                $query->whereHas('user', function($q) use ($notification) {
+                $query->whereHas('user', function ($q) use ($notification) {
                     $q->where('plan_type', $notification->segment);
                     // Filter by active status for specific plan types
-                    $q->where(function($sq) {
+                    $q->where(function ($sq) {
                         $sq->whereNull('plan_expires_at')
-                           ->orWhere('plan_expires_at', '>', now());
+                            ->orWhere('plan_expires_at', '>', now());
                     });
                 });
                 break;
             case 'expired':
-                $query->whereHas('user', function($q) {
+                $query->whereHas('user', function ($q) {
                     $q->whereNotNull('plan_expires_at')
-                       ->where('plan_expires_at', '<', now());
+                        ->where('plan_expires_at', '<', now());
                 });
                 break;
             case 'guest':
@@ -284,7 +287,7 @@ class NotificationController extends Controller
             ];
 
             $results = $this->fcmService->sendPush($tokens, $data);
-            
+
             $notification->update(['push_status' => 'sent']);
             return $results;
         }
@@ -297,7 +300,8 @@ class NotificationController extends Controller
         $search = $request->query('q');
         $type = $request->query('type');
 
-        if (strlen($search) < 2) return response()->json([]);
+        if (strlen($search) < 2)
+            return response()->json([]);
 
         if ($type === 'movie') {
             $results = Movie::where('title', 'like', "%{$search}%")->limit(10)->get(['id', 'title', 'poster']);
@@ -311,7 +315,8 @@ class NotificationController extends Controller
     public function searchUser(Request $request)
     {
         $search = $request->query('q');
-        if (strlen($search) < 2) return response()->json([]);
+        if (strlen($search) < 2)
+            return response()->json([]);
 
         $users = User::where('name', 'like', "%{$search}%")
             ->orWhere('email', 'like', "%{$search}%")
@@ -325,18 +330,18 @@ class NotificationController extends Controller
     {
         // Buscar a notificação diretamente
         $notif = Notification::findOrFail($notification);
-        
+
         try {
             // Deletar os readers (pivot)
             \DB::table('notification_user')
                 ->where('notification_id', $notif->id)
                 ->delete();
-            
+
             // Deletar a notificação
             \DB::table('notifications')
                 ->where('id', $notif->id)
                 ->delete();
-            
+
             return redirect()->route('admin.notifications.index')
                 ->with('success', 'Notificação deletada permanentemente do histórico!');
         } catch (\Exception $e) {

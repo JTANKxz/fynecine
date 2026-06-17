@@ -39,10 +39,31 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => 'required|in:admin,editor,user',
+            'plan_type' => 'required|in:free,basic,premium',
+            'premium_days' => 'nullable|integer|min:0',
         ]);
 
         // Forçar username minúsculo
         $validated['username'] = strtolower($validated['username']);
+
+        $planExpiresAt = null;
+        $features = [];
+        $subscriptionPlanId = null;
+
+        if ($validated['plan_type'] !== 'free') {
+            $days = intval($request->input('premium_days', 0));
+            if ($days > 0) {
+                $planExpiresAt = now()->addDays($days);
+            }
+            
+            $plan = \App\Models\SubscriptionPlan::where('plan_type', $validated['plan_type'])
+                ->where('is_active', true)
+                ->first();
+            if ($plan) {
+                $features = $plan->features ?? [];
+                $subscriptionPlanId = $plan->id;
+            }
+        }
 
         // Criação do usuário
         User::create([
@@ -52,6 +73,10 @@ class UserController extends Controller
             'password' => $validated['password'], // hashed automaticamente pelo cast do model
             'role' => $validated['role'],
             'is_admin' => $validated['role'] === 'admin',
+            'plan_type' => $validated['plan_type'],
+            'plan_expires_at' => $planExpiresAt,
+            'features' => $features,
+            'subscription_plan_id' => $subscriptionPlanId,
         ]);
 
         return redirect()->route('admin.users.index')
@@ -74,14 +99,15 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'nullable|in:admin,editor,user',
             'plan_type' => 'required|in:free,basic,premium',
+            'premium_days' => 'nullable|integer|min:0',
             'password' => 'nullable|string|min:6',
         ]);
 
         $currentUser = $request->user();
 
-        // Editor não pode alterar SENHA nem CARGO
+        // Editor não pode alterar SENHA, CARGO nem PLANO/DIAS DE PREMIUM
         if (!$currentUser->canChangeUserSensitiveData()) {
-            unset($validated['password'], $validated['role']);
+            unset($validated['password'], $validated['role'], $validated['plan_type'], $validated['premium_days']);
         }
 
         if (isset($validated['password'])) {
@@ -95,7 +121,35 @@ class UserController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->plan_type = $validated['plan_type'];
+
+        if (isset($validated['plan_type'])) {
+            $user->plan_type = $validated['plan_type'];
+            
+            if ($user->plan_type === 'free') {
+                $user->plan_expires_at = null;
+                $user->features = [];
+                $user->subscription_plan_id = null;
+            } else {
+                $days = intval($validated['premium_days'] ?? 0);
+                if ($days > 0) {
+                    $user->plan_expires_at = now()->addDays($days);
+                } else {
+                    $user->plan_expires_at = null;
+                }
+                
+                $plan = \App\Models\SubscriptionPlan::where('plan_type', $user->plan_type)
+                    ->where('is_active', true)
+                    ->first();
+                if ($plan) {
+                    $user->features = $plan->features ?? [];
+                    $user->subscription_plan_id = $plan->id;
+                } else {
+                    $user->features = [];
+                    $user->subscription_plan_id = null;
+                }
+            }
+        }
+
         $user->save();
 
         return redirect()->route('admin.users.index')

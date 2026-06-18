@@ -107,7 +107,7 @@ class UserController extends Controller
             unset($validated['password'], $validated['role'], $validated['plan_type'], $validated['premium_days']);
         }
 
-        if (isset($validated['password'])) {
+        if (!empty($validated['password'])) {
             $user->password = $validated['password'];
         }
 

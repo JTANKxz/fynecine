@@ -32,7 +32,9 @@ class CheckApiToken
         $token = trim($request->header('X-API-Token') ?? '');
         $expectedToken = trim(\App\Models\AppConfig::getSettings()->api_token_key ?? '');
 
-        if (empty($expectedToken) || $token !== $expectedToken) {
+        // Se nenhum token está configurado no banco, permite (sem proteção)
+        // Se há token configurado, verifica se bate
+        if (!empty($expectedToken) && $token !== $expectedToken) {
             \Log::warning("CheckApiToken Falhou: Recebido '{$token}', Esperado '{$expectedToken}' para URI: " . $request->path());
             
             return response()->json([

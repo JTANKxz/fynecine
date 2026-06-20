@@ -12,11 +12,17 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         $query = $request->get('q');
+        $genreSlug = $request->get('genre');
 
-        if (!$query) {
+        if (!$query && !$genreSlug) {
             return response()->json([
                 'data' => []
             ]);
+        }
+
+        $genre = null;
+        if ($genreSlug) {
+            $genre = \App\Models\Genre::where('slug', $genreSlug)->first();
         }
 
         /*
@@ -25,8 +31,17 @@ class SearchController extends Controller
         =========================
         */
 
-        $movies = Movie::where('title', 'like', "%{$query}%")
-            ->limit(20)
+        $movieQuery = Movie::query();
+        if ($query) {
+            $movieQuery->where('title', 'like', "%{$query}%");
+        }
+        if ($genre) {
+            $movieQuery->whereHas('genres', function ($q) use ($genre) {
+                $q->where('genres.id', $genre->id);
+            });
+        }
+
+        $movies = $movieQuery->limit(20)
             ->get()
             ->map(function ($movie) {
                 return [
@@ -48,8 +63,17 @@ class SearchController extends Controller
         =========================
         */
 
-        $series = Serie::where('name', 'like', "%{$query}%")
-            ->limit(20)
+        $serieQuery = Serie::query();
+        if ($query) {
+            $serieQuery->where('name', 'like', "%{$query}%");
+        }
+        if ($genre) {
+            $serieQuery->whereHas('genres', function ($q) use ($genre) {
+                $q->where('genres.id', $genre->id);
+            });
+        }
+
+        $series = $serieQuery->limit(20)
             ->get()
             ->map(function ($serie) {
                 return [

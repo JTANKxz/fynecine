@@ -41,6 +41,39 @@ class User extends Authenticatable
         'max_profiles',
         'plan_status',
     ];
+
+    /**
+     * Retorna as features sempre como lista de strings simples,
+     * independente de estarem salvas como strings ou como objetos {name, included}.
+     * Isso garante compatibilidade com o app Android que espera List<String>.
+     */
+    public function getFeaturesAttribute($value): array
+    {
+        if (empty($value)) {
+            return [];
+        }
+
+        $raw = is_array($value) ? $value : json_decode($value, true);
+
+        if (!is_array($raw)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($raw as $feature) {
+            if (is_string($feature)) {
+                $normalized[] = $feature;
+            } elseif (is_array($feature) && isset($feature['name'])) {
+                // Novo formato {name, included} — retorna apenas se incluído
+                if (!empty($feature['included'])) {
+                    $normalized[] = $feature['name'];
+                }
+            }
+        }
+
+        return $normalized;
+    }
+
     public const ROLE_ADMIN = 'admin';
     public const ROLE_EDITOR = 'editor';
     public const ROLE_USER = 'user';
@@ -84,7 +117,7 @@ class User extends Authenticatable
 
     public function getPlanStatusAttribute(): string
     {
-        if ($this->plan_type === 'free') {
+        if (!$this->plan_type || $this->plan_type === 'free') {
             return 'none';
         }
 
@@ -142,7 +175,7 @@ class User extends Authenticatable
 
     public function hasPlan(): bool
     {
-        if ($this->plan_type === 'free') {
+        if (!$this->plan_type || $this->plan_type === 'free') {
             return false;
         }
 

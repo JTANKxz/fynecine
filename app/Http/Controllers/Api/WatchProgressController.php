@@ -26,6 +26,8 @@ class WatchProgressController extends Controller
             'link_id' => ['nullable', 'string'],
             'link_type' => ['nullable', 'string'],
             'link_url' => ['nullable', 'string'],
+            'link_headers' => ['nullable', 'string'],
+            'link_cookies' => ['nullable', 'string'],
             'guest_id' => ['nullable', 'string'],
         ]);
 
@@ -47,6 +49,8 @@ class WatchProgressController extends Controller
             linkId: $validated['link_id'] ?? null,
             linkType: $validated['link_type'] ?? null,
             linkUrl: $validated['link_url'] ?? null,
+            linkHeaders: $validated['link_headers'] ?? null,
+            linkCookies: $validated['link_cookies'] ?? null,
         );
 
         if (!$progress) {

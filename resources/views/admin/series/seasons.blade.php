@@ -352,7 +352,7 @@
                 const modal = document.getElementById('settingsModal');
                 modal.style.display = "flex";
                 document.getElementById('useAutoEmbed').checked = useAutoEmbed;
-                document.getElementById('settingsForm').action = "{{ route('admin.seasons.settings', ':id') }}".replace(':id', id);
+                document.getElementById('settingsForm').action = "{{ route('admin.series.seasons.settings', ':id') }}".replace(':id', id);
             }
 
             function closeSettingsModal() {

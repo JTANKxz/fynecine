@@ -84,7 +84,7 @@
 <!-- SECONDARY STATS -->
 <section class="mb-8">
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-        <a href="{{ route('admin.links.movies') }}" class="block bg-neutral-900/50 p-3 rounded-lg border border-neutral-800/50 text-center hover:bg-neutral-800 transition group">
+        <a href="{{ route('admin.links.movies.global') }}" class="block bg-neutral-900/50 p-3 rounded-lg border border-neutral-800/50 text-center hover:bg-neutral-800 transition group">
             <p class="text-lg font-bold text-white group-hover:text-netflix transition">{{ number_format($stats['movie_links']) }}</p>
             <p class="text-[10px] text-neutral-500 uppercase font-bold">Links Filmes</p>
         </a>

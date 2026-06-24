@@ -241,7 +241,7 @@ class SerieController extends Controller
                                 ];
                             });
 
-                            if ($config->autoembed_series && $serie->use_autoembed) {
+                            if ($config->autoembed_series && $serie->use_autoembed && $season->use_autoembed) {
                                 $excluded = $serie->excluded_autoembeds ?? [];
                                 
                                 $autoSources = collect($config->autoembed_serie_sources ?? [])->map(function($s) use ($serie, $season, $episode) {

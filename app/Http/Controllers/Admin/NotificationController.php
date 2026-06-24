@@ -304,9 +304,23 @@ class NotificationController extends Controller
             return response()->json([]);
 
         if ($type === 'movie') {
-            $results = Movie::where('title', 'like', "%{$search}%")->limit(10)->get(['id', 'title', 'poster']);
+            $results = Movie::where('title', 'like', "%{$search}%")
+                ->limit(10)
+                ->get(['id', 'title', 'poster_path'])
+                ->map(fn($m) => [
+                    'id' => $m->id,
+                    'title' => $m->title,
+                    'poster' => $m->poster_path,
+                ]);
         } else {
-            $results = Serie::where('title', 'like', "%{$search}%")->limit(10)->get(['id', 'title', 'poster']);
+            $results = Serie::where('name', 'like', "%{$search}%")
+                ->limit(10)
+                ->get(['id', 'name', 'poster_path'])
+                ->map(fn($s) => [
+                    'id' => $s->id,
+                    'title' => $s->name,
+                    'poster' => $s->poster_path,
+                ]);
         }
 
         return response()->json($results);

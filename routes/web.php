@@ -161,6 +161,8 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::get('/seasons/{season}/episodes', [SerieController::class, 'episodes'])->name('episodes');
         Route::put('/seasons/{season}', [SerieController::class, 'updateSeason'])
             ->name('seasons.update');
+        Route::patch('/seasons/{season}/settings', [SerieController::class, 'updateSeasonSettings'])
+            ->name('seasons.settings');
         Route::put('/episodes/{episode}', [SerieController::class, 'updateEpisode'])->name('episodes.update');
         Route::delete('/episodes/{episode}', [SerieController::class, 'deleteEpisode'])
             ->name('episodes.delete');

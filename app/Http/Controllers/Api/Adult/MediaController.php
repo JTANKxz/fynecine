@@ -18,6 +18,7 @@ class MediaController extends Controller
         $media = AdultMedia::where('is_active', true)
             ->where('type', $type)
             ->whereNull('adult_gallery_id')
+            ->whereNull('adult_model_id')
             ->orderByDesc('id')
             ->paginate($perPage);
 

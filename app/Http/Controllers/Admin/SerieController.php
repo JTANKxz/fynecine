@@ -150,6 +150,15 @@ class SerieController extends Controller
         return back()->with('success', 'Temporada atualizada!');
     }
 
+    public function updateSeasonSettings(Request $request, Season $season)
+    {
+        $season->update([
+            'use_autoembed' => $request->has('use_autoembed')
+        ]);
+
+        return back()->with('success', 'Configurações da temporada atualizadas!');
+    }
+
     public function episodes(Season $season)
     {
         $episodes = $season->episodes()
@@ -227,6 +236,7 @@ class SerieController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
+            'subtitle_url' => 'nullable|string',
         ]);
 
         $data = $request->all();
@@ -236,6 +246,8 @@ class SerieController extends Controller
 
         $data['skip_ending_start'] = $this->timeToSeconds($request->skip_ending_start);
         $data['skip_ending_end'] = $this->timeToSeconds($request->skip_ending_end);
+
+        $data['subtitle_url'] = $request->subtitle_url;
 
         $episode->links()->create($data);
 
@@ -274,6 +286,7 @@ class SerieController extends Controller
             'referer' => 'nullable|string',
             'origin' => 'nullable|string',
             'cookie' => 'nullable|string',
+            'subtitle_url' => 'nullable|string',
         ]);
 
         $data = $request->all();
@@ -283,6 +296,8 @@ class SerieController extends Controller
 
         $data['skip_ending_start'] = $this->timeToSeconds($request->skip_ending_start);
         $data['skip_ending_end'] = $this->timeToSeconds($request->skip_ending_end);
+
+        $data['subtitle_url'] = $request->subtitle_url;
 
         $link->update($data);
 

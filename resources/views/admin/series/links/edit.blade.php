@@ -128,6 +128,20 @@
                 </div>
             </div>
 
+            {{-- SUBTITLE URL --}}
+            <div class="mb-4 p-4 border border-dashed border-neutral-700 bg-neutral-800/20 rounded">
+                <div class="mb-2">
+                    <h3 class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-1">Legenda (Opcional)</h3>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">URL da Legenda (.vtt, .srt)</label>
+                    <input type="text" name="subtitle_url" value="{{ old('subtitle_url', $link->subtitle_url) }}"
+                        class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                        placeholder="https://site.com/legenda.vtt">
+                    @error('subtitle_url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
             {{-- SKIP INTRO --}}
             <div class="grid md:grid-cols-2 gap-4">
 

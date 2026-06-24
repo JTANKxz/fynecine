@@ -10,7 +10,12 @@ class Season extends Model
         'series_id',
         'season_number',
         'tmdb_id',
-        'status'
+        'status',
+        'use_autoembed'
+    ];
+
+    protected $casts = [
+        'use_autoembed' => 'boolean',
     ];
 
     public function series()

@@ -94,6 +94,12 @@
 
                                 </button>
 
+                                <button
+                                    onclick="openSettingsModal({{ $season->id }}, {{ $season->use_autoembed ? 'true' : 'false' }})"
+                                    class="text-neutral-400 hover:text-white" title="Configurações">
+                                    <i class="fa-solid fa-gear"></i>
+                                </button>
+
                             </td>
 
                         </tr>
@@ -168,6 +174,33 @@
 
             </div>
 
+        </div>
+
+        <div id="settingsModal" style="display:none" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div class="bg-neutral-900 p-6 rounded-lg w-full max-w-md">
+                <h2 class="text-lg font-bold mb-4">Configurações de Reprodução</h2>
+                <form id="settingsForm" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="space-y-4">
+                        <label class="flex items-center gap-3 p-3 bg-neutral-800 rounded hover:bg-neutral-700 cursor-pointer">
+                            <input type="checkbox" name="use_autoembed" id="useAutoEmbed">
+                            <div>
+                                <div class="font-bold">Usar Auto-Embed</div>
+                                <div class="text-xs text-neutral-400">Buscar players automaticamente na API global</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button" onclick="closeSettingsModal()" class="bg-neutral-700 px-4 py-2 rounded hover:bg-neutral-600">
+                            Cancelar
+                        </button>
+                        <button class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">
+                            Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div id="syncModal" style="display:none" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -313,6 +346,17 @@
 
                 document.getElementById('seasonModal').style.display = "none";
 
+            }
+
+            function openSettingsModal(id, useAutoEmbed) {
+                const modal = document.getElementById('settingsModal');
+                modal.style.display = "flex";
+                document.getElementById('useAutoEmbed').checked = useAutoEmbed;
+                document.getElementById('settingsForm').action = "{{ route('admin.seasons.settings', ':id') }}".replace(':id', id);
+            }
+
+            function closeSettingsModal() {
+                document.getElementById('settingsModal').style.display = "none";
             }
         </script>
     </section>

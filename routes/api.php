@@ -197,6 +197,7 @@ Route::middleware('api.token')->group(function () {
             Route::get('/media', [\App\Http\Controllers\Api\Adult\MediaController::class, 'index']);
             Route::get('/media/{id}', [\App\Http\Controllers\Api\Adult\MediaController::class, 'show']);
             Route::get('/categories', [\App\Http\Controllers\Api\Adult\GalleryController::class, 'categories']);
+            Route::get('/categories/{slug}', [\App\Http\Controllers\Api\Adult\AdultCategoryController::class, 'show']);
         });
     });
 

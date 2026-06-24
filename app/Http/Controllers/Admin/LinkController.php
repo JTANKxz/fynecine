@@ -14,7 +14,7 @@ class LinkController extends Controller
 {
     public function movies(Request $request)
     {
-        $query = Movie::with('playLinks');
+        $query = Movie::with('playLinks')->whereHas('playLinks');
 
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%{$search}%")
@@ -28,7 +28,11 @@ class LinkController extends Controller
 
     public function series(Request $request)
     {
-        $query = Serie::with('seasons.episodes.links');
+        $query = Serie::with(['seasons' => function ($q) {
+            $q->whereHas('episodes.links')->with(['episodes' => function ($q) {
+                $q->whereHas('links')->with('links');
+            }]);
+        }])->whereHas('seasons.episodes.links');
 
         if ($search = $request->input('search')) {
             $query->where('name', 'like', "%{$search}%")

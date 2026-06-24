@@ -23,28 +23,55 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach ($series as $serie)
-            <div class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden group hover:border-netflix transition">
-                <div class="relative aspect-video">
-                    <img src="{{ $serie->backdrop_path ? 'https://image.tmdb.org/t/p/w500'.$serie->backdrop_path : 'https://via.placeholder.com/500x281' }}" 
-                         class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-                    <div class="absolute bottom-4 left-4">
-                        <h3 class="font-bold text-white">{{ $serie->name }}</h3>
-                        <p class="text-[10px] text-neutral-400 uppercase">{{ $serie->first_air_year }} • TMDB: {{ $serie->tmdb_id }}</p>
-                    </div>
-                </div>
-                <div class="p-4 flex justify-between items-center">
-                    <div class="text-xs text-neutral-500">
-                        <span class="block">{{ $serie->seasons->count() }} Temporadas</span>
-                    </div>
-                    <a href="{{ route('admin.links.series.manage', $serie->id) }}" class="bg-netflix text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-red-700 transition">
-                        GERENCIAR LINKS
-                    </a>
+    <div class="space-y-6">
+        @forelse ($series as $serie)
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-4">
+                <h3 class="text-lg font-bold text-netflix mb-4">{{ $serie->name }}</h3>
+                
+                <div class="space-y-4">
+                    @foreach ($serie->seasons as $season)
+                        @if($season->episodes->count() > 0)
+                        <div class="bg-neutral-800/50 border border-neutral-700 rounded p-3">
+                            <h4 class="font-bold mb-2 text-neutral-300">Temporada {{ $season->season_number }}</h4>
+                            
+                            <div class="space-y-2">
+                                @foreach ($season->episodes as $episode)
+                                    @if($episode->links->count() > 0)
+                                    <div class="bg-neutral-800 border border-neutral-700 p-2 rounded">
+                                        <div class="text-sm font-semibold mb-2">Ep. {{ $episode->episode_number }} - {{ $episode->name }}</div>
+                                        
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                            @foreach ($episode->links as $link)
+                                            <div class="flex justify-between items-center bg-neutral-900 border border-neutral-800 p-2 rounded text-xs">
+                                                <div class="truncate pr-2">
+                                                    <span class="font-bold text-blue-400">[{{ strtoupper($link->type) }}]</span> 
+                                                    {{ $link->name }} <span class="text-neutral-500">({{ $link->quality }})</span>
+                                                </div>
+                                                <div class="flex gap-3">
+                                                    <a href="{{ route('admin.series.episodes.links.edit', $link->id) }}" class="text-blue-500 hover:text-blue-400" title="Editar"><i class="fa-solid fa-edit"></i></a>
+                                                    <button onclick="deleteEpLink({{ $link->id }})" class="text-red-500 hover:text-red-400" title="Remover"><i class="fa-solid fa-trash"></i></button>
+                                                    <form id="delete-eplink-{{ $link->id }}" action="{{ route('admin.series.episodes.links.delete', $link->id) }}" method="POST" class="hidden">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                    @endforeach
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-8 text-center text-neutral-500">
+                Nenhum link manual cadastrado para séries.
+            </div>
+        @endforelse
     </div>
 
     <div class="mt-8">

@@ -8,7 +8,7 @@
     @php
         $settings = \App\Models\AppConfig::getSettings();
         $autoEmbedUrl = null;
-        if($settings->is_autoembed_active && $serie->tmdb_id && $serie->use_autoembed) {
+        if($settings->is_autoembed_active && $serie->tmdb_id && $serie->use_autoembed && $episode->season->use_autoembed) {
             $autoEmbedUrl = str_replace(
                 ['{id}', '{s}', '{e}'], 
                 [$serie->tmdb_id, $season_number, $episode_number], 

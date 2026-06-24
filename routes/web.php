@@ -196,154 +196,154 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
     Route::post('/series/episode/{episode}/store', [LinkController::class, 'storeEpisodeLink'])->name('series.episode.store');
     Route::put('/series/link/{link}', [LinkController::class, 'updateEpisodeLink'])->name('series.episode.update');
     Route::delete('/series/link/{link}', [LinkController::class, 'destroyEpisodeLink'])->name('series.episode.delete');
+
+    // ========== DOWNLOADS ==========
+    Route::prefix('downloads')->name('downloads.')->group(function () {
+        Route::get('/movies', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'movies'])->name('movies');
+        Route::get('/series', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'series'])->name('series');
+        Route::get('/series/{serie}/manage', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'serieManage'])->name('series.manage');
+
+        Route::post('/movies/{movie}/store', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'storeMovieDownload'])->name('movies.store');
+        Route::put('/movies/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'updateMovieDownload'])->name('movies.update');
+        Route::delete('/movies/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'destroyMovieDownload'])->name('movies.delete');
+
+        Route::post('/series/episode/{episode}/store', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'storeEpisodeDownload'])->name('series.episode.store');
+        Route::put('/series/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'updateEpisodeDownload'])->name('series.episode.update');
+        Route::delete('/series/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'destroyEpisodeDownload'])->name('series.episode.delete');
+    });
+
+    // ========== TV AO VIVO ==========
+    Route::prefix('channels')->name('channels.')->group(function () {
+        Route::get('/', [TvChannelController::class, 'index'])->name('index');
+        Route::get('/create', [TvChannelController::class, 'create'])->name('create');
+        Route::post('/', [TvChannelController::class, 'store'])->name('store');
+        Route::get('/{channel}/edit', [TvChannelController::class, 'edit'])->name('edit');
+        Route::put('/{channel}', [TvChannelController::class, 'update'])->name('update');
+        Route::delete('/{channel}', [TvChannelController::class, 'destroy'])->name('delete');
+
+        // Links do canal
+        Route::get('/{channel}/links', [TvChannelController::class, 'links'])->name('links');
+        Route::get('/{channel}/links/create', [TvChannelController::class, 'createLink'])->name('links.create');
+        Route::post('/{channel}/links', [TvChannelController::class, 'storeLink'])->name('links.store');
+        Route::get('/links/{link}/edit', [TvChannelController::class, 'editLink'])->name('links.edit');
+        Route::put('/links/{link}', [TvChannelController::class, 'updateLink'])->name('links.update');
+        Route::delete('/links/{link}', [TvChannelController::class, 'deleteLink'])->name('links.delete');
+    });
+
+    Route::prefix('channel-categories')->name('channel-categories.')->group(function () {
+        Route::get('/', [TvChannelCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [TvChannelCategoryController::class, 'create'])->name('create');
+        Route::post('/', [TvChannelCategoryController::class, 'store'])->name('store');
+        Route::get('/{category}/edit', [TvChannelCategoryController::class, 'edit'])->name('edit');
+        Route::put('/{category}', [TvChannelCategoryController::class, 'update'])->name('update');
+        Route::delete('/{category}', [TvChannelCategoryController::class, 'destroy'])->name('delete');
+    });
+
+    // ========== SEÇÕES DA HOME ==========
+    Route::prefix('sections')->name('sections.')->group(function () {
+        Route::get('/', [HomeSectionController::class, 'index'])->name('index');
+        Route::get('/create', [HomeSectionController::class, 'create'])->name('create');
+        Route::post('/', [HomeSectionController::class, 'store'])->name('store');
+        Route::get('/{section}/edit', [HomeSectionController::class, 'edit'])->name('edit');
+        Route::put('/{section}', [HomeSectionController::class, 'update'])->name('update');
+        Route::delete('/{section}', [HomeSectionController::class, 'destroy'])->name('delete');
+
+        Route::patch('/{section}/toggle', [HomeSectionController::class, 'toggle'])->name('toggle');
+        Route::post('/reorder', [HomeSectionController::class, 'reorder'])->name('reorder');
+
+        Route::get('/{section}/items', [HomeSectionController::class, 'items'])->name('items');
+        Route::post('/{section}/items', [HomeSectionController::class, 'addItem'])->name('items.add');
+        Route::delete('/items/{item}', [HomeSectionController::class, 'removeItem'])->name('items.remove');
+        Route::get('/search', [HomeSectionController::class, 'searchContent'])->name('search');
+    });
+
+    // ========== NETWORKS ==========
+    Route::prefix('networks')->name('networks.')->group(function () {
+        Route::get('/', [NetworkController::class, 'index'])->name('index');
+        Route::get('/create', [NetworkController::class, 'create'])->name('create');
+        Route::post('/', [NetworkController::class, 'store'])->name('store');
+        Route::get('/{network}/edit', [NetworkController::class, 'edit'])->name('edit');
+        Route::put('/{network}', [NetworkController::class, 'update'])->name('update');
+        Route::delete('/{network}', [NetworkController::class, 'destroy'])->name('delete');
+
+        Route::get('/{network}/content', [NetworkController::class, 'content'])->name('content');
+        Route::post('/{network}/content', [NetworkController::class, 'addContent'])->name('content.add');
+        Route::delete('/{network}/content', [NetworkController::class, 'removeContent'])->name('content.remove');
+        Route::get('/search', [NetworkController::class, 'searchContent'])->name('search');
+    });
+
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/', [TicketController::class, 'index'])->name('index');
+        Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
+        Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('delete');
+        Route::post('/{ticket}/respond', [TicketController::class, 'respond'])->name('respond');
+    });
+
+    // ========== AVATARES ==========
+    Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
+    Route::resource('avatars', AvatarController::class)->names('avatars');
+    Route::resource('content-categories', ContentCategoryController::class)->names('categories')->parameters(['content-categories' => 'category']);
+
+    // Rotas específicas de notificações ANTES do resource genérico
+    Route::get('notifications/search-content', [\App\Http\Controllers\Admin\NotificationController::class, 'searchContent'])->name('notifications.search');
+    Route::get('notifications/search-users', [\App\Http\Controllers\Admin\NotificationController::class, 'searchUser'])->name('notifications.search-users');
+    Route::post('notifications/user/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToUser'])->name('notifications.send-user');
+    Route::post('notifications/content/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToContent'])->name('notifications.send-content');
+
+    // Resource genérico por ÚLTIMO
+    Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
+
+    Route::resource('in-app-notifications', InAppNotificationController::class)->names('in-app-notifications');
+    Route::resource('push-notifications', PushNotificationController::class)->names('push-notifications');
+
+    // ========== EVENTOS AO VIVO ==========
+    Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
+    Route::get('events/{event}/links', [\App\Http\Controllers\Admin\EventController::class, 'links'])->name('events.links');
+    Route::get('events/{event}/links/create', [\App\Http\Controllers\Admin\EventController::class, 'createLink'])->name('events.links.create');
+    Route::post('events/{event}/links', [\App\Http\Controllers\Admin\EventController::class, 'storeLink'])->name('events.links.store');
+    Route::get('event-links/{link}/edit', [\App\Http\Controllers\Admin\EventController::class, 'editLink'])->name('events.links.edit');
+    Route::put('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'updateLink'])->name('events.links.update');
+    Route::delete('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'deleteLink'])->name('events.links.destroy');
+
+    // ========== TIMES / EQUIPES ==========
+    Route::resource('teams', \App\Http\Controllers\Admin\TeamController::class)->names('teams');
+    Route::get('teams-search', [\App\Http\Controllers\Admin\TeamController::class, 'search'])->name('teams.search');
+
+    // ========== CAMPEONATOS ==========
+    Route::resource('championships', ChampionshipController::class)->except(['show', 'create', 'edit']);
+
+    // ========== ANOTAÇÕES ==========
+    Route::prefix('notes')->name('notes.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminNoteController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminNoteController::class, 'store'])->name('store');
+        Route::put('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'update'])->name('update');
+        Route::delete('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'destroy'])->name('destroy');
+        Route::patch('/{note}/pin', [\App\Http\Controllers\Admin\AdminNoteController::class, 'togglePin'])->name('pin');
+        Route::patch('/{note}/task', [\App\Http\Controllers\Admin\AdminNoteController::class, 'toggleTask'])->name('toggle-task');
+    });
+
+    // ========== MODO ADULTO ==========
+    Route::prefix('adult')->name('adult.')->group(function () {
+        Route::resource('categories', AdultCategoryController::class)->names('categories');
+        Route::resource('models', AdultModelController::class)->names('models');
+        Route::resource('collections', AdultCollectionController::class)->names('collections');
+        Route::patch('collections/{collection}/toggle', [AdultCollectionController::class, 'toggle'])->name('collections.toggle');
+
+        Route::resource('galleries', AdultGalleryController::class)->names('galleries');
+        Route::get('galleries/{gallery}/media', [AdultGalleryController::class, 'media'])->name('galleries.media');
+        Route::post('galleries/{gallery}/media', [AdultGalleryController::class, 'addMedia'])->name('galleries.media.add');
+        Route::delete('galleries/media/{media}', [AdultGalleryController::class, 'removeMedia'])->name('galleries.media.remove');
+
+        Route::resource('media', AdultMediaController::class)->names('media')->parameters(['media' => 'media']);
+
+        Route::resource('home-sections', AdultHomeSectionController::class)->names('home-sections');
+        Route::get('home-sections/{section}/items', [AdultHomeSectionController::class, 'manageItems'])->name('home-sections.items');
+        Route::post('home-sections/{section}/items', [AdultHomeSectionController::class, 'addItem'])->name('home-sections.items.add');
+        Route::delete('home-sections/items/{item}', [AdultHomeSectionController::class, 'removeItem'])->name('home-sections.items.remove');
+        Route::patch('home-sections/{section}/toggle', [AdultHomeSectionController::class, 'toggle'])->name('home-sections.toggle');
+    });
+
 });
-
-// ========== DOWNLOADS ==========
-Route::prefix('downloads')->name('downloads.')->group(function () {
-    Route::get('/movies', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'movies'])->name('movies');
-    Route::get('/series', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'series'])->name('series');
-    Route::get('/series/{serie}/manage', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'serieManage'])->name('series.manage');
-
-    Route::post('/movies/{movie}/store', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'storeMovieDownload'])->name('movies.store');
-    Route::put('/movies/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'updateMovieDownload'])->name('movies.update');
-    Route::delete('/movies/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'destroyMovieDownload'])->name('movies.delete');
-
-    Route::post('/series/episode/{episode}/store', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'storeEpisodeDownload'])->name('series.episode.store');
-    Route::put('/series/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'updateEpisodeDownload'])->name('series.episode.update');
-    Route::delete('/series/link/{link}', [\App\Http\Controllers\Admin\DownloadLinkController::class, 'destroyEpisodeDownload'])->name('series.episode.delete');
-});
-
-// ========== TV AO VIVO ==========
-Route::prefix('channels')->name('channels.')->group(function () {
-    Route::get('/', [TvChannelController::class, 'index'])->name('index');
-    Route::get('/create', [TvChannelController::class, 'create'])->name('create');
-    Route::post('/', [TvChannelController::class, 'store'])->name('store');
-    Route::get('/{channel}/edit', [TvChannelController::class, 'edit'])->name('edit');
-    Route::put('/{channel}', [TvChannelController::class, 'update'])->name('update');
-    Route::delete('/{channel}', [TvChannelController::class, 'destroy'])->name('delete');
-
-    // Links do canal
-    Route::get('/{channel}/links', [TvChannelController::class, 'links'])->name('links');
-    Route::get('/{channel}/links/create', [TvChannelController::class, 'createLink'])->name('links.create');
-    Route::post('/{channel}/links', [TvChannelController::class, 'storeLink'])->name('links.store');
-    Route::get('/links/{link}/edit', [TvChannelController::class, 'editLink'])->name('links.edit');
-    Route::put('/links/{link}', [TvChannelController::class, 'updateLink'])->name('links.update');
-    Route::delete('/links/{link}', [TvChannelController::class, 'deleteLink'])->name('links.delete');
-});
-
-Route::prefix('channel-categories')->name('channel-categories.')->group(function () {
-    Route::get('/', [TvChannelCategoryController::class, 'index'])->name('index');
-    Route::get('/create', [TvChannelCategoryController::class, 'create'])->name('create');
-    Route::post('/', [TvChannelCategoryController::class, 'store'])->name('store');
-    Route::get('/{category}/edit', [TvChannelCategoryController::class, 'edit'])->name('edit');
-    Route::put('/{category}', [TvChannelCategoryController::class, 'update'])->name('update');
-    Route::delete('/{category}', [TvChannelCategoryController::class, 'destroy'])->name('delete');
-});
-
-// ========== SEÇÕES DA HOME ==========
-Route::prefix('sections')->name('sections.')->group(function () {
-    Route::get('/', [HomeSectionController::class, 'index'])->name('index');
-    Route::get('/create', [HomeSectionController::class, 'create'])->name('create');
-    Route::post('/', [HomeSectionController::class, 'store'])->name('store');
-    Route::get('/{section}/edit', [HomeSectionController::class, 'edit'])->name('edit');
-    Route::put('/{section}', [HomeSectionController::class, 'update'])->name('update');
-    Route::delete('/{section}', [HomeSectionController::class, 'destroy'])->name('delete');
-
-    Route::patch('/{section}/toggle', [HomeSectionController::class, 'toggle'])->name('toggle');
-    Route::post('/reorder', [HomeSectionController::class, 'reorder'])->name('reorder');
-
-    Route::get('/{section}/items', [HomeSectionController::class, 'items'])->name('items');
-    Route::post('/{section}/items', [HomeSectionController::class, 'addItem'])->name('items.add');
-    Route::delete('/items/{item}', [HomeSectionController::class, 'removeItem'])->name('items.remove');
-    Route::get('/search', [HomeSectionController::class, 'searchContent'])->name('search');
-});
-
-// ========== NETWORKS ==========
-Route::prefix('networks')->name('networks.')->group(function () {
-    Route::get('/', [NetworkController::class, 'index'])->name('index');
-    Route::get('/create', [NetworkController::class, 'create'])->name('create');
-    Route::post('/', [NetworkController::class, 'store'])->name('store');
-    Route::get('/{network}/edit', [NetworkController::class, 'edit'])->name('edit');
-    Route::put('/{network}', [NetworkController::class, 'update'])->name('update');
-    Route::delete('/{network}', [NetworkController::class, 'destroy'])->name('delete');
-
-    Route::get('/{network}/content', [NetworkController::class, 'content'])->name('content');
-    Route::post('/{network}/content', [NetworkController::class, 'addContent'])->name('content.add');
-    Route::delete('/{network}/content', [NetworkController::class, 'removeContent'])->name('content.remove');
-    Route::get('/search', [NetworkController::class, 'searchContent'])->name('search');
-});
-
-Route::prefix('tickets')->name('tickets.')->group(function () {
-    Route::get('/', [TicketController::class, 'index'])->name('index');
-    Route::patch('/{ticket}', [TicketController::class, 'update'])->name('update');
-    Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('delete');
-    Route::post('/{ticket}/respond', [TicketController::class, 'respond'])->name('respond');
-});
-
-// ========== AVATARES ==========
-Route::resource('avatar-categories', AvatarCategoryController::class)->names('avatar-categories');
-Route::resource('avatars', AvatarController::class)->names('avatars');
-Route::resource('content-categories', ContentCategoryController::class)->names('categories')->parameters(['content-categories' => 'category']);
-
-// Rotas específicas de notificações ANTES do resource genérico
-Route::get('notifications/search-content', [\App\Http\Controllers\Admin\NotificationController::class, 'searchContent'])->name('notifications.search');
-Route::get('notifications/search-users', [\App\Http\Controllers\Admin\NotificationController::class, 'searchUser'])->name('notifications.search-users');
-Route::post('notifications/user/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToUser'])->name('notifications.send-user');
-Route::post('notifications/content/send', [\App\Http\Controllers\Admin\NotificationController::class, 'sendToContent'])->name('notifications.send-content');
-
-// Resource genérico por ÚLTIMO
-Route::resource('notifications', \App\Http\Controllers\Admin\NotificationController::class)->names('notifications');
-
-Route::resource('in-app-notifications', InAppNotificationController::class)->names('in-app-notifications');
-Route::resource('push-notifications', PushNotificationController::class)->names('push-notifications');
-
-// ========== EVENTOS AO VIVO ==========
-Route::resource('events', \App\Http\Controllers\Admin\EventController::class)->names('events');
-Route::get('events/{event}/links', [\App\Http\Controllers\Admin\EventController::class, 'links'])->name('events.links');
-Route::get('events/{event}/links/create', [\App\Http\Controllers\Admin\EventController::class, 'createLink'])->name('events.links.create');
-Route::post('events/{event}/links', [\App\Http\Controllers\Admin\EventController::class, 'storeLink'])->name('events.links.store');
-Route::get('event-links/{link}/edit', [\App\Http\Controllers\Admin\EventController::class, 'editLink'])->name('events.links.edit');
-Route::put('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'updateLink'])->name('events.links.update');
-Route::delete('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'deleteLink'])->name('events.links.destroy');
-
-// ========== TIMES / EQUIPES ==========
-Route::resource('teams', \App\Http\Controllers\Admin\TeamController::class)->names('teams');
-Route::get('teams-search', [\App\Http\Controllers\Admin\TeamController::class, 'search'])->name('teams.search');
-
-// ========== CAMPEONATOS ==========
-Route::resource('championships', ChampionshipController::class)->except(['show', 'create', 'edit']);
-
-// ========== ANOTAÇÕES ==========
-Route::prefix('notes')->name('notes.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Admin\AdminNoteController::class, 'index'])->name('index');
-    Route::post('/', [\App\Http\Controllers\Admin\AdminNoteController::class, 'store'])->name('store');
-    Route::put('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'update'])->name('update');
-    Route::delete('/{note}', [\App\Http\Controllers\Admin\AdminNoteController::class, 'destroy'])->name('destroy');
-    Route::patch('/{note}/pin', [\App\Http\Controllers\Admin\AdminNoteController::class, 'togglePin'])->name('pin');
-    Route::patch('/{note}/task', [\App\Http\Controllers\Admin\AdminNoteController::class, 'toggleTask'])->name('toggle-task');
-});
-
-// ========== MODO ADULTO ==========
-Route::prefix('adult')->name('adult.')->group(function () {
-    Route::resource('categories', AdultCategoryController::class)->names('categories');
-    Route::resource('models', AdultModelController::class)->names('models');
-    Route::resource('collections', AdultCollectionController::class)->names('collections');
-    Route::patch('collections/{collection}/toggle', [AdultCollectionController::class, 'toggle'])->name('collections.toggle');
-
-    Route::resource('galleries', AdultGalleryController::class)->names('galleries');
-    Route::get('galleries/{gallery}/media', [AdultGalleryController::class, 'media'])->name('galleries.media');
-    Route::post('galleries/{gallery}/media', [AdultGalleryController::class, 'addMedia'])->name('galleries.media.add');
-    Route::delete('galleries/media/{media}', [AdultGalleryController::class, 'removeMedia'])->name('galleries.media.remove');
-
-    Route::resource('media', AdultMediaController::class)->names('media')->parameters(['media' => 'media']);
-
-    Route::resource('home-sections', AdultHomeSectionController::class)->names('home-sections');
-    Route::get('home-sections/{section}/items', [AdultHomeSectionController::class, 'manageItems'])->name('home-sections.items');
-    Route::post('home-sections/{section}/items', [AdultHomeSectionController::class, 'addItem'])->name('home-sections.items.add');
-    Route::delete('home-sections/items/{item}', [AdultHomeSectionController::class, 'removeItem'])->name('home-sections.items.remove');
-    Route::patch('home-sections/{section}/toggle', [AdultHomeSectionController::class, 'toggle'])->name('home-sections.toggle');
-});
-
 
 // PIX Checkout (página pública para WebView do app)
 Route::get('/pix/checkout/{pixPaymentId}', [\App\Http\Controllers\PixCheckoutController::class, 'show'])->name('pix.checkout');

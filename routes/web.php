@@ -184,9 +184,9 @@ Route::middleware(['admin','auth'])->prefix('dashzin')->name('admin.')->group(fu
         Route::delete('/{upcoming}', [\App\Http\Controllers\Admin\UpcomingController::class, 'destroy'])->name('destroy');
     });
 
-    Route::prefix('links')->name('links.')->group(function () {
         Route::get('/movies', [LinkController::class, 'movies'])->name('movies');
         Route::get('/series', [LinkController::class, 'series'])->name('series');
+        Route::get('/series-global', [LinkController::class, 'seriesGlobal'])->name('series.global');
         Route::get('/series/{serie}/manage', [LinkController::class, 'serieManage'])->name('series.manage');
         
         Route::post('/movies/{movie}/store', [LinkController::class, 'storeMovieLink'])->name('movies.store');

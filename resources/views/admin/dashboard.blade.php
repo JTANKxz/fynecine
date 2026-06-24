@@ -88,7 +88,7 @@
             <p class="text-lg font-bold text-white group-hover:text-netflix transition">{{ number_format($stats['movie_links']) }}</p>
             <p class="text-[10px] text-neutral-500 uppercase font-bold">Links Filmes</p>
         </a>
-        <a href="{{ route('admin.links.series') }}" class="block bg-neutral-900/50 p-3 rounded-lg border border-neutral-800/50 text-center hover:bg-neutral-800 transition group">
+        <a href="{{ route('admin.links.series.global') }}" class="block bg-neutral-900/50 p-3 rounded-lg border border-neutral-800/50 text-center hover:bg-neutral-800 transition group">
             <p class="text-lg font-bold text-white group-hover:text-netflix transition">{{ number_format($stats['episode_links']) }}</p>
             <p class="text-[10px] text-neutral-500 uppercase font-bold">Links Episódios</p>
         </a>

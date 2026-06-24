@@ -24,7 +24,7 @@
     @endif
 
     <div class="space-y-6">
-        @forelse ($movies as $movie)
+        @foreach ($movies as $movie)
             <div class="bg-neutral-950 border border-neutral-900 rounded-lg overflow-hidden">
                 <div class="bg-neutral-900/50 p-4 border-b border-neutral-900 flex flex-wrap justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
@@ -145,11 +145,7 @@
                     </div>
                 </div>
             </div>
-        @empty
-            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-8 text-center text-neutral-500">
-                Nenhum link manual cadastrado para filmes.
-            </div>
-        @endforelse
+        @endforeach
     </div>
 
     <div class="mt-8">

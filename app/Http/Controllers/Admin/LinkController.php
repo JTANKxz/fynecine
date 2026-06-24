@@ -14,7 +14,7 @@ class LinkController extends Controller
 {
     public function movies(Request $request)
     {
-        $query = Movie::with('playLinks')->whereHas('playLinks');
+        $query = Movie::with('playLinks');
 
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%{$search}%")
@@ -28,6 +28,20 @@ class LinkController extends Controller
 
     public function series(Request $request)
     {
+        $query = Serie::with('seasons.episodes.links');
+
+        if ($search = $request->input('search')) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('tmdb_id', $search);
+        }
+
+        $series = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+
+        return view('admin.links.series', compact('series'));
+    }
+
+    public function seriesGlobal(Request $request)
+    {
         $query = Serie::with(['seasons' => function ($q) {
             $q->whereHas('episodes.links')->with(['episodes' => function ($q) {
                 $q->whereHas('links')->with('links');
@@ -39,9 +53,9 @@ class LinkController extends Controller
                 ->orWhere('tmdb_id', $search);
         }
 
-        $series = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+        $series = $query->orderBy('id', 'desc')->paginate(20)->withQueryString();
 
-        return view('admin.links.series', compact('series'));
+        return view('admin.links.series_global', compact('series'));
     }
 
     public function storeMovieLink(Request $request, Movie $movie)

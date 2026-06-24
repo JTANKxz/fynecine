@@ -184,18 +184,20 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
         Route::delete('/{upcoming}', [\App\Http\Controllers\Admin\UpcomingController::class, 'destroy'])->name('destroy');
     });
 
-    Route::get('/movies', [LinkController::class, 'movies'])->name('movies');
-    Route::get('/series', [LinkController::class, 'series'])->name('series');
-    Route::get('/series-global', [LinkController::class, 'seriesGlobal'])->name('series.global');
-    Route::get('/series/{serie}/manage', [LinkController::class, 'serieManage'])->name('series.manage');
+    Route::prefix('links')->name('links.')->group(function () {
+        Route::get('/movies', [LinkController::class, 'movies'])->name('movies');
+        Route::get('/series', [LinkController::class, 'series'])->name('series');
+        Route::get('/series-global', [LinkController::class, 'seriesGlobal'])->name('series.global');
+        Route::get('/series/{serie}/manage', [LinkController::class, 'serieManage'])->name('series.manage');
 
-    Route::post('/movies/{movie}/store', [LinkController::class, 'storeMovieLink'])->name('movies.store');
-    Route::put('/movies/link/{link}', [LinkController::class, 'updateMovieLink'])->name('movies.update');
-    Route::delete('/movies/link/{link}', [LinkController::class, 'destroyMovieLink'])->name('movies.delete');
+        Route::post('/movies/{movie}/store', [LinkController::class, 'storeMovieLink'])->name('movies.store');
+        Route::put('/movies/link/{link}', [LinkController::class, 'updateMovieLink'])->name('movies.update');
+        Route::delete('/movies/link/{link}', [LinkController::class, 'destroyMovieLink'])->name('movies.delete');
 
-    Route::post('/series/episode/{episode}/store', [LinkController::class, 'storeEpisodeLink'])->name('series.episode.store');
-    Route::put('/series/link/{link}', [LinkController::class, 'updateEpisodeLink'])->name('series.episode.update');
-    Route::delete('/series/link/{link}', [LinkController::class, 'destroyEpisodeLink'])->name('series.episode.delete');
+        Route::post('/series/episode/{episode}/store', [LinkController::class, 'storeEpisodeLink'])->name('series.episode.store');
+        Route::put('/series/link/{link}', [LinkController::class, 'updateEpisodeLink'])->name('series.episode.update');
+        Route::delete('/series/link/{link}', [LinkController::class, 'destroyEpisodeLink'])->name('series.episode.delete');
+    });
 
     // ========== DOWNLOADS ==========
     Route::prefix('downloads')->name('downloads.')->group(function () {

@@ -54,12 +54,63 @@ class FrontendController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('q');
-        if (!$query) return redirect()->route('home');
+        $categoria = $request->input('categoria', 'todos');
+        $ano = $request->input('ano', '');
+        $avaliacao = $request->input('avaliacao', '');
+        $duracao = $request->input('duracao', '');
+        
+        $limit = 24;
+        
+        $movies = collect();
+        $series = collect();
 
-        $movies = Movie::where('title', 'LIKE', "%{$query}%")->limit(20)->get();
-        $series = Serie::where('name', 'LIKE', "%{$query}%")->limit(20)->get();
+        // Query Movies
+        if ($categoria === 'todos' || $categoria === 'filmes' || $categoria === 'animes') {
+            $mQuery = Movie::query();
+            if ($query) $mQuery->where('title', 'LIKE', "%{$query}%");
+            if ($ano) $mQuery->where('release_year', $ano);
+            if ($avaliacao) $mQuery->where('rating', '>=', $avaliacao);
+            if ($duracao) {
+                if ($duracao == '90') $mQuery->where('runtime', '<=', 90);
+                if ($duracao == '120') $mQuery->whereBetween('runtime', [90, 120]);
+                if ($duracao == '150') $mQuery->where('runtime', '>', 120);
+            }
+            if ($categoria === 'animes') {
+                $mQuery->where('content_type', 'anime');
+            }
+            $movies = $mQuery->latest()->get();
+        }
 
-        return view('frontend.search', compact('movies', 'series', 'query'));
+        // Query Series
+        if ($categoria === 'todos' || $categoria === 'series' || $categoria === 'animes') {
+            $sQuery = Serie::query();
+            if ($query) $sQuery->where('name', 'LIKE', "%{$query}%");
+            if ($ano) $sQuery->where('first_air_year', $ano);
+            if ($avaliacao) $sQuery->where('rating', '>=', $avaliacao);
+            // duracao mostly applies to movies, but we can ignore for series or filter by episode length if it existed.
+            if ($categoria === 'animes') {
+                $sQuery->where('content_type', 'anime');
+            }
+            $series = $sQuery->latest()->get();
+        }
+
+        // Combine and Paginate manually
+        $all = $movies->concat($series)->sortByDesc('created_at')->values();
+        
+        $page = $request->input('page', 1);
+        $total = $all->count();
+        $results = $all->slice(($page - 1) * $limit, $limit)->values();
+
+        $hasMore = ($page * $limit) < $total;
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('frontend.partials.catalog_cards', compact('results'))->render(),
+                'hasMore' => $hasMore
+            ]);
+        }
+
+        return view('frontend.search', compact('results', 'query', 'categoria', 'ano', 'avaliacao', 'duracao', 'hasMore'));
     }
 
     public function genre($slug)

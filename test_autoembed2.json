@@ -1,0 +1,50 @@
+{
+    "autoembed_movie_sources": {
+        "1776623604934": {
+            "url": "https:\/\/fembed.sx\/e\/{tmdb_id}-dub",
+            "name": "Prermium Dublado",
+            "quality": "HD",
+            "type": "embed",
+            "player_sub": "premium",
+            "user_agent": "Mozilla\/5.0 (Linux; Android 15; 23028RA60L) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/133.0.6943.121 Mobile Safari\/537.36",
+            "referer": "https:\/\/fynecine.online",
+            "origin": "https:\/\/fynecine.online",
+            "cookie": null
+        },
+        "1776623897781": {
+            "url": "https:\/\/embedplayapi.top\/embed\/{tmdb_id}",
+            "name": "Gr\u00e1tis 1",
+            "quality": "HD",
+            "type": "embed",
+            "player_sub": "free",
+            "user_agent": null,
+            "referer": null,
+            "origin": null,
+            "cookie": null
+        }
+    },
+    "autoembed_serie_sources": {
+        "1774990888721": {
+            "url": "https:\/\/fembed.sx\/e\/{tmdb_id}-dub\/{season}-{episode}",
+            "name": "Premium Dublado",
+            "quality": "HD",
+            "type": "embed",
+            "player_sub": "premium",
+            "user_agent": "Mozilla\/5.0 (Linux; Android 15; 23028RA60L) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/133.0.6943.121 Mobile Safari\/537.36",
+            "referer": "https:\/\/fynecine.online",
+            "origin": "https:\/\/fynecine.online",
+            "cookie": null
+        },
+        "1776450122651": {
+            "url": "https:\/\/embedplayapi.top\/embed\/{tmdb_id}\/{season}\/{episode}",
+            "name": "Gr\u00e1tis 1",
+            "quality": "HD",
+            "type": "embed",
+            "player_sub": "free",
+            "user_agent": "Mozilla\/5.0 (Linux; Android 15; 23028RA60L) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/133.0.6943.121 Mobile Safari\/537.36",
+            "referer": "https:\/\/maxcine.online",
+            "origin": "https:\/\/maxcine.online",
+            "cookie": null
+        }
+    }
+}

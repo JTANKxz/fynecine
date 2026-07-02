@@ -1,15 +1,22 @@
 @extends('layouts.fyne')
 
-@section('title', 'FYNECINE - ' . $serie->name)
+@section('title', 'Assistir ' . $serie->name . ' Online')
 
+@section('seo')
+    <meta name="description" content="{{ Str::limit($serie->overview, 150) }}">
+    <meta property="og:title" content="Assistir {{ $serie->name }} Online - FYNECINE">
+    <meta property="og:description" content="{{ Str::limit($serie->overview, 150) }}">
+    <meta property="og:image" content="{{ $serie->backdrop_path ? 'https://image.tmdb.org/t/p/w1280' . $serie->backdrop_path : asset('img/no-backdrop.jpg') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="video.tv_show">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Assistir {{ $serie->name }} Online - FYNECINE">
+    <meta name="twitter:description" content="{{ Str::limit($serie->overview, 150) }}">
+    <meta name="twitter:image" content="{{ $serie->backdrop_path ? 'https://image.tmdb.org/t/p/w1280' . $serie->backdrop_path : asset('img/no-backdrop.jpg') }}">
+@endsection
 @section('styles')
 <style>
-    /* ----- HEADER OVERRIDE ----- */
-    .header {
-        position: fixed !important;
-        background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%) !important;
-    }
-
     /* ----- DETAILS BACKDROP (fixo com efeito de scroll) ----- */
     .details-backdrop {
         position: sticky;
@@ -36,7 +43,7 @@
         pointer-events: none;
     }
 
-    /* ----- CONTEÚDO SOBREPOSTO (rola por cima) - LARGURA TOTAL ----- */
+    /* ----- CONTEÚDO SOBREPOSTO ----- */
     .details-content-wrapper {
         position: relative;
         z-index: 20;
@@ -100,7 +107,7 @@
         font-weight: 500;
     }
 
-    /* ----- BOTÃO ASSISTIR (full width em mobile) ----- */
+    /* ----- BOTÃO ASSISTIR ----- */
     .btn-assistir-full {
         background: #7c3aed;
         color: #fff;
@@ -237,7 +244,6 @@
         background: #6b21a5;
         border-radius: 20px;
     }
-
     .temp-btn {
         flex: 0 0 auto;
         padding: 8px 20px;
@@ -291,8 +297,6 @@
         background: #6b21a5;
         border-radius: 20px;
     }
-
-    /* Card de episódio - hover apenas na imagem */
     .ep-card-wrapper {
         flex: 0 0 160px;
         scroll-snap-align: start;
@@ -306,7 +310,6 @@
         border-color: #7c3aed;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
     }
-
     .ep-card {
         border-radius: 12px;
         overflow: hidden;
@@ -327,8 +330,6 @@
     .ep-card-wrapper:hover .ep-card-img {
         transform: scale(1.05);
     }
-
-    /* Duração no canto inferior direito do card */
     .ep-duration {
         position: absolute;
         bottom: 6px;
@@ -343,8 +344,6 @@
         border: 1px solid rgba(255,255,255,0.08);
         pointer-events: none;
     }
-
-    /* Título do episódio fora do card, alinhado à esquerda */
     .ep-title {
         font-size: 13px;
         font-weight: 600;
@@ -358,7 +357,7 @@
         min-width: 0;
     }
 
-    /* ----- RELACIONADOS (mesmo estilo da home) ----- */
+    /* ----- RELACIONADOS ----- */
     .relacionados {
         padding: 0 0 10px 0;
     }
@@ -387,10 +386,10 @@
         background: #6b21a5;
         border-radius: 20px;
     }
-
     .card-wrapper {
         width: 140px;
         flex-shrink: 0;
+        flex-grow: 0;
         scroll-snap-align: start;
         cursor: pointer;
         display: flex;
@@ -488,7 +487,11 @@
         padding-bottom: 12px;
         border-bottom: 1px solid #1a1a1a;
     }
-    .modal-header h2 { font-size: 20px; font-weight: 700; color: #f0f2f5; }
+    .modal-header h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #f0f2f5;
+    }
     .modal-header h2 i { color: #a855f7; margin-right: 8px; }
     .modal-close {
         background: none;
@@ -500,6 +503,12 @@
         padding: 4px 8px;
     }
     .modal-close:hover { color: #a855f7; transform: rotate(90deg); }
+
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
     .server-item {
         background: #141414;
@@ -513,7 +522,6 @@
         transition: 0.2s;
         gap: 12px;
         flex-wrap: wrap;
-        margin-bottom: 10px;
     }
     .server-item:hover {
         border-color: #7c3aed;
@@ -527,7 +535,27 @@
         flex: 1;
         min-width: 120px;
     }
-    .server-item .server-name { font-weight: 700; font-size: 15px; color: #f0f2f5; }
+    .server-item .server-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: #f0f2f5;
+    }
+    .server-item .server-details {
+        display: flex;
+        gap: 12px;
+        font-size: 12px;
+        color: #b0b8c4;
+        flex-wrap: wrap;
+    }
+    .server-item .server-details span {
+        background: #1a1a1a;
+        padding: 2px 10px;
+        border-radius: 20px;
+        border: 1px solid #2a2a2a;
+    }
+    .server-item .server-details .quality { color: #fbbf24; border-color: #7c3aed; }
+    .server-item .server-details .audio { color: #6ee7b7; border-color: #0d9488; }
+    .server-item .server-details .type { color: #93c5fd; border-color: #2563eb; }
     .server-item .server-action {
         color: #a855f7;
         font-size: 18px;
@@ -541,15 +569,20 @@
         background: rgba(124, 58, 237, 0.2);
         border-color: #7c3aed;
     }
+    .server-item .server-action i { font-size: 16px; }
+
+    .modal-footer {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid #1a1a1a;
+        text-align: center;
+        font-size: 12px;
+        color: #6b7385;
+    }
 
     /* Responsividade geral */
     @media (max-width: 600px) {
-        .details-backdrop {
-            height: 50vh;
-            min-height: 280px;
-            max-height: 400px;
-            padding: 16px 16px 0;
-        }
+        .details-backdrop { height: 50vh; min-height: 280px; max-height: 400px; padding: 16px 16px 0; }
         .details-content-wrapper { margin-top: -15vh; padding: 0 16px 20px; }
         .details-content h1 { font-size: 20px; margin-bottom: 2px; }
         .details-content .meta { font-size: 11px; gap: 8px; margin-bottom: 6px; }
@@ -560,18 +593,16 @@
         .action-icons { gap: 10px; justify-content: space-around; }
         .action-icons button { font-size: 10px; }
         .action-icons button i { font-size: 18px; }
+        .action-icons button .label { font-size: 8px; }
         .elenco-item { flex: 0 0 56px; }
         .elenco-item .foto { width: 56px; height: 56px; font-size: 14px; }
         .elenco-item .nome { font-size: 9px; }
+        .temp-btn { padding: 6px 14px; font-size: 12px; }
         .ep-card-wrapper { flex: 0 0 130px; }
-        .ep-title { font-size: 11px; }
-        .ep-duration { font-size: 10px; padding: 1px 8px; }
         .card-wrapper { width: 100px; gap: 4px; }
         .card-title { font-size: 11px; }
-        .scroll-horizontal, .episodios-scroll, .temporadas-scroll { gap: 8px; padding-bottom: 4px; }
-        .relacionados, .episodios-section, .temporadas-section { padding: 0 0 12px 0; }
-        .details-elenco { padding: 0 0 12px 0; }
-        .temp-btn { font-size: 12px; padding: 6px 14px; }
+        .scroll-horizontal { gap: 8px; padding-bottom: 4px; }
+        .temporadas-scroll, .episodios-scroll { gap: 8px; padding-bottom: 4px; }
     }
 
     @media (min-width: 601px) {
@@ -580,7 +611,6 @@
         .details-content-wrapper { padding-left: 40px; padding-right: 40px; }
         .details-content h1 { font-size: 38px; }
         .details-content .sinopse { font-size: 16px; max-width: 800px; }
-        .ep-card-wrapper { flex: 0 0 200px; }
         .card-wrapper { width: 180px; }
     }
 
@@ -589,34 +619,101 @@
         .details-content h1 { font-size: 46px; }
         .details-content .sinopse { font-size: 17px; max-width: 900px; }
         .details-content-wrapper { padding-left: 60px; padding-right: 60px; }
-        .ep-card-wrapper { flex: 0 0 220px; }
         .card-wrapper { width: 200px; }
     }
 
     .details-page { animation: fadeIn 0.4s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Header Override Fix */
+    .header {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%) !important;
+    }
 </style>
 @endsection
 
 @section('content')
 
     @php
+        $settings = \App\Models\AppConfig::getSettings();
+        
         $backdrop = $serie->backdrop_path ? 'https://image.tmdb.org/t/p/original' . $serie->backdrop_path : asset('img/no-backdrop.jpg');
         $ano = $serie->first_air_year ?? ($serie->first_air_date ? date('Y', strtotime($serie->first_air_date)) : 'N/A');
         $generos = $serie->genres->pluck('name')->join(', ') ?: 'Série';
         $classificacao = $serie->age_rating ?: 'Livre';
+
+        // Prepara links em JSON para uso com Javascript Modal
+        $episodesData = [];
+        $firstEpS = 1;
+        $firstEpE = 1;
+        
+        $hasEpisodes = $serie->seasons->count() > 0 && $serie->seasons->first()->episodes->count() > 0;
+        if($hasEpisodes) {
+            $firstEpS = $serie->seasons->first()->season_number;
+            $firstEpE = $serie->seasons->first()->episodes->first()->episode_number;
+        }
+
+        foreach($serie->seasons as $season) {
+            foreach($season->episodes as $ep) {
+                $epLinks = [];
+
+                // Autoembed if active
+                if($settings->autoembed_series && $serie->tmdb_id && $serie->use_autoembed && $season->use_autoembed) {
+                    $sources = is_string($settings->autoembed_serie_sources) ? json_decode($settings->autoembed_serie_sources, true) : $settings->autoembed_serie_sources;
+                    $sources = $sources ?: [];
+                    foreach($sources as $source) {
+                        if(($source['player_sub'] ?? '') === 'premium' || ($source['type'] ?? '') === 'premium') continue;
+                        $autoEmbedUrl = str_replace(
+                            ['{tmdb_id}', '{season}', '{episode}'], 
+                            [$serie->tmdb_id, $season->season_number, $ep->episode_number], 
+                            $source['url'] ?? ''
+                        );
+                        $epLinks[] = [
+                            'name' => $source['name'] ?? 'AutoEmbed',
+                            'quality' => $source['quality'] ?? 'HD',
+                            'audio' => 'Auto',
+                            'type' => 'EMBED',
+                            'url' => $autoEmbedUrl,
+                            'is_auto' => true
+                        ];
+                    }
+                }
+
+                foreach($ep->links as $link) {
+                    if($link->type === 'premium') continue;
+                    
+                    $linkUrl = $link->url;
+                    if($link->type === 'private' || $link->type === 'mp4') {
+                        $linkUrl = \App\Services\BunnyLinkService::generateSignedUrl($linkUrl, $link->link_path, $link->expiration_hours);
+                    }
+                    $epLinks[] = [
+                        'name' => $link->name ?? 'Servidor ' . (count($epLinks) + 1),
+                        'quality' => $link->quality ?? 'HD',
+                        'audio' => $link->audio ?? 'Dublado',
+                        'type' => strtoupper($link->type),
+                        'url' => $linkUrl,
+                        'is_auto' => false
+                    ];
+                }
+                $episodesData[$season->season_number . '_' . $ep->episode_number] = $epLinks;
+            }
+        }
     @endphp
 
     <!-- ===== DETAILS PAGE ===== -->
     <div class="details-page">
 
-        <!-- BACKDROP (fixo com efeito de scroll) -->
+        <!-- BACKDROP -->
         <div class="details-backdrop" style="background-image: url('{{ $backdrop }}')"></div>
 
         <!-- CONTEÚDO SOBREPOSTO -->
         <div class="details-content-wrapper">
             <div class="details-content">
-                <span class="badge">📺 Série</span>
+                <span class="badge">Série</span>
                 <h1>{{ $serie->name }}</h1>
                 <div class="meta">
                     <span class="avaliacao"><i class="fas fa-star"></i> {{ number_format($serie->rating ?? 0, 1) }}</span>
@@ -627,28 +724,25 @@
                 <div class="sinopse">{{ $serie->overview ?: 'Nenhuma sinopse disponível.' }}</div>
                 <div class="classificacao"><span>Classificação:</span> {{ $classificacao }}</div>
 
-                <!-- Botão Assistir (abre o modal de servidores) -->
-                @if($serie->seasons->count() > 0 && $serie->seasons->first()->episodes->count() > 0)
-                    @php
-                        $firstEp = $serie->seasons->first()->episodes->first();
-                    @endphp
-                    <a href="{{ route('frontend.episode', [$serie->slug, $serie->seasons->first()->season_number, $firstEp->episode_number]) }}" style="text-decoration: none;">
-                        <button class="btn-assistir-full"><i class="fas fa-play"></i> Assistir Episódio 1</button>
-                    </a>
+                <!-- Botão Assistir -->
+                @if($hasEpisodes)
+                    <button class="btn-assistir-full" onclick="openEpisodeModal({{ $firstEpS }}, {{ $firstEpE }})"><i class="fas fa-play"></i> Assistir Episódio</button>
                 @else
                     <button class="btn-assistir-full" onclick="alert('Episódios em breve!')"><i class="fas fa-play"></i> Em Breve</button>
                 @endif
 
                 <!-- Ações com ícones -->
                 <div class="action-icons">
-                    <button onclick="alert('Em desenvolvimento')"><i class="fas fa-comment"></i><span class="label">Comentar</span></button>
-                    <button onclick="alert('Em desenvolvimento')"><i class="fas fa-plus"></i><span class="label">Lista</span></button>
+                    {{-- Comentar - em desenvolvimento --}}
+                    {{-- <button><i class="fas fa-comment"></i><span class="label">Comentar</span></button> --}}
+                    {{-- Minha Lista - em desenvolvimento --}}
+                    {{-- <button><i class="fas fa-plus"></i><span class="label">Lista</span></button> --}}
                     @if($serie->trailer_key)
                         <button onclick="window.open('https://youtube.com/watch?v={{ $serie->trailer_key }}', '_blank')"><i class="fas fa-film"></i><span class="label">Trailer</span></button>
                     @else
-                        <button onclick="alert('Trailer indisponível')"><i class="fas fa-film"></i><span class="label">Trailer</span></button>
+                        <button><i class="fas fa-film"></i><span class="label">Trailer</span></button>
                     @endif
-                    <button onclick="navigator.share ? navigator.share({title: '{{ $serie->name }}', url: window.location.href}) : alert('Em desenvolvimento')"><i class="fas fa-share-alt"></i><span class="label">Compartilhar</span></button>
+                    <button><i class="fas fa-share-alt"></i><span class="label">Compartilhar</span></button>
                 </div>
 
                 <!-- TEMPORADAS -->
@@ -672,11 +766,13 @@
                             @foreach($season->episodes as $ep)
                                 @php
                                     $ep_image = $ep->still_path ? 'https://image.tmdb.org/t/p/w300' . $ep->still_path : ($serie->backdrop_path ? 'https://image.tmdb.org/t/p/w300' . $serie->backdrop_path : asset('img/no-backdrop.jpg'));
-                                    $url = route('frontend.episode', [$serie->slug, $season->season_number, $ep->episode_number]);
                                 @endphp
-                                <div class="ep-card-wrapper" onclick="window.location.href='{{ $url }}'">
+                                <div class="ep-card-wrapper" onclick="openEpisodeModal({{ $season->season_number }}, {{ $ep->episode_number }})">
                                     <div class="ep-card">
                                         <div class="ep-card-img" style="background-image: url('{{ $ep_image }}')"></div>
+                                        @if($ep->duration)
+                                            <div class="ep-duration">{{ $ep->duration }} min</div>
+                                        @endif
                                     </div>
                                     <div class="ep-title">{{ $ep->episode_number }}. {{ $ep->name }}</div>
                                 </div>
@@ -711,6 +807,7 @@
                 @endif
 
                 <!-- RELACIONADOS -->
+                @if($related && $related->count() > 0)
                 <div class="relacionados">
                     <h3><i class="fas fa-play-circle"></i> Relacionados</h3>
                     <div class="scroll-horizontal">
@@ -719,22 +816,26 @@
                                 $isMovie = isset($content->title);
                                 $title = $isMovie ? $content->title : $content->name;
                                 $image = $content->poster_path ? 'https://image.tmdb.org/t/p/w500' . $content->poster_path : asset('img/no-poster.jpg');
+                                $backdrop = $content->backdrop_path ? 'https://image.tmdb.org/t/p/w780' . $content->backdrop_path : '';
                                 $url = $isMovie ? route('frontend.movie', $content->slug) : route('frontend.serie', $content->slug);
-                                $nota = $content->vote_average ?? ($content->rating ?? 0);
-                                $anoC = $isMovie ? ($content->release_date ? date('Y', strtotime($content->release_date)) : $content->release_year) : ($content->first_air_date ? date('Y', strtotime($content->first_air_date)) : $content->first_air_year);
-                                $duracao = $isMovie ? ($content->runtime ?? 0) : 0;
-                                $sinopse = $content->overview ?? 'Sinopse não disponível.';
+                                $relAno = $isMovie
+                                    ? ($content->release_year ?? ($content->release_date ? date('Y', strtotime($content->release_date)) : ''))
+                                    : ($content->first_air_year ?? ($content->first_air_date ? date('Y', strtotime($content->first_air_date)) : ''));
+                                $relNota = $content->rating ?? $content->vote_average ?? 0;
+                                $relDuracao = $isMovie ? ($content->runtime ?? 0) : 0;
+                                $relSinopse = $content->overview ?? 'Sinopse não disponível.';
                             @endphp
-                            <div class="card-wrapper catalog-card" 
-                                data-titulo="{{ $title }}" 
-                                data-ano="{{ $anoC }}" 
-                                data-nota="{{ $nota }}" 
-                                data-duracao="{{ $duracao }}" 
-                                data-img="{{ $image }}" 
-                                data-sinopse="{{ $sinopse }}"
-                                data-url="{{ $url }}"
-                                onclick="window.location.href='{{ $url }}'">
-                                <div class="card">
+                            <div class="card-wrapper">
+                                <div class="card"
+                                     data-titulo="{{ $title }}"
+                                     data-ano="{{ $relAno }}"
+                                     data-nota="{{ $relNota }}"
+                                     data-duracao="{{ $relDuracao }}"
+                                     data-img="{{ $image }}"
+                                     data-backdrop="{{ $backdrop }}"
+                                     data-sinopse="{{ $relSinopse }}"
+                                     data-url="{{ $url }}"
+                                     onclick="window.location.href='{{ $url }}'">
                                     <div class="card-img" style="background-image: url('{{ $image }}')"></div>
                                 </div>
                                 <div class="card-title">{{ $title }}</div>
@@ -742,24 +843,102 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
+
+    <!-- ===== MODAL DE SERVIDORES ===== -->
+    <div class="modal-overlay" id="serversModal">
+        <div class="modal-container" id="modalContainer">
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="fas fa-server"></i> Assistir: Episódio</h2>
+                <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body" id="serverList">
+                <!-- Populado por Javascript -->
+            </div>
+            <div class="modal-footer">Selecione um servidor, o player abrirá em uma nova aba.</div>
+        </div>
+    </div>
+
 @endsection
 
 @section('scripts')
 <script>
-    function showSeason(seasonId, btnElement) {
-        // Atualiza botões
-        document.querySelectorAll('.temp-btn').forEach(b => b.classList.remove('active'));
-        btnElement.classList.add('active');
+    const episodesData = {!! json_encode($episodesData) !!};
 
-        // Mostra apenas a lista de episódios da temporada
-        document.querySelectorAll('.season-episodes').forEach(c => c.style.display = 'none');
-        const activeSeason = document.getElementById('season-' + seasonId);
-        if(activeSeason) {
-            activeSeason.style.display = 'flex';
+    function showSeason(seasonId, btnElement) {
+        document.querySelectorAll('.season-episodes').forEach(el => {
+            el.style.display = 'none';
+        });
+        document.getElementById('season-' + seasonId).style.display = 'flex';
+        
+        document.querySelectorAll('.temp-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        btnElement.classList.add('active');
+    }
+
+    // Lógica do Modal
+    const modal = document.getElementById('serversModal');
+    const btnClose = document.getElementById('modalClose');
+    const serverList = document.getElementById('serverList');
+    const modalTitle = document.getElementById('modalTitle');
+
+    function openEpisodeModal(season, episode) {
+        const key = season + '_' + episode;
+        const links = episodesData[key] || [];
+
+        modalTitle.innerHTML = `<i class="fas fa-server"></i> Assistir: S${season} E${episode}`;
+        serverList.innerHTML = '';
+
+        if(links.length === 0) {
+            serverList.innerHTML = '<div style="text-align:center; padding: 20px; color:#b0b8c4;">Nenhum servidor disponível para este episódio.</div>';
+        } else {
+            links.forEach((link, idx) => {
+                const isAuto = link.is_auto;
+                const html = `
+                    <div class="server-item" onclick="playVideo('${link.url}')">
+                        <div class="server-info">
+                            <div class="server-name">${link.name}</div>
+                            <div class="server-details">
+                                <span class="quality">${link.quality}</span>
+                                <span class="audio">${link.audio}</span>
+                                <span class="type">${link.type}</span>
+                            </div>
+                        </div>
+                        <div class="server-action"><i class="fas fa-external-link-alt"></i></div>
+                    </div>
+                `;
+                serverList.innerHTML += html;
+            });
         }
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    btnClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    function playVideo(url) {
+        if(!url) {
+            alert('URL do vídeo não encontrada.');
+            return;
+        }
+        // Codifica a URL em Base64 e envia para a nossa rota interna de player
+        const encodedUrl = btoa(url);
+        window.open('/assistir/{{ $serie->slug }}?url=' + encodedUrl, '_blank');
+        closeModal();
     }
 </script>
 @endsection

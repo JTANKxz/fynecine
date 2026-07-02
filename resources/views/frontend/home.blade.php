@@ -1,191 +1,294 @@
 @extends('layouts.fyne')
 
+@section('title', (\App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE') . ' - Filmes e Séries')
+
+@section('seo')
+    <meta name="description" content="Assista os melhores Filmes e Séries online com a melhor qualidade no {{ \App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE' }}.">
+    <meta property="og:title" content="{{ \App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE' }} - Filmes e Séries">
+    <meta property="og:description" content="Assista os melhores Filmes e Séries online com a melhor qualidade no {{ \App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE' }}.">
+    <meta property="og:image" content="{{ asset('img/logo.png') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ \App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE' }} - Filmes e Séries">
+    <meta name="twitter:description" content="Assista os melhores Filmes e Séries online com a melhor qualidade no {{ \App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE' }}.">
+    <meta name="twitter:image" content="{{ asset('img/logo.png') }}">
+@endsection
+
 @section('nav_home_active', 'active')
 
 @section('styles')
 <style>
-    /* ----- CARROSSEL (SLIDER) ----- */
+    body {
+        padding-top: 0;
+    }
+
+    /* ----- CARROSSEL HERO ----- */
     .hero-slider {
         position: relative;
-        width: 100%;
-        height: 60vh;
-        max-height: 500px;
-        min-height: 350px;
+        width: calc(100% - 40px);
+        height: 50vw;
+        max-height: 420px;
         overflow: hidden;
+        border-radius: 24px;
+        margin: 12px 20px 28px;
+        border: 2px solid #7c3aed;
     }
     .slides-wrapper {
         display: flex;
+        width: 100%;
         height: 100%;
-        transition: transform 0.5s ease;
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
     .slide {
         min-width: 100%;
         height: 100%;
         background-size: cover;
-        background-position: center;
+        background-position: center 30%;
         position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding: 30px 24px;
     }
-    .slide::before {
+    .slide::after {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(0deg, #000000 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+        inset: 0;
+        background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, transparent 70%);
     }
     .slide-content {
-        position: absolute;
-        bottom: 40px;
-        left: 20px;
-        right: 20px;
+        position: relative;
         z-index: 2;
+        max-width: 340px;
+        width: 100%;
     }
-    .badge {
+    .slide-content .badge {
+        display: inline-block;
         background: #7c3aed;
         color: #fff;
-        padding: 4px 10px;
-        border-radius: 20px;
         font-size: 11px;
         font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
         margin-bottom: 8px;
     }
-    .slide h2 {
+    .slide-content h2 {
         font-size: 28px;
-        font-weight: 800;
-        margin-bottom: 6px;
+        font-weight: 700;
         line-height: 1.1;
+        margin-bottom: 6px;
+        color: #f0f2f5;
     }
-    .slide p {
+    .slide-content p {
         font-size: 13px;
-        color: #b0b8c4;
+        color: #cbd5e0;
+        opacity: 0.9;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
         margin-bottom: 12px;
-        max-width: 90%;
     }
-    .meta-mini {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 12px;
-        color: #fff;
-        margin-bottom: 16px;
-    }
-    .meta-mini .avaliacao {
-        color: #fbbf24;
-        font-weight: 600;
+    .slide-content .meta-mini {
+        display: none;
     }
     .btn-play {
-        background: #f0f2f5;
-        color: #000;
+        background: #7c3aed;
+        color: #fff;
         border: none;
-        padding: 10px 24px;
+        padding: 8px 24px;
         border-radius: 30px;
-        font-size: 14px;
         font-weight: 700;
+        font-size: 14px;
         cursor: pointer;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
         transition: 0.2s;
+        text-decoration: none;
     }
     .btn-play:hover {
-        background: #fff;
-        transform: scale(1.05);
+        background: #a855f7;
+        transform: scale(1.02);
     }
     .slider-dots {
         position: absolute;
-        bottom: 15px;
+        bottom: 16px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
-        gap: 6px;
-        z-index: 10;
+        gap: 8px;
+        z-index: 5;
     }
     .slider-dots span {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.4);
+        background: rgba(255,255,255,0.25);
         cursor: pointer;
-        transition: 0.3s;
+        transition: 0.25s;
     }
     .slider-dots span.active {
-        width: 20px;
-        background: #7c3aed;
-        border-radius: 4px;
+        background: #a855f7;
+        width: 24px;
+        border-radius: 20px;
     }
 
-    /* ----- SEÇÕES (EM ALTA, ORIGINAIS, ETC) ----- */
+    /* Slider responsive */
+    @media (max-width: 600px) {
+        .hero-slider {
+            height: 55vw;
+            max-height: 300px;
+            margin: 8px 12px 18px;
+            width: calc(100% - 24px);
+            border-radius: 16px;
+            border-width: 1.5px;
+        }
+        .slide {
+            padding: 14px 16px 18px;
+            align-items: flex-end;
+        }
+        .slide-content { max-width: 100%; }
+        .slide-content .badge,
+        .slide-content p { display: none; }
+        .slide-content h2 {
+            font-size: 18px;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+        .slide-content .meta-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #cbd5e0;
+            margin-bottom: 4px;
+        }
+        .slide-content .meta-mini .avaliacao {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            color: #fbbf24;
+        }
+        .btn-play { padding: 5px 16px; font-size: 12px; gap: 4px; }
+        .slider-dots { bottom: 8px; }
+        .slider-dots span { width: 6px; height: 6px; }
+        .slider-dots span.active { width: 18px; }
+    }
+    @media (min-width: 601px) and (max-width: 1024px) {
+        .hero-slider { height: 45vw; max-height: 380px; }
+        .slide-content h2 { font-size: 26px; }
+    }
+    @media (min-width: 1025px) {
+        .hero-slider {
+            max-height: 480px;
+            margin: 16px 40px 36px;
+            width: calc(100% - 80px);
+            border-radius: 28px;
+        }
+        .slide-content { max-width: 420px; }
+        .slide-content h2 { font-size: 36px; }
+        .slide-content p { font-size: 15px; -webkit-line-clamp: 3; }
+        .btn-play { padding: 10px 32px; font-size: 16px; }
+    }
+
+    /* ----- SEÇÕES ----- */
     .section {
-        padding: 20px 0 10px;
+        padding: 0 20px 32px;
+        animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     .section-header {
         display: flex;
+        align-items: baseline;
         justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     }
     .section-header h3 {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
+        color: #f0f2f5;
         display: flex;
         align-items: center;
         gap: 8px;
     }
-    .section-header h3 i {
-        color: #7c3aed;
-    }
+    .section-header h3 i { color: #a855f7; }
     .ver-todos {
         font-size: 13px;
-        font-weight: 600;
-        color: #a855f7;
+        color: #8a94a6;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
         text-decoration: none;
+        white-space: nowrap;
     }
+    .ver-todos:hover { color: #a855f7; }
 
-    /* ----- SCROLL HORIZONTAL (CARDS) ----- */
+    /* ----- SCROLL HORIZONTAL (cards) ----- */
     .scroll-horizontal {
         display: flex;
-        overflow-x: auto;
         gap: 14px;
-        padding: 0 20px 20px;
-        scrollbar-width: none; /* Firefox */
+        overflow-x: auto;
+        padding-bottom: 8px;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
-    .scroll-horizontal::-webkit-scrollbar {
-        display: none; /* Chrome */
-    }
+    .scroll-horizontal::-webkit-scrollbar { display: none; }
+
+    /* ----- CARD (imagem apenas) ----- */
     .card {
-        min-width: 130px;
+        flex: 0 0 130px;
         width: 130px;
-        flex-shrink: 0;
-        aspect-ratio: 2/3;
+        scroll-snap-align: start;
         border-radius: 12px;
-        background: #1a1a1a;
-        position: relative;
-        cursor: pointer;
         overflow: hidden;
-        transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        background: #0a0a0a;
+        transition: transform 0.25s, box-shadow 0.25s;
+        cursor: pointer;
+        position: relative;
+        aspect-ratio: 2 / 3;
+        border: 1px solid rgba(124, 58, 237, 0.15);
     }
     .card:hover {
-        transform: scale(1.05);
-        z-index: 10;
+        transform: scale(1.03);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
+        border-color: #7c3aed;
+        z-index: 2;
     }
     .card-img {
         width: 100%;
         height: 100%;
         background-size: cover;
         background-position: center;
-        transition: 0.3s;
+        transition: transform 0.3s ease;
+    }
+    .card:hover .card-img { transform: scale(1.04); }
+
+    @media (max-width: 600px) {
+        .card { flex: 0 0 105px; width: 105px; border-radius: 10px; }
+        .section { padding: 0 12px 24px; }
+        .scroll-horizontal { gap: 10px; }
+        .section-header h3 { font-size: 17px; }
+    }
+    @media (min-width: 601px) {
+        .card { flex: 0 0 155px; width: 155px; }
+    }
+    @media (min-width: 1025px) {
+        .card { flex: 0 0 180px; width: 180px; }
+        .section { padding: 0 40px 36px; }
     }
 </style>
 @endsection
 
 @section('content')
-    <!-- CARROSSEL HERO -->
+
+    <!-- ===== HERO SLIDER ===== -->
     @if($sliders->isNotEmpty())
     <section class="hero-slider" id="heroSlider">
         <div class="slides-wrapper" id="slidesWrapper">
@@ -194,27 +297,29 @@
                     $content = $slider->movie ?? $slider->serie;
                     if (!$content) continue;
                     $title = $content->title ?? $content->name;
-                    $image = $content->backdrop_path ? 'https://image.tmdb.org/t/p/w1280' . $content->backdrop_path : asset('img/no-backdrop.jpg');
-                    $url = $slider->content_type === 'movie' ? route('frontend.movie', $content->slug) : route('frontend.serie', $content->slug);
-                    $nota = $content->vote_average ?? 0;
-                    $ano = $content->release_date ? date('Y', strtotime($content->release_date)) : ($content->first_air_date ? date('Y', strtotime($content->first_air_date)) : '');
-                    $duracao = $content->runtime ? $content->runtime . ' min' : '';
+                    $image = $content->backdrop_path
+                        ? 'https://image.tmdb.org/t/p/w1280' . $content->backdrop_path
+                        : asset('img/no-backdrop.jpg');
+                    $url = $slider->content_type === 'movie'
+                        ? route('frontend.movie', $content->slug)
+                        : route('frontend.serie', $content->slug);
+                    $nota = $content->rating ?? $content->vote_average ?? 0;
+                    $ano = $content->release_year ?? $content->first_air_year ?? '';
+                    $duracao = $content->runtime ?? 0;
+                    $overview = $content->overview ?? '';
+                    $tipo = $slider->content_type === 'movie' ? 'Filme' : 'Série';
                 @endphp
-                <div class="slide" style="background-image: url('{{ $image }}');">
+                <div class="slide" style="background-image: url('{{ $image }}')">
                     <div class="slide-content">
-                        <span class="badge">✨ Destaque</span>
+                        <span class="badge">{{ $tipo }}</span>
                         <h2>{{ $title }}</h2>
-                        <p>{{ $content->overview }}</p>
+                        <p>{{ $overview }}</p>
                         <div class="meta-mini">
                             <span class="avaliacao"><i class="fas fa-star"></i> {{ number_format($nota, 1) }}</span>
-                            <span>{{ $ano }}</span>
-                            @if($duracao)
-                                <span>{{ $duracao }}</span>
-                            @endif
+                            @if($ano)<span>{{ $ano }}</span>@endif
+                            @if($duracao)<span>{{ $duracao }} min</span>@endif
                         </div>
-                        <a href="{{ $url }}" style="text-decoration: none;">
-                            <button class="btn-play"><i class="fas fa-play"></i> Assistir</button>
-                        </a>
+                        <a href="{{ $url }}" class="btn-play"><i class="fas fa-play"></i> Assistir</a>
                     </div>
                 </div>
             @endforeach
@@ -229,98 +334,87 @@
     </section>
     @endif
 
-    <!-- SEÇÕES -->
-    <section class="section">
-        <div class="section-header">
-            <h3><i class="fas fa-fire"></i> Em Alta</h3>
-            <a href="{{ route('frontend.search') }}" class="ver-todos">Ver todos →</a>
-        </div>
-        <div class="scroll-horizontal" id="scrollEmAlta">
-            @foreach($latestMovies as $movie)
-                @php
-                    $image = $movie->poster_path ? 'https://image.tmdb.org/t/p/w500' . $movie->poster_path : asset('img/no-poster.jpg');
-                    $url = route('frontend.movie', $movie->slug);
-                    $nota = $movie->vote_average ?? 0;
-                    $ano = $movie->release_date ? date('Y', strtotime($movie->release_date)) : '';
-                    $duracao = $movie->runtime ?? 0;
-                    $sinopse = $movie->overview ?? 'Sinopse não disponível.';
-                @endphp
-                <div class="card" 
-                     data-titulo="{{ $movie->title }}" 
-                     data-ano="{{ $ano }}" 
-                     data-nota="{{ $nota }}" 
-                     data-duracao="{{ $duracao }}" 
-                     data-img="{{ $image }}" 
-                     data-sinopse="{{ $sinopse }}"
-                     data-url="{{ $url }}"
-                     onclick="window.location.href='{{ $url }}'">
-                    <div class="card-img" style="background-image: url('{{ $image }}')"></div>
-                </div>
-            @endforeach
-        </div>
-    </section>
+    <!-- ===== SEÇÕES DINÂMICAS ===== -->
+    @foreach($sections as $sectionIdx => $section)
+        @php
+            $items = $section->resolveItems();
+            if ($items->isEmpty()) continue;
 
-    <section class="section">
-        <div class="section-header">
-            <h3><i class="fas fa-star"></i> Originais</h3>
-            <a href="{{ route('frontend.search') }}" class="ver-todos">Ver todos →</a>
-        </div>
-        <div class="scroll-horizontal" id="scrollOriginais">
-            @foreach($latestSeries as $serie)
-                @php
-                    $image = $serie->poster_path ? 'https://image.tmdb.org/t/p/w500' . $serie->poster_path : asset('img/no-poster.jpg');
-                    $url = route('frontend.serie', $serie->slug);
-                    $nota = $serie->vote_average ?? 0;
-                    $ano = $serie->first_air_date ? date('Y', strtotime($serie->first_air_date)) : '';
-                    $duracao = 0;
-                    $sinopse = $serie->overview ?? 'Sinopse não disponível.';
-                @endphp
-                <div class="card" 
-                     data-titulo="{{ $serie->name }}" 
-                     data-ano="{{ $ano }}" 
-                     data-nota="{{ $nota }}" 
-                     data-duracao="{{ $duracao }}" 
-                     data-img="{{ $image }}" 
-                     data-sinopse="{{ $sinopse }}"
-                     data-url="{{ $url }}"
-                     onclick="window.location.href='{{ $url }}'">
-                    <div class="card-img" style="background-image: url('{{ $image }}')"></div>
-                </div>
-            @endforeach
-        </div>
-    </section>
+            // Ícone baseado no tipo da seção
+            $icon = match($section->type) {
+                'trending', 'top_10' => 'fas fa-fire',
+                'recently_added'     => 'fas fa-clock',
+                'genre'              => 'fas fa-tag',
+                'network'            => 'fas fa-tv',
+                'upcoming'           => 'fas fa-hourglass-half',
+                'events'             => 'fas fa-calendar',
+                default              => 'fas fa-play-circle',
+            };
 
-    <section class="section">
-        <div class="section-header">
-            <h3><i class="fas fa-play-circle"></i> Continue Assistindo</h3>
-            <a href="{{ route('frontend.search') }}" class="ver-todos">Ver todos →</a>
-        </div>
-        <div class="scroll-horizontal" id="scrollContinue">
-            @foreach($latestMovies->merge($latestSeries)->shuffle()->take(10) as $content)
-                @php
-                    $isMovie = isset($content->title);
-                    $title = $isMovie ? $content->title : $content->name;
-                    $image = $content->poster_path ? 'https://image.tmdb.org/t/p/w500' . $content->poster_path : asset('img/no-poster.jpg');
-                    $url = $isMovie ? route('frontend.movie', $content->slug) : route('frontend.serie', $content->slug);
-                    $nota = $content->vote_average ?? 0;
-                    $ano = $isMovie ? ($content->release_date ? date('Y', strtotime($content->release_date)) : '') : ($content->first_air_date ? date('Y', strtotime($content->first_air_date)) : '');
-                    $duracao = $isMovie ? ($content->runtime ?? 0) : 0;
-                    $sinopse = $content->overview ?? 'Sinopse não disponível.';
-                @endphp
-                <div class="card" 
-                     data-titulo="{{ $title }}" 
-                     data-ano="{{ $ano }}" 
-                     data-nota="{{ $nota }}" 
-                     data-duracao="{{ $duracao }}" 
-                     data-img="{{ $image }}" 
-                     data-sinopse="{{ $sinopse }}"
-                     data-url="{{ $url }}"
-                     onclick="window.location.href='{{ $url }}'">
-                    <div class="card-img" style="background-image: url('{{ $image }}')"></div>
-                </div>
-            @endforeach
-        </div>
-    </section>
+            // URL "Ver Todos" com filtros pré-aplicados
+            $verTodosUrl = match(true) {
+                $section->type === 'genre' && $section->genre => route('frontend.search', [
+                    'genero'    => $section->genre->slug,
+                    'categoria' => match($section->content_type) {
+                        'movie'  => 'filmes',
+                        'series' => 'series',
+                        default  => 'todos',
+                    }
+                ]),
+                $section->content_type === 'movie' => route('frontend.search', ['categoria' => 'filmes']),
+                $section->content_type === 'series' => route('frontend.search', ['categoria' => 'series']),
+                default => route('frontend.search'),
+            };
+        @endphp
+
+        <section class="section" style="animation-delay: {{ $sectionIdx * 0.08 }}s">
+            <div class="section-header">
+                <h3><i class="{{ $icon }}"></i> {{ $section->title }}</h3>
+                <a href="{{ $verTodosUrl }}" class="ver-todos">Ver todos →</a>
+            </div>
+
+            <div class="scroll-horizontal">
+                @foreach($items as $item)
+                    @php
+                        // Pula itens que não são filmes/séries (ex: events, upcoming, networks)
+                        $isMovie = isset($item->title) && isset($item->slug);
+                        $isSerie = isset($item->name) && isset($item->slug);
+                        if (!$isMovie && !$isSerie) continue;
+
+                        $itemTitle   = $isMovie ? $item->title : $item->name;
+                        $itemImage   = $item->poster_path
+                            ? 'https://image.tmdb.org/t/p/w500' . $item->poster_path
+                            : asset('img/no-poster.jpg');
+                        $itemBackdrop = $item->backdrop_path
+                            ? 'https://image.tmdb.org/t/p/w780' . $item->backdrop_path
+                            : '';
+                        $itemUrl     = $isMovie
+                            ? route('frontend.movie', $item->slug)
+                            : route('frontend.serie', $item->slug);
+                        $itemNota    = $item->rating ?? $item->vote_average ?? 0;
+                        $itemAno     = $isMovie
+                            ? ($item->release_year ?? ($item->release_date ? date('Y', strtotime($item->release_date)) : ''))
+                            : ($item->first_air_year ?? ($item->first_air_date ? date('Y', strtotime($item->first_air_date)) : ''));
+                        $itemDuracao = $isMovie ? ($item->runtime ?? 0) : 0;
+                        $itemSinopse = $item->overview ?? 'Sinopse não disponível.';
+                    @endphp
+                    <div class="card"
+                         data-titulo="{{ $itemTitle }}"
+                         data-ano="{{ $itemAno }}"
+                         data-nota="{{ $itemNota }}"
+                         data-duracao="{{ $itemDuracao }}"
+                         data-img="{{ $itemImage }}"
+                         data-backdrop="{{ $itemBackdrop }}"
+                         data-sinopse="{{ $itemSinopse }}"
+                         data-url="{{ $itemUrl }}"
+                         onclick="window.location.href='{{ $itemUrl }}'">
+                        <div class="card-img" style="background-image: url('{{ $itemImage }}')"></div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endforeach
+
 @endsection
 
 @section('scripts')
@@ -338,10 +432,9 @@
         if (index >= totalSlides) index = 0;
         currentSlide = index;
         slidesWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentSlide);
-        });
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
     }
+
     dots.forEach(dot => {
         dot.addEventListener('click', () => {
             goToSlide(parseInt(dot.dataset.index));
@@ -353,11 +446,9 @@
 
     function resetAutoSlide() {
         clearInterval(autoSlideInterval);
-        if (totalSlides > 1) {
-            autoSlideInterval = setInterval(nextSlide, 6000);
-        }
+        if (totalSlides > 1) autoSlideInterval = setInterval(nextSlide, 6000);
     }
-    
+
     if (totalSlides > 1) {
         autoSlideInterval = setInterval(nextSlide, 6000);
         const hero = document.getElementById('heroSlider');

@@ -39,12 +39,13 @@ use App\Http\Controllers\FrontendController;
 Route::get('/', [PublicHomeController::class, 'index'])->name('home');
 
 Route::controller(FrontendController::class)->group(function () {
-    Route::get('/movie/{slug}', 'movie')->name('frontend.movie');
-    Route::get('/series/{slug}', 'serie')->name('frontend.serie');
-    Route::get('/series/{slug}/season/{season}/episode/{episode}', 'episode')->name('frontend.episode');
-    Route::get('/search', 'search')->name('frontend.search');
-    Route::get('/genre/{slug}', 'genre')->name('frontend.genre');
-    Route::get('/network/{slug}', 'network')->name('frontend.network');
+    Route::get('/filme/{slug}', 'movie')->name('frontend.movie');
+    Route::get('/serie/{slug}', 'serie')->name('frontend.serie');
+    Route::get('/serie/{slug}/temporada/{season}/episodio/{episode}', 'episode')->name('frontend.episode');
+    Route::get('/busca', 'search')->name('frontend.search');
+    Route::get('/genero/{slug}', 'genre')->name('frontend.genre');
+    Route::get('/estudio/{slug}', 'network')->name('frontend.network');
+    Route::get('/assistir/{slug}', 'player')->name('frontend.player');
 });
 
 // Rotas Públicas (Legal)

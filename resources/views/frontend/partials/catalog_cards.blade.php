@@ -3,6 +3,7 @@
         $isMovie = isset($content->title);
         $title = $isMovie ? $content->title : $content->name;
         $image = $content->poster_path ? 'https://image.tmdb.org/t/p/w500' . $content->poster_path : asset('img/no-poster.jpg');
+        $backdrop = $content->backdrop_path ? 'https://image.tmdb.org/t/p/w780' . $content->backdrop_path : '';
         $url = $isMovie ? route('frontend.movie', $content->slug) : route('frontend.serie', $content->slug);
         $nota = $content->vote_average ?? ($content->rating ?? 0);
         $ano = $isMovie ? ($content->release_date ? date('Y', strtotime($content->release_date)) : $content->release_year) : ($content->first_air_date ? date('Y', strtotime($content->first_air_date)) : $content->first_air_year);
@@ -14,10 +15,12 @@
          data-ano="{{ $ano }}" 
          data-nota="{{ $nota }}" 
          data-duracao="{{ $duracao }}" 
-         data-img="{{ $image }}" 
+         data-img="{{ $image }}"
+         data-backdrop="{{ $backdrop }}"
          data-sinopse="{{ $sinopse }}"
          data-url="{{ $url }}"
          onclick="window.location.href='{{ $url }}'">
         <div class="card-img" style="background-image: url('{{ $image }}')"></div>
+        <div class="card-badge">{{ $isMovie ? 'Filme' : 'Série' }}</div>
     </div>
 @endforeach

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>@yield('title', \App\Models\AppConfig::getSettings()->app_name ?? 'FYNECINE' . ' - Filmes e Séries')</title>
+    @yield('seo')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         /* ----- RESET & BASE - TEMA AMOLED + ROXO SEM NEON ----- */
@@ -368,10 +369,12 @@
                     </button>
                 </form>
             </div>
-            <i class="fas fa-bell"></i>
-            <div class="avatar" onclick="window.location.href='{{ route('login') }}'">
+            {{-- Notificação - em desenvolvimento --}}
+            {{-- <i class="fas fa-bell"></i> --}}
+            {{-- Avatar/Perfil - em desenvolvimento --}}
+            {{-- <div class="avatar" onclick="window.location.href='{{ route('login') }}'">
                 {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'F' }}
-            </div>
+            </div> --}}
         </div>
     </header>
 
@@ -381,8 +384,10 @@
     <nav class="bottom-nav">
         <button class="nav-item @yield('nav_home_active')" data-tab="home" onclick="window.location.href='{{ route('home') }}'"><i class="fas fa-home"></i><span>Início</span></button>
         <button class="nav-item @yield('nav_catalogo_active')" data-tab="catalogo" onclick="window.location.href='{{ route('frontend.search') }}'"><i class="fas fa-compass"></i><span>Explorar</span></button>
-        <button class="nav-item" data-tab="lista" onclick="window.location.href='{{ auth()->check() ? route('login') : route('login') }}'"><i class="fas fa-list"></i><span>Minha Lista</span></button>
-        <button class="nav-item" data-tab="perfil" onclick="window.location.href='{{ route('login') }}'"><i class="fas fa-user"></i><span>Perfil</span></button>
+        {{-- Minha Lista - em desenvolvimento --}}
+        {{-- <button class="nav-item" data-tab="lista" onclick="window.location.href='{{ auth()->check() ? route('login') : route('login') }}'"><i class="fas fa-list"></i><span>Minha Lista</span></button> --}}
+        {{-- Perfil - em desenvolvimento --}}
+        {{-- <button class="nav-item" data-tab="perfil" onclick="window.location.href='{{ route('login') }}'"><i class="fas fa-user"></i><span>Perfil</span></button> --}}
     </nav>
 
     <!-- CARD FLUTUANTE -->
@@ -398,7 +403,8 @@
             <div class="sinopse" id="floatSinopse"></div>
             <div class="botoes">
                 <button class="btn-assistir" id="floatAssistir"><i class="fas fa-play"></i> Assistir agora</button>
-                <button class="btn-salvar" id="floatSalvar" onclick="alert('Funcionalidade em desenvolvimento!')"><i class="fas fa-plus"></i> Salvar</button>
+                {{-- Salvar na lista - em desenvolvimento --}}
+                {{-- <button class="btn-salvar" id="floatSalvar" onclick="alert('Funcionalidade em desenvolvimento!')"><i class="fas fa-plus"></i> Salvar</button> --}}
             </div>
         </div>
     </div>
@@ -464,8 +470,10 @@
             const img = card.dataset.img;
             const sinopse = card.dataset.sinopse || 'Sinopse não disponível.';
             const url = card.dataset.url;
+            // Usa backdrop se disponível, senão cai no poster
+            const banner = card.dataset.backdrop || img;
 
-            floatBanner.style.backgroundImage = `url('${img}')`;
+            floatBanner.style.backgroundImage = `url('${banner}')`;
             floatTitulo.textContent = titulo;
             floatSinopse.textContent = sinopse;
             floatAvaliacao.innerHTML = `<i class="fas fa-star"></i> ${nota.toFixed(1)}`;

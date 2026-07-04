@@ -595,14 +595,20 @@
         floating.addEventListener('mouseleave', hideFloatingCard);
 
         window.addEventListener('scroll', () => {
-            if (activeCard && floating.classList.contains('active')) {
-                const rect = activeCard.getBoundingClientRect();
-                const isVisible = rect.bottom > 0 && rect.top < window.innerHeight &&
-                    rect.right > 0 && rect.left < window.innerWidth;
-                if (!isVisible) {
-                    hideFloatingCard();
-                }
+            if (floating.classList.contains('active')) {
+                floating.classList.remove('active');
+                activeCard = null;
             }
+        });
+
+        // Adicionar também para os contêineres horizontais
+        document.querySelectorAll('.scroll-horizontal, .temporadas-scroll').forEach(el => {
+            el.addEventListener('scroll', () => {
+                if (floating.classList.contains('active')) {
+                    floating.classList.remove('active');
+                    activeCard = null;
+                }
+            });
         });
     </script>
     @yield('scripts')

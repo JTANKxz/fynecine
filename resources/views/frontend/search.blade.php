@@ -243,6 +243,48 @@
     .btn-limpar { background: rgba(255, 255, 255, 0.05); color: #b0b8c4; border: 1px solid rgba(124, 58, 237, 0.2) !important; }
     .btn-limpar:hover { background: rgba(124, 58, 237, 0.15); border-color: #7c3aed !important; }
 
+    /* ===== PAGINAÇÃO ===== */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+    .btn-page {
+        background: rgba(124, 58, 237, 0.1);
+        color: #f0f2f5;
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s ease;
+        font-size: 14px;
+    }
+    .btn-page:hover {
+        background: rgba(124, 58, 237, 0.3);
+        border-color: #7c3aed;
+        transform: translateY(-2px);
+    }
+    .btn-page.active {
+        background: #7c3aed;
+        color: #fff;
+        border-color: #7c3aed;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+    .btn-page.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+
     /* Estilo de Card adaptado da home */
     .catalogo-grid .card {
         border-radius: 12px;
@@ -361,10 +403,26 @@
             @include('frontend.partials.catalog_cards', ['results' => $results])
         </div>
 
-        <!-- Loading Spinner & Observer Target -->
-        <div class="loading-spinner" id="loadingSpinner" style="display: {{ $hasMore ? 'block' : 'none' }}; text-align: center; padding: 20px 0;">
-            <i class="fas fa-circle-notch fa-spin" style="font-size: 24px; color: #7c3aed;"></i>
+        <!-- Paginação -->
+        @if ($results->lastPage() > 1)
+        <div class="pagination-container">
+            @if ($results->onFirstPage())
+                <span class="btn-page disabled"><i class="fas fa-chevron-left"></i></span>
+            @else
+                <a href="{{ $results->previousPageUrl() }}" class="btn-page"><i class="fas fa-chevron-left"></i></a>
+            @endif
+            
+            @foreach ($results->getUrlRange(max(1, $results->currentPage() - 2), min($results->lastPage(), $results->currentPage() + 2)) as $page => $url)
+                <a href="{{ $url }}" class="btn-page {{ $page == $results->currentPage() ? 'active' : '' }}">{{ $page }}</a>
+            @endforeach
+
+            @if ($results->hasMorePages())
+                <a href="{{ $results->nextPageUrl() }}" class="btn-page"><i class="fas fa-chevron-right"></i></a>
+            @else
+                <span class="btn-page disabled"><i class="fas fa-chevron-right"></i></span>
+            @endif
         </div>
+        @endif
 
     </div>
 
@@ -480,17 +538,12 @@
         });
     }
 
+    // Setup inicial dos filtros
     setupFilterGroup('filtroGenero', 'inputGenero');
     setupFilterGroup('filtroAno', 'inputAno');
     setupFilterGroup('filtroNota', 'inputAvaliacao');
     setupFilterGroup('filtroDuracao', 'inputDuracao');
 
-    // Aplicar
-    document.getElementById('aplicarFiltros').addEventListener('click', () => {
-        document.getElementById('filterForm').submit();
-    });
-
-    // Limpar
     document.getElementById('limparFiltros').addEventListener('click', () => {
         document.getElementById('inputGenero').value = 'todos';
         document.getElementById('inputAno').value = 'todos';
@@ -499,64 +552,9 @@
         document.getElementById('filterForm').submit();
     });
 
-    // ===== INFINITE SCROLL =====
-    let currentPage = 1;
-    let isLoading = false;
-    let hasMorePages = {{ $hasMore ? 'true' : 'false' }};
-    
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const gridCatalogo = document.getElementById('gridCatalogo');
-
-    const observerOptions = { root: null, rootMargin: '0px 0px 200px 0px', threshold: 0 };
-
-    const loadMoreObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMorePages && !isLoading) {
-            loadMoreItems();
-        }
-    }, observerOptions);
-
-    if (loadingSpinner) {
-        loadMoreObserver.observe(loadingSpinner);
-    }
-
-    function loadMoreItems() {
-        isLoading = true;
-        currentPage++;
-        
-        const form = document.getElementById('filterForm');
-        const urlParams = new URLSearchParams(new FormData(form));
-        urlParams.append('page', currentPage);
-        
-        fetch(`{{ route('frontend.search') }}?${urlParams.toString()}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.html) {
-                gridCatalogo.insertAdjacentHTML('beforeend', data.html);
-                
-                const newCards = gridCatalogo.querySelectorAll('.catalog-card:not(.event-attached)');
-                if (typeof attachCardEvents === 'function') {
-                    attachCardEvents(newCards);
-                }
-                newCards.forEach(card => card.classList.add('event-attached'));
-            }
-            
-            hasMorePages = data.hasMore;
-            if (!hasMorePages) {
-                loadingSpinner.style.display = 'none';
-                loadMoreObserver.disconnect();
-            }
-            isLoading = false;
-        })
-        .catch(error => {
-            console.error('Error loading more items:', error);
-            isLoading = false;
-        });
-    }
+    document.getElementById('aplicarFiltros').addEventListener('click', () => {
+        document.getElementById('filterForm').submit();
+    });
 
     // Attach marker to initial cards
     document.querySelectorAll('.catalog-card').forEach(card => card.classList.add('event-attached'));

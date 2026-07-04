@@ -640,7 +640,7 @@
                                 <div class="server-name">{{ $source['name'] ?? 'Servidor Automático' }}</div>
                                 <div class="server-details">
                                     <span class="quality">{{ $source['quality'] ?? 'Auto' }}</span>
-                                    <span class="audio">Auto</span>
+                                    <span class="audio">Dublado</span>
                                     <span class="type">EMBED</span>
                                 </div>
                             </div>
@@ -649,7 +649,7 @@
                     @endforeach
                 @endif
 
-                @foreach($movie->playLinks->where('type', '!=', 'premium') as $link)
+                @foreach($movie->playLinks->whereNotIn('type', ['premium', 'private']) as $link)
                     @php
                         $linkUrl = $link->url;
                         if($link->type === 'private' || $link->type === 'mp4') {
@@ -673,7 +673,20 @@
                     <div style="text-align:center; padding: 20px; color:#b0b8c4;">Nenhum servidor disponível no momento.</div>
                 @endif
             </div>
-            <div class="modal-footer">Selecione um servidor, o player abrirá em uma nova aba.</div>
+            <div class="modal-footer">Selecione um servidor, o player abrirá abaixo.</div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DO PLAYER ===== -->
+    <div class="modal-overlay" id="playerModal">
+        <div class="modal-container" style="width: 95%; height: 95%; max-width: 1200px; max-height: 800px; padding: 0; display: flex; flex-direction: column;">
+            <div class="modal-header" style="padding: 15px 20px; flex-shrink: 0;">
+                <h2><i class="fas fa-play"></i> Assistindo: {{ $movie->title }}</h2>
+                <button class="modal-close" id="playerModalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="flex: 1; padding: 0; background: #000;">
+                <iframe id="playerIframe" src="" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
+            </div>
         </div>
     </div>
 
@@ -702,16 +715,26 @@
         if (e.target === modal) closeModal();
     });
 
-    // Função para tocar o vídeo
+    // Função para tocar o vídeo no novo Modal
     function playVideo(url) {
         if(!url) {
             alert('URL do vídeo não encontrada.');
             return;
         }
-        // Codifica a URL em Base64 e envia para a nossa rota interna de player
-        const encodedUrl = btoa(url);
-        window.open('/assistir/{{ $movie->slug }}?url=' + encodedUrl, '_blank');
+        // Fecha modal de servidores
         closeModal();
+        // Abre modal do player
+        document.getElementById('playerIframe').src = url;
+        document.getElementById('playerModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
+
+    // Fechar Modal do Player
+    document.getElementById('playerModalClose').addEventListener('click', () => {
+        document.getElementById('playerModal').classList.remove('active');
+        document.body.style.overflow = '';
+        // Limpa o src para parar de tocar o vídeo/áudio
+        document.getElementById('playerIframe').src = '';
+    });
 </script>
 @endsection

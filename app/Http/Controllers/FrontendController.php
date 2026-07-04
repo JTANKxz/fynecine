@@ -155,18 +155,17 @@ class FrontendController extends Controller
         
         $page = $request->input('page', 1);
         $total = $all->count();
-        $results = $all->slice(($page - 1) * $limit, $limit)->values();
+        $items = $all->slice(($page - 1) * $limit, $limit)->values();
 
-        $hasMore = ($page * $limit) < $total;
+        $results = new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $total,
+            $limit,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
-        if ($request->ajax()) {
-            return response()->json([
-                'html' => view('frontend.partials.catalog_cards', compact('results'))->render(),
-                'hasMore' => $hasMore
-            ]);
-        }
-
-        return view('frontend.search', compact('results', 'query', 'categoria', 'genero', 'ano', 'avaliacao', 'duracao', 'hasMore'));
+        return view('frontend.search', compact('results', 'query', 'categoria', 'genero', 'ano', 'avaliacao', 'duracao'));
     }
 
     public function genre($slug)

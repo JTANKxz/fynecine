@@ -294,7 +294,7 @@
         <div class="slides-wrapper" id="slidesWrapper">
             @foreach($sliders as $index => $slider)
                 @php
-                    $content = $slider->movie ?? $slider->serie;
+                    $content = $slider->content_type === 'movie' ? $slider->movie : $slider->serie;
                     if (!$content) continue;
                     $title = $content->title ?? $content->name;
                     $image = $content->backdrop_path

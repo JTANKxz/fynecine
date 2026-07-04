@@ -675,7 +675,7 @@
                         $epLinks[] = [
                             'name' => $source['name'] ?? 'AutoEmbed',
                             'quality' => $source['quality'] ?? 'HD',
-                            'audio' => 'Auto',
+                            'audio' => 'Dublado',
                             'type' => 'EMBED',
                             'url' => $autoEmbedUrl,
                             'is_auto' => true
@@ -684,7 +684,7 @@
                 }
 
                 foreach($ep->links as $link) {
-                    if($link->type === 'premium') continue;
+                    if($link->type === 'premium' || $link->type === 'private') continue;
                     
                     $linkUrl = $link->url;
                     if($link->type === 'private' || $link->type === 'mp4') {
@@ -726,7 +726,7 @@
 
                 <!-- Botão Assistir -->
                 @if($hasEpisodes)
-                    <button class="btn-assistir-full" onclick="openEpisodeModal({{ $firstEpS }}, {{ $firstEpE }})"><i class="fas fa-play"></i> Assistir Episódio</button>
+                    <button class="btn-assistir-full" onclick="playActiveSeasonFirstEpisode()"><i class="fas fa-play"></i> Assistir Episódio</button>
                 @else
                     <button class="btn-assistir-full" onclick="alert('Episódios em breve!')"><i class="fas fa-play"></i> Em Breve</button>
                 @endif
@@ -859,7 +859,20 @@
             <div class="modal-body" id="serverList">
                 <!-- Populado por Javascript -->
             </div>
-            <div class="modal-footer">Selecione um servidor, o player abrirá em uma nova aba.</div>
+            <div class="modal-footer">Selecione um servidor, o player abrirá abaixo.</div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DO PLAYER ===== -->
+    <div class="modal-overlay" id="playerModal">
+        <div class="modal-container" style="width: 95%; height: 95%; max-width: 1200px; max-height: 800px; padding: 0; display: flex; flex-direction: column;">
+            <div class="modal-header" style="padding: 15px 20px; flex-shrink: 0;">
+                <h2 id="playerModalTitle"><i class="fas fa-play"></i> Assistindo</h2>
+                <button class="modal-close" id="playerModalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="flex: 1; padding: 0; background: #000;">
+                <iframe id="playerIframe" src="" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
+            </div>
         </div>
     </div>
 
@@ -935,10 +948,35 @@
             alert('URL do vídeo não encontrada.');
             return;
         }
-        // Codifica a URL em Base64 e envia para a nossa rota interna de player
-        const encodedUrl = btoa(url);
-        window.open('/assistir/{{ $serie->slug }}?url=' + encodedUrl, '_blank');
+        // Fecha modal de servidores
         closeModal();
+        // Atualiza o título do modal do player com a temporada e ep atuais
+        document.getElementById('playerModalTitle').innerHTML = modalTitle.innerHTML;
+        // Abre modal do player
+        document.getElementById('playerIframe').src = url;
+        document.getElementById('playerModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Fechar Modal do Player
+    document.getElementById('playerModalClose').addEventListener('click', () => {
+        document.getElementById('playerModal').classList.remove('active');
+        document.body.style.overflow = '';
+        // Limpa o src para parar de tocar o vídeo/áudio
+        document.getElementById('playerIframe').src = '';
+    });
+
+    // Assistir primeiro episódio da temporada ativa
+    function playActiveSeasonFirstEpisode() {
+        const activeSeasonContainer = document.querySelector('.season-episodes[style*="display: flex"]');
+        if(activeSeasonContainer) {
+            const firstEp = activeSeasonContainer.querySelector('.ep-card-wrapper');
+            if(firstEp) {
+                firstEp.click();
+            } else {
+                alert('Nenhum episódio encontrado nesta temporada.');
+            }
+        }
     }
 </script>
 @endsection

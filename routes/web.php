@@ -46,6 +46,7 @@ Route::controller(FrontendController::class)->group(function () {
     Route::get('/genero/{slug}', 'genre')->name('frontend.genre');
     Route::get('/estudio/{slug}', 'network')->name('frontend.network');
     Route::get('/assistir/{slug}', 'player')->name('frontend.player');
+    Route::get('/baixar-app', 'appDownload')->name('frontend.app-download');
 });
 
 // Rotas Públicas (Legal)

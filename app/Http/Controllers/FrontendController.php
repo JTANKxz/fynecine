@@ -198,4 +198,10 @@ class FrontendController extends Controller
             'description' => "Assistir conteúdos da {$network->name} online grátis."
         ]);
     }
+
+    public function appDownload()
+    {
+        $settings = \App\Models\AppConfig::getSettings();
+        return view('frontend.app-download', compact('settings'));
+    }
 }

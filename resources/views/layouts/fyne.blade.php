@@ -383,6 +383,7 @@
     <!-- MENU INFERIOR -->
     <nav class="bottom-nav">
         <button class="nav-item @yield('nav_home_active')" data-tab="home" onclick="window.location.href='{{ route('home') }}'"><i class="fas fa-home"></i><span>Início</span></button>
+        <button class="nav-item @yield('nav_app_active')" data-tab="app" onclick="window.location.href='{{ route('frontend.app-download') }}'"><i class="fas fa-download"></i><span>APP</span></button>
         <button class="nav-item @yield('nav_catalogo_active')" data-tab="catalogo" onclick="window.location.href='{{ route('frontend.search') }}'"><i class="fas fa-compass"></i><span>Explorar</span></button>
         {{-- Minha Lista - em desenvolvimento --}}
         {{-- <button class="nav-item" data-tab="lista" onclick="window.location.href='{{ auth()->check() ? route('login') : route('login') }}'"><i class="fas fa-list"></i><span>Minha Lista</span></button> --}}

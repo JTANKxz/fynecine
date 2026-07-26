@@ -128,7 +128,22 @@ class HomeSection extends Model
                 return Movie::find($item->content_id);
             }
             return Serie::find($item->content_id);
-        })->filter()->take($limit)->values();
+        })->filter(function ($content) {
+            if (!$content) return false;
+            
+            if (!$this->content_category_id) {
+                // Home: sem filtro, mostra tudo (geral)
+                return true;
+            }
+
+            if ($this->isDedicatedCategory()) {
+                // Animes/Doramas: mostrar só conteúdo dessa categoria
+                return $content->content_category_id == $this->content_category_id;
+            } else {
+                // Filmes/outras: mostrar só conteúdo geral (sem categoria)
+                return is_null($content->content_category_id);
+            }
+        })->take($limit)->values();
     }
 
     private function isDedicatedCategory(): bool

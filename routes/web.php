@@ -73,6 +73,9 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
     Route::get('/tmdb/episodes/{tmdbId}/{seasonNumber}', [TMDBController::class, 'fetchEpisodesForSync'])->name('tmdb.episodes');
     Route::post('/tmdb/sync-seasons', [TMDBController::class, 'syncSeasons'])->name('tmdb.sync-seasons');
     Route::post('/tmdb/sync-episodes', [TMDBController::class, 'syncEpisodes'])->name('tmdb.sync-episodes');
+    Route::post('/tmdb/cast-limit', [TMDBController::class, 'updateCastLimit'])->name('tmdb.cast-limit');
+    Route::get('/tmdb/batch-items', [TMDBController::class, 'batchItems'])->name('tmdb.batch-items');
+    Route::post('/tmdb/refresh-imported', [TMDBController::class, 'refreshImported'])->name('tmdb.refresh-imported');
 
 
     Route::prefix('users')->name('users.')->group(function () {

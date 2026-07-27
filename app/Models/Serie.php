@@ -16,6 +16,7 @@ class Serie extends Model
         'number_of_seasons',
         'number_of_episodes',
         'rating',
+        'vote_count',
         'overview',
         'poster_path',
         'backdrop_path',
@@ -55,6 +56,11 @@ class Serie extends Model
     }
 
 
+
+    public function keywords()
+    {
+        return $this->morphToMany(TmdbKeyword::class, 'keywordable');
+    }
 
     public function genres()
     {

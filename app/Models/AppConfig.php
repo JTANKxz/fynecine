@@ -9,6 +9,7 @@ class AppConfig extends Model
     protected $fillable = [
         'app_name',
         'tmdb_key',
+        'tmdb_cast_limit',
         'api_token_key',
         'custom_message',
         'custom_message_status',
@@ -111,6 +112,7 @@ class AppConfig extends Model
         'rewards_status' => 'boolean',
         'is_adult_active' => 'boolean',
         'interstitial_interval' => 'integer',
+        'tmdb_cast_limit' => 'integer',
         'default_avatar_p1' => 'integer',
         'default_avatar_p2' => 'integer',
         'default_avatar_p3' => 'integer',

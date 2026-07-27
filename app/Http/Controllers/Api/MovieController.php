@@ -106,6 +106,7 @@ class MovieController extends Controller
 
         $movie = Movie::with([
             'genres',
+            'keywords',
             'playLinks',
             'downloadLinks',
             'cast' => function ($q) {
@@ -130,12 +131,7 @@ class MovieController extends Controller
         =========================
         */
 
-        $related = Movie::whereHas('genres', function ($q) use ($movie) {
-            $q->whereIn('genres.id', $movie->genres->pluck('id'));
-        })
-            ->where('id', '!=', $movie->id)
-            ->limit(12)
-            ->get();
+        $related = app(\App\Services\RelatedContentService::class)->for($movie);
 
         $config = \App\Models\AppConfig::getSettings();
         

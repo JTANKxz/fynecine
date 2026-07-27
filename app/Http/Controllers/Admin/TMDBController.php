@@ -19,7 +19,7 @@ class TMDBController extends Controller
 
     public function index()
     {
-        return view('admin.tmdb.tmdb');
+        return view('admin.tmdb.tmdb', ['castLimit' => \App\Models\AppConfig::getSettings()->tmdb_cast_limit ?? 10]);
     }
 
     public function search(Request $request)
@@ -118,10 +118,11 @@ class TMDBController extends Controller
         $mode = $request->mode;
         $categoryId = $request->category_id;
         $importCast = $request->input('import_cast', true);
+        $castLimit = $request->integer('cast_limit') ?: null;
 
         if ($type === 'tv') {
             $fullImport = ($mode === 'full');
-            $result = $this->performSeriesImport($tmdbId, $fullImport, $categoryId, $importCast);
+            $result = $this->performSeriesImport($tmdbId, $fullImport, $categoryId, $importCast, $castLimit);
             
             if (!$result['success']) {
                 return response()->json(['error' => $result['error']], 404);
@@ -129,12 +130,12 @@ class TMDBController extends Controller
             return response()->json($result);
         }
 
-        return $this->importMovie($tmdbId, $categoryId, $importCast);
+        return $this->importMovie($tmdbId, $categoryId, $importCast, $castLimit);
     }
     
-    public function importMovie($tmdbId, $categoryId = null, $importCast = true)
+    public function importMovie($tmdbId, $categoryId = null, $importCast = true, ?int $castLimit = null)
     {
-        $result = $this->performMovieImport($tmdbId, $categoryId, $importCast);
+        $result = $this->performMovieImport($tmdbId, $categoryId, $importCast, $castLimit);
         
         if (!$result['success']) {
             return response()->json(['error' => $result['error']], 404);
@@ -241,4 +242,44 @@ class TMDBController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function updateCastLimit(Request $request)
+    {
+        $validated = $request->validate(['cast_limit' => ['required', 'integer', 'min:1', 'max:30']]);
+        $config = \App\Models\AppConfig::getSettings();
+        $config->update(['tmdb_cast_limit' => $validated['cast_limit']]);
+        return response()->json(['success' => true, 'cast_limit' => $config->tmdb_cast_limit]);
+    }
+
+    public function batchItems(Request $request)
+    {
+        $type = $request->validate(['type' => ['required', 'in:movie,tv']])['type'];
+        $items = $type === 'movie'
+            ? Movie::orderBy('id')->get(['id', 'tmdb_id', 'title'])->map(fn ($item) => ['id' => $item->id, 'tmdb_id' => $item->tmdb_id, 'title' => $item->title])
+            : Serie::orderBy('id')->get(['id', 'tmdb_id', 'name'])->map(fn ($item) => ['id' => $item->id, 'tmdb_id' => $item->tmdb_id, 'title' => $item->name]);
+        return response()->json(['items' => $items]);
+    }
+
+    public function refreshImported(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => ['required', 'in:movie,tv'], 'id' => ['required', 'integer'],
+            'action' => ['required', 'in:details,cast,keywords'], 'cast_limit' => ['nullable', 'integer', 'min:1', 'max:30'],
+        ]);
+        $model = $validated['type'] === 'movie' ? Movie::findOrFail($validated['id']) : Serie::findOrFail($validated['id']);
+        $limit = $validated['cast_limit'] ?? null;
+        if ($validated['action'] === 'cast') {
+            $this->syncCast($model, $validated['type'] === 'movie' ? 'movie' : 'tv', $model->tmdb_id, $this->resolveCastLimit($limit));
+            return response()->json(['success' => true, 'message' => 'Elenco atualizado.']);
+        }
+        if ($validated['action'] === 'keywords') {
+            $this->syncKeywords($model, $validated['type'] === 'movie' ? 'movie' : 'tv', $model->tmdb_id);
+            return response()->json(['success' => true, 'message' => 'Palavras-chave atualizadas.']);
+        }
+        $result = $model instanceof Movie
+            ? $this->refreshMovieFromTmdb($model, $limit)
+            : $this->refreshSeriesFromTmdb($model, $limit);
+        return response()->json($result, $result['success'] ? 200 : 422);
+    }
+
 }

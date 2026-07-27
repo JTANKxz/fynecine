@@ -6,9 +6,18 @@
 <section>
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold border-l-4 border-netflix pl-3">Editar Detalhes: <span class="text-neutral-400 font-medium">{{ $movie->title }}</span></h2>
-        <a href="{{ route('admin.movies.index') }}" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded transition text-sm">
-            <i class="fa-solid fa-arrow-left mr-2"></i>Voltar
-        </a>
+        <div class="flex items-center gap-2">
+            <form action="{{ route('admin.tmdb.refresh-imported') }}" method="POST" onsubmit="return confirm('Atualizar os dados deste conteudo pelo TMDB? Links, categoria e tags manuais serao preservados.')">
+                @csrf
+                <input type="hidden" name="type" value="movie">
+                <input type="hidden" name="id" value="{{ $movie->id }}">
+                <input type="hidden" name="action" value="details">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition text-sm"><i class="fa-solid fa-rotate mr-2"></i>Atualizar TMDB</button>
+            </form>
+            <a href="{{ route('admin.movies.index') }}" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded transition text-sm">
+                <i class="fa-solid fa-arrow-left mr-2"></i>Voltar
+            </a>
+        </div>
     </div>
 
     <div class="bg-neutral-900 rounded-xl border border-neutral-800 p-6 shadow-2xl">

@@ -60,9 +60,10 @@ trait ImportableContent
         return null;
     }
 
-    public function performMovieImport($tmdbId, $categoryId = null, $importCast = true)
+    public function performMovieImport($tmdbId, $categoryId = null, $importCast = true, ?int $castLimit = null)
     {
         try {
+            $castLimit = $this->resolveCastLimit($castLimit);
             $response = $this->fetchTMDB("movie/$tmdbId", [
                 'language' => 'pt-BR'
             ]);
@@ -107,6 +108,7 @@ trait ImportableContent
                 'release_year' => $year,
                 'runtime' => $data['runtime'] ?? 0,
                 'rating' => $data['vote_average'] ?? 0,
+                'vote_count' => $data['vote_count'] ?? 0,
                 'overview' => $data['overview'] ?? '',
                 'poster_path' => ($data['poster_path'] ?? null) ? $baseImage . $data['poster_path'] : null,
                 'backdrop_path' => ($data['backdrop_path'] ?? null) ? $baseImage . $data['backdrop_path'] : null,
@@ -131,33 +133,9 @@ trait ImportableContent
             }
             $movie->genres()->sync($genreIds);
 
-            // IMPORTAR ELENCO
+            $this->syncKeywords($movie, 'movie', $tmdbId);
             if ($importCast) {
-                $credits = $this->fetchTMDB("movie/$tmdbId/credits", [
-                    'language' => 'pt-BR'
-                ])->json();
-
-                if (isset($credits['cast'])) {
-                    foreach (array_slice($credits['cast'], 0, 5) as $actor) {
-                        $cast = Cast::updateOrCreate(
-                            ['tmdb_id' => $actor['id']],
-                            [
-                                'name' => $actor['name'],
-                                'slug' => Str::slug($actor['name']),
-                                'profile_path' => $actor['profile_path']
-                                    ? "https://image.tmdb.org/t/p/w500" . $actor['profile_path']
-                                    : null
-                            ]
-                        );
-
-                        $movie->cast()->syncWithoutDetaching([
-                            $cast->id => [
-                                'character' => $actor['character'] ?? null,
-                                'order' => $actor['order'] ?? 0
-                            ]
-                        ]);
-                    }
-                }
+                $this->syncCast($movie, 'movie', $tmdbId, $castLimit);
             }
 
             return ['success' => true, 'movie' => $movie];
@@ -166,9 +144,10 @@ trait ImportableContent
         }
     }
 
-    public function performSeriesImport($tmdbId, $fullImport = false, $categoryId = null, $importCast = true)
+    public function performSeriesImport($tmdbId, $fullImport = false, $categoryId = null, $importCast = true, ?int $castLimit = null)
     {
         try {
+            $castLimit = $this->resolveCastLimit($castLimit);
             $response = $this->fetchTMDB("tv/$tmdbId", [
                 'language' => 'pt-BR'
             ]);
@@ -214,6 +193,7 @@ trait ImportableContent
                 'number_of_seasons' => $data['number_of_seasons'] ?? 0,
                 'number_of_episodes' => $data['number_of_episodes'] ?? 0,
                 'rating' => $data['vote_average'] ?? 0,
+                'vote_count' => $data['vote_count'] ?? 0,
                 'overview' => $data['overview'] ?? '',
                 'poster_path' => ($data['poster_path'] ?? null) ? $baseImage . $data['poster_path'] : null,
                 'backdrop_path' => ($data['backdrop_path'] ?? null) ? $baseImage . $data['backdrop_path'] : null,
@@ -238,33 +218,9 @@ trait ImportableContent
             }
             $series->genres()->sync($genreIds);
 
-            // IMPORTAR ELENCO
+            $this->syncKeywords($series, 'tv', $tmdbId);
             if ($importCast) {
-                $credits = $this->fetchTMDB("tv/$tmdbId/credits", [
-                    'language' => 'pt-BR'
-                ])->json();
-
-                if (isset($credits['cast'])) {
-                    foreach (array_slice($credits['cast'], 0, 5) as $actor) {
-                        $cast = Cast::updateOrCreate(
-                            ['tmdb_id' => $actor['id']],
-                            [
-                                'name' => $actor['name'],
-                                'slug' => Str::slug($actor['name']),
-                                'profile_path' => $actor['profile_path']
-                                    ? "https://image.tmdb.org/t/p/w500" . $actor['profile_path']
-                                    : null
-                            ]
-                        );
-
-                        $series->cast()->syncWithoutDetaching([
-                            $cast->id => [
-                                'character' => $actor['character'] ?? null,
-                                'order' => $actor['order'] ?? 0
-                            ]
-                        ]);
-                    }
-                }
+                $this->syncCast($series, 'tv', $tmdbId, $castLimit);
             }
 
             // IMPORTAR TEMPORADAS (Full Import)
@@ -327,4 +283,88 @@ trait ImportableContent
 
         return ['success' => true, 'season' => $season];
     }
+
+    private function resolveCastLimit(?int $castLimit): int
+    {
+        $configured = AppConfig::getSettings()->tmdb_cast_limit ?? 10;
+        return max(1, min(30, $castLimit ?? $configured));
+    }
+
+    private function syncCast($content, string $type, int $tmdbId, int $castLimit): void
+    {
+        $credits = $this->fetchTMDB(($type === 'movie' ? "movie/$tmdbId" : "tv/$tmdbId") . '/credits', ['language' => 'pt-BR'])->json();
+        $sync = [];
+        foreach (array_slice($credits['cast'] ?? [], 0, $castLimit) as $actor) {
+            $cast = Cast::updateOrCreate(['tmdb_id' => $actor['id']], [
+                'name' => $actor['name'],
+                'slug' => Str::slug($actor['name']),
+                'profile_path' => !empty($actor['profile_path']) ? 'https://image.tmdb.org/t/p/w500' . $actor['profile_path'] : null,
+            ]);
+            $sync[$cast->id] = ['character' => $actor['character'] ?? null, 'order' => $actor['order'] ?? 0];
+        }
+        $content->cast()->sync($sync);
+    }
+
+    private function syncKeywords($content, string $type, int $tmdbId): void
+    {
+        $data = $this->fetchTMDB(($type === 'movie' ? "movie/$tmdbId" : "tv/$tmdbId") . '/keywords')->json();
+        $items = $type === 'movie' ? ($data['keywords'] ?? []) : ($data['results'] ?? []);
+        $ids = [];
+        foreach ($items as $item) {
+            $keyword = \App\Models\TmdbKeyword::updateOrCreate(['tmdb_id' => $item['id']], ['name' => $item['name']]);
+            $ids[] = $keyword->id;
+        }
+        $content->keywords()->sync($ids);
+    }
+
+    public function refreshMovieFromTmdb(Movie $movie, ?int $castLimit = null, bool $syncCast = true, bool $syncKeywords = true): array
+    {
+        $data = $this->fetchTMDB("movie/{$movie->tmdb_id}", ['language' => 'pt-BR'])->json();
+        if (empty($data['id'])) return ['success' => false, 'error' => 'Filme nao encontrado no TMDB.'];
+        $base = 'https://image.tmdb.org/t/p/original';
+        $movie->update([
+            'title' => $data['title'] ?? $movie->title, 'release_year' => substr($data['release_date'] ?? '', 0, 4) ?: $movie->release_year,
+            'runtime' => $data['runtime'] ?? $movie->runtime, 'rating' => $data['vote_average'] ?? $movie->rating,
+            'vote_count' => $data['vote_count'] ?? $movie->vote_count, 'overview' => $data['overview'] ?? $movie->overview,
+            'poster_path' => !empty($data['poster_path']) ? $base . $data['poster_path'] : $movie->poster_path,
+            'backdrop_path' => !empty($data['backdrop_path']) ? $base . $data['backdrop_path'] : $movie->backdrop_path,
+            'age_rating' => $this->getAgeRating('movie', $movie->tmdb_id),
+        ]);
+        $this->syncGenres($movie, $data['genres'] ?? []);
+        if ($syncKeywords) $this->syncKeywords($movie, 'movie', $movie->tmdb_id);
+        if ($syncCast) $this->syncCast($movie, 'movie', $movie->tmdb_id, $this->resolveCastLimit($castLimit));
+        return ['success' => true, 'movie' => $movie->fresh()];
+    }
+
+    public function refreshSeriesFromTmdb(Serie $series, ?int $castLimit = null, bool $syncCast = true, bool $syncKeywords = true): array
+    {
+        $data = $this->fetchTMDB("tv/{$series->tmdb_id}", ['language' => 'pt-BR'])->json();
+        if (empty($data['id'])) return ['success' => false, 'error' => 'Serie nao encontrada no TMDB.'];
+        $base = 'https://image.tmdb.org/t/p/original';
+        $series->update([
+            'name' => $data['name'] ?? $series->name, 'first_air_year' => substr($data['first_air_date'] ?? '', 0, 4) ?: $series->first_air_year,
+            'last_air_year' => !empty($data['last_air_date']) ? substr($data['last_air_date'], 0, 4) : $series->last_air_year,
+            'number_of_seasons' => $data['number_of_seasons'] ?? $series->number_of_seasons, 'number_of_episodes' => $data['number_of_episodes'] ?? $series->number_of_episodes,
+            'rating' => $data['vote_average'] ?? $series->rating, 'vote_count' => $data['vote_count'] ?? $series->vote_count,
+            'overview' => $data['overview'] ?? $series->overview, 'poster_path' => !empty($data['poster_path']) ? $base . $data['poster_path'] : $series->poster_path,
+            'backdrop_path' => !empty($data['backdrop_path']) ? $base . $data['backdrop_path'] : $series->backdrop_path,
+            'age_rating' => $this->getAgeRating('tv', $series->tmdb_id),
+        ]);
+        $this->syncGenres($series, $data['genres'] ?? []);
+        if ($syncKeywords) $this->syncKeywords($series, 'tv', $series->tmdb_id);
+        if ($syncCast) $this->syncCast($series, 'tv', $series->tmdb_id, $this->resolveCastLimit($castLimit));
+        return ['success' => true, 'series' => $series->fresh()];
+    }
+
+    private function syncGenres($content, array $genres): void
+    {
+        $ids = [];
+        foreach ($genres as $genre) {
+            $model = Genre::updateOrCreate(['tmdb_id' => $genre['id']], ['name' => $genre['name'], 'slug' => Str::slug($genre['name'])]);
+            $ids[] = $model->id;
+        }
+        $content->genres()->sync($ids);
+    }
+
+
 }

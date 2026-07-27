@@ -121,6 +121,7 @@ class SerieController extends Controller
 
         $serie = Serie::with([
             'genres',
+            'keywords',
             'seasons.episodes.links',
             'seasons.episodes.downloadLinks',
             'cast' => function ($q) {
@@ -145,12 +146,7 @@ class SerieController extends Controller
         =========================
         */
 
-        $related = Serie::whereHas('genres', function ($q) use ($serie) {
-            $q->whereIn('genres.id', $serie->genres->pluck('id'));
-        })
-            ->where('id', '!=', $serie->id)
-            ->limit(12)
-            ->get();
+        $related = app(\App\Services\RelatedContentService::class)->for($serie);
 
         $config = \App\Models\AppConfig::getSettings();
 

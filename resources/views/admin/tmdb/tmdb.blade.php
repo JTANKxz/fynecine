@@ -6,6 +6,31 @@
 <!-- STATS -->
 <!-- BUSCA TMDB COM FILTROS E IDIOMA PT-BR -->
 <section>
+    <div class="mb-5 rounded-xl border border-neutral-800 bg-neutral-900 p-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h2 class="text-xl font-bold">Importacao e atualizacao TMDB</h2>
+                <p class="mt-1 text-sm text-neutral-400">Defina o elenco padrao e atualize metadados sem alterar links, categorias ou tags manuais.</p>
+            </div>
+            <div class="flex items-end gap-2">
+                <label class="block text-sm font-semibold text-neutral-300">Atores por conteudo
+                    <input id="castLimit" type="number" min="1" max="30" value="{{ $castLimit }}" class="mt-1 block w-24 rounded bg-neutral-800 px-3 py-2 text-white outline-none ring-1 ring-neutral-700 focus:ring-netflix">
+                </label>
+                <button type="button" onclick="saveCastLimit()" class="rounded bg-neutral-700 px-4 py-2 text-sm font-bold hover:bg-neutral-600">Salvar padrao</button>
+            </div>
+        </div>
+        <div class="mt-5 grid gap-3 md:grid-cols-2">
+            <button type="button" onclick="startBatch('movie','cast')" class="rounded-lg bg-blue-700 px-4 py-3 text-left font-bold hover:bg-blue-600">Atualizar elenco de todos os filmes</button>
+            <button type="button" onclick="startBatch('tv','cast')" class="rounded-lg bg-blue-700 px-4 py-3 text-left font-bold hover:bg-blue-600">Atualizar elenco de todas as series</button>
+            <button type="button" onclick="startBatch('movie','keywords')" class="rounded-lg bg-purple-700 px-4 py-3 text-left font-bold hover:bg-purple-600">Atualizar palavras-chave dos filmes</button>
+            <button type="button" onclick="startBatch('tv','keywords')" class="rounded-lg bg-purple-700 px-4 py-3 text-left font-bold hover:bg-purple-600">Atualizar palavras-chave das series</button>
+        </div>
+        <div id="batchProgress" class="mt-4 hidden rounded-lg border border-neutral-700 bg-neutral-950 p-4">
+            <div class="flex items-center justify-between text-sm"><span id="batchText">Preparando...</span><button type="button" onclick="cancelBatch()" class="text-red-400 hover:text-red-300">Cancelar</button></div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-neutral-800"><div id="batchBar" class="h-full w-0 bg-netflix transition-all"></div></div>
+            <p id="batchCurrent" class="mt-2 truncate text-xs text-neutral-500"></p>
+        </div>
+    </div>
     <h2 class="text-xl font-bold mb-4">Buscar no TMDB (pt-BR)</h2>
     <div class="bg-neutral-900 p-5 rounded space-y-4">
         <!-- Filtros Avançados -->
@@ -85,7 +110,7 @@
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" id="importCast" class="rounded accent-netflix w-5 h-5" checked>
-                    <span class="text-sm">Importar Elenco</span>
+                    <span class="text-sm">Importar Elenco (usa o limite acima)</span>
                 </label>
             </div>
 
@@ -283,7 +308,8 @@
                     type: type,
                     mode: mode,
                     category_id: categoryId,
-                    import_cast: importCast
+                    import_cast: importCast,
+                    cast_limit: Number(document.getElementById("castLimit").value)
                 })
             });
 
@@ -385,6 +411,42 @@
             });
         }
     });
+
+    let batchCancelled = false;
+    const csrfToken = () => document.querySelector('meta[name="csrf-token"]').content;
+
+    async function saveCastLimit() {
+        const castLimit = Number(document.getElementById('castLimit').value);
+        const response = await fetch('/dashzin/tmdb/cast-limit', {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken()}, body: JSON.stringify({cast_limit: castLimit})});
+        if (!response.ok) return alert('Nao foi possivel salvar o limite.');
+        alert('Limite padrao salvo.');
+    }
+
+    function cancelBatch() { batchCancelled = true; }
+
+    async function startBatch(type, action) {
+        if (!confirm('Iniciar esta atualizacao? Mantenha esta pagina aberta ate terminar.')) return;
+        batchCancelled = false;
+        const progress = document.getElementById('batchProgress');
+        const text = document.getElementById('batchText');
+        const current = document.getElementById('batchCurrent');
+        const bar = document.getElementById('batchBar');
+        progress.classList.remove('hidden'); bar.style.width = '0%'; text.textContent = 'Buscando conteudos...';
+        const response = await fetch(`/dashzin/tmdb/batch-items?type=${type}`);
+        const data = await response.json();
+        const items = data.items || []; let completed = 0; let errors = 0;
+        for (const item of items) {
+            if (batchCancelled) break;
+            current.textContent = item.title;
+            try {
+                const result = await fetch('/dashzin/tmdb/refresh-imported', {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken()}, body: JSON.stringify({type, id: item.id, action, cast_limit: Number(document.getElementById('castLimit').value)})});
+                if (!result.ok) errors++;
+            } catch (_) { errors++; }
+            completed++; const percent = items.length ? Math.round((completed / items.length) * 100) : 100;
+            bar.style.width = `${percent}%`; text.textContent = `${completed}/${items.length} processados${errors ? ` - ${errors} erros` : ''}`;
+        }
+        current.textContent = batchCancelled ? 'Atualizacao cancelada.' : `Concluido. ${errors ? `${errors} erros.` : 'Sem erros.'}`;
+    }
 </script>
 <div id="importModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
 

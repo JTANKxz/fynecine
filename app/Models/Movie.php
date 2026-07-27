@@ -14,6 +14,7 @@ class Movie extends Model
         'release_year',
         'runtime',
         'rating',
+        'vote_count',
         'overview',
         'poster_path',
         'backdrop_path',
@@ -52,6 +53,11 @@ class Movie extends Model
             return null;
         }
         return $this->tag_text;
+    }
+
+    public function keywords()
+    {
+        return $this->morphToMany(TmdbKeyword::class, 'keywordable');
     }
 
     public function genres()

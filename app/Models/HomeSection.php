@@ -92,7 +92,7 @@ class HomeSection extends Model
         // Exclui automaticamente os itens do banco se a data de lançamento já chegou
         Upcoming::where('release_date', '<=', now()->toDateString())->delete();
 
-        return Upcoming::orderBy('release_date', 'asc')->limit($limit)->get();
+        return Upcoming::with('serie')->orderBy('release_date', 'asc')->limit($limit)->get();
     }
 
     private function resolveNetworksList($limit)

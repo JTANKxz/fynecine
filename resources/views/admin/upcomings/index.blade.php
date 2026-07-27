@@ -135,12 +135,14 @@
                 const button = item.imported ?
                     `<button class="bg-green-600 w-full mt-2 text-xs p-1 rounded cursor-default font-bold">Na Lista</button>` :
                     `<button id="btn-upc-${item.id}" class="bg-blue-600 w-full mt-2 text-xs p-1 font-bold rounded hover:bg-blue-700 transition" onclick="importUpcoming(${item.id}, '${type}')">+ IMPORTAR</button>`;
+                const seasonButton = type === 'tv' ? `<button class="bg-purple-700 w-full mt-2 text-xs p-1 font-bold rounded hover:bg-purple-600 transition" onclick="openSeasonModal(${item.id})">+ TEMPORADA FUTURA</button>` : '';
 
                 results.innerHTML += `
                 <div class="bg-neutral-800 rounded p-2 shadow border border-neutral-700">
                     <img src="${poster}" class="rounded w-full aspect-[2/3] object-cover mb-2">
                     <p class="text-[10px] font-bold truncate">${title}</p>
                     ${button}
+                    ${seasonButton}
                 </div>`;
             });
 
@@ -150,7 +152,7 @@
         }
     }
 
-    async function importUpcoming(id, type) {
+    async function importUpcoming(id, type, seasonNumber = null) {
         const btn = document.getElementById(`btn-upc-${id}`);
         if(btn) {
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
@@ -164,7 +166,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({ tmdb_id: id, type: type })
+                body: JSON.stringify({ tmdb_id: id, type: type, season_number: seasonNumber })
             });
 
             const data = await response.json();
@@ -182,5 +184,31 @@
             if(btn) btn.innerHTML = 'Erro';
         }
     }
+
+    let selectedUpcomingSeries = null;
+    async function openSeasonModal(tmdbId) {
+        selectedUpcomingSeries = tmdbId;
+        const modal = document.getElementById('seasonModal');
+        const list = document.getElementById('seasonList');
+        list.innerHTML = '<p class="text-sm text-neutral-400">Carregando temporadas...</p>';
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        const response = await fetch(`/dashzin/upcomings/seasons/${tmdbId}`);
+        const data = await response.json();
+        if (!response.ok) { list.innerHTML = '<p class="text-red-400">Nao foi possivel consultar as temporadas.</p>'; return; }
+        list.innerHTML = data.seasons.map(season => {
+            const date = season.air_date ? new Date(`${season.air_date}T12:00:00`).toLocaleDateString('pt-BR') : 'Data ainda nao anunciada';
+            return `<button type="button" onclick="importSeason(${season.season_number})" class="w-full rounded-lg border border-neutral-700 bg-neutral-800 p-3 text-left hover:border-purple-500"><strong>${season.name}</strong><span class="mt-1 block text-xs text-neutral-400">Estreia: ${date}</span></button>`;
+        }).join('') || '<p class="text-sm text-neutral-400">Nenhuma temporada encontrada.</p>';
+    }
+    function closeSeasonModal() { const modal = document.getElementById('seasonModal'); modal.classList.add('hidden'); modal.classList.remove('flex'); }
+    async function importSeason(seasonNumber) { await importUpcoming(selectedUpcomingSeries, 'tv', seasonNumber); closeSeasonModal(); }
 </script>
+
+<div id="seasonModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+    <div class="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-xl border border-neutral-700 bg-neutral-900 p-5">
+        <div class="mb-4 flex items-center justify-between"><h3 class="text-lg font-bold">Adicionar temporada futura</h3><button type="button" onclick="closeSeasonModal()" class="text-neutral-400 hover:text-white">Fechar</button></div>
+        <p class="mb-4 text-sm text-neutral-400">Escolha a temporada que deseja mostrar em Chegando em Breve. O trailer da serie sera associado automaticamente.</p>
+        <div id="seasonList" class="space-y-2"></div>
+    </div>
+</div>
 @endsection

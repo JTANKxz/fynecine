@@ -186,6 +186,7 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
     Route::prefix('upcomings')->name('upcomings.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\UpcomingController::class, 'index'])->name('index');
         Route::post('/import', [\App\Http\Controllers\Admin\UpcomingController::class, 'import'])->name('import');
+        Route::get('/seasons/{tmdbId}', [\App\Http\Controllers\Admin\UpcomingController::class, 'seasons'])->name('seasons');
         Route::delete('/{upcoming}', [\App\Http\Controllers\Admin\UpcomingController::class, 'destroy'])->name('destroy');
     });
 

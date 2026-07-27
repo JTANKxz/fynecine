@@ -216,3 +216,5 @@ Route::get('/pix/status/{paymentId}', [\App\Http\Controllers\Api\PixPaymentContr
 
 // Webhook do Mercado Pago (público — sem auth)
 Route::post('/webhooks/mercadopago', [\App\Http\Controllers\Api\PixWebhookController::class, 'handle']);
+// Cakto campaign webhook (public; excluded from api.token and Sanctum)
+Route::post('/webhooks/cakto', [\App\Http\Controllers\Api\CaktoWebhookController::class, 'handle']);

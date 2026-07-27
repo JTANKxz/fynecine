@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'cakto' => [
+        'webhook_secret' => env('CAKTO_WEBHOOK_SECRET'),
+        'campaign_product_id' => env('CAKTO_CAMPAIGN_PRODUCT_ID'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

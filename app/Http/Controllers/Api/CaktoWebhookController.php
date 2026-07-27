@@ -44,7 +44,7 @@ class CaktoWebhookController extends Controller
             'product.id', 'product_id', 'data.product.id', 'data.product_id', 'purchase.product.id',
         ]);
         $purchaseId = (string) $this->firstValue($payload, [
-            'purchase.id', 'order.id', 'transaction.id', 'data.purchase.id', 'data.order.id', 'id',
+            'data.id', 'purchase.id', 'order.id', 'transaction.id', 'data.purchase.id', 'data.order.id', 'id',
         ]);
         if ($purchaseId === '') {
             Log::warning('Cakto webhook rejected: purchase id missing.', ['product_id' => $productId]);

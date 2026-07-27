@@ -17,17 +17,10 @@ class CaktoWebhookController extends Controller
      */
     public function handle(Request $request): JsonResponse
     {
-        $secret = (string) config('services.cakto.webhook_secret');
-        $expectedProduct = (string) config('services.cakto.campaign_product_id');
-
-        if ($secret === '' || $expectedProduct === '') {
+        $webhooks = (array) config('services.cakto.campaign_webhooks', []);
+        if ($webhooks === []) {
             Log::critical('Cakto webhook is not configured.');
             return response()->json(['message' => 'Cakto integration is not configured.'], 503);
-        }
-
-        if (!$this->hasValidSecret($request, $secret)) {
-            Log::warning('Cakto webhook rejected: invalid secret.', ['ip' => $request->ip()]);
-            return response()->json(['message' => 'Unauthorized.'], 401);
         }
 
         $payload = $request->json()->all() ?: $request->all();
@@ -36,14 +29,15 @@ class CaktoWebhookController extends Controller
             return response()->json(['status' => 'ignored']);
         }
 
+        $campaignPlan = $this->campaignPlanForRequest($request, $webhooks);
+        if ($campaignPlan === null) {
+            Log::warning('Cakto webhook rejected: invalid secret.', ['ip' => $request->ip()]);
+            return response()->json(['message' => 'Unauthorized.'], 401);
+        }
+
         $productId = (string) $this->firstValue($payload, [
             'product.id', 'product_id', 'data.product.id', 'data.product_id', 'purchase.product.id',
         ]);
-        if ($productId === '' || !hash_equals($expectedProduct, $productId)) {
-            Log::warning('Cakto webhook rejected: unexpected product.', ['product_id' => $productId]);
-            return response()->json(['status' => 'ignored']);
-        }
-
         $purchaseId = (string) $this->firstValue($payload, [
             'purchase.id', 'order.id', 'transaction.id', 'data.purchase.id', 'data.order.id', 'id',
         ]);
@@ -62,16 +56,27 @@ class CaktoWebhookController extends Controller
         CaktoCampaignPurchase::updateOrCreate(
             ['cakto_purchase_id' => $purchaseId],
             [
-                'product_id' => $productId,
+                'product_id' => $productId ?: 'cakto-' . $campaignPlan,
                 'buyer_name' => $name ?: null,
                 'buyer_email' => $email ?: null,
-                'status' => 'approved',
+                'status' => 'approved:' . $campaignPlan,
                 'payload' => $payload,
                 'approved_at' => now(),
             ]
         );
 
         return response()->json(['status' => 'accepted']);
+    }
+
+    private function campaignPlanForRequest(Request $request, array $webhooks): ?string
+    {
+        foreach ($webhooks as $plan => $secret) {
+            if (is_string($secret) && $secret !== '' && $this->hasValidSecret($request, $secret)) {
+                return (string) $plan;
+            }
+        }
+
+        return null;
     }
 
     private function hasValidSecret(Request $request, string $secret): bool

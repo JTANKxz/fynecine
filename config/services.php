@@ -15,8 +15,10 @@ return [
     */
 
     'cakto' => [
-        'webhook_secret' => env('CAKTO_WEBHOOK_SECRET'),
-        'campaign_product_id' => env('CAKTO_CAMPAIGN_PRODUCT_ID'),
+        'campaign_webhooks' => array_filter([
+            'basic' => env('CAKTO_BASIC_WEBHOOK_SECRET'),
+            'plus' => env('CAKTO_PLUS_WEBHOOK_SECRET'),
+        ]),
     ],
 
     'postmark' => [

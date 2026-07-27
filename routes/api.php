@@ -218,3 +218,10 @@ Route::get('/pix/status/{paymentId}', [\App\Http\Controllers\Api\PixPaymentContr
 Route::post('/webhooks/mercadopago', [\App\Http\Controllers\Api\PixWebhookController::class, 'handle']);
 // Cakto campaign webhook (public; excluded from api.token and Sanctum)
 Route::post('/webhooks/cakto', [\App\Http\Controllers\Api\CaktoWebhookController::class, 'handle']);
+
+// Campaign account activation (public; purchase is verified by an email code)
+Route::prefix('/campaigns/cakto/activation')->group(function () {
+    Route::post('/start', [\App\Http\Controllers\Api\CaktoActivationController::class, 'start']);
+    Route::post('/verify', [\App\Http\Controllers\Api\CaktoActivationController::class, 'verify']);
+    Route::post('/confirm', [\App\Http\Controllers\Api\CaktoActivationController::class, 'confirm']);
+});

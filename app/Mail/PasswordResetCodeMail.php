@@ -15,13 +15,15 @@ class PasswordResetCodeMail extends Mailable
     use Queueable, SerializesModels;
 
     public $code;
+    public $purpose;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($code)
+    public function __construct($code, string $purpose = "reset")
     {
         $this->code = $code;
+        $this->purpose = $purpose;
     }
 
     /**

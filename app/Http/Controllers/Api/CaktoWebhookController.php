@@ -23,13 +23,18 @@ class CaktoWebhookController extends Controller
             return response()->json(['message' => 'Cakto integration is not configured.'], 503);
         }
 
-        $payload = $request->json()->all() ?: $request->all();
+        // Cakto may omit the Content-Type header. Decode the raw body first so
+        // data.id, customer and product are available in either delivery format.
+        $rawPayload = json_decode($request->getContent(), true);
+        $payload = is_array($rawPayload) && $rawPayload !== []
+            ? $rawPayload
+            : ($request->json()->all() ?: $request->all());
         $event = (string) data_get($payload, 'event', data_get($payload, 'event_type', data_get($payload, 'type', 'purchase_approved')));
         if ($event !== 'purchase_approved') {
             return response()->json(['status' => 'ignored']);
         }
 
-        $campaignPlan = $this->campaignPlanForRequest($request, $webhooks);
+        $campaignPlan = $this->campaignPlanForRequest($request, $webhooks, $payload);
         if ($campaignPlan === null) {
             Log::warning('Cakto webhook rejected: invalid secret.', ['ip' => $request->ip()]);
             return response()->json(['message' => 'Unauthorized.'], 401);
@@ -68,10 +73,10 @@ class CaktoWebhookController extends Controller
         return response()->json(['status' => 'accepted']);
     }
 
-    private function campaignPlanForRequest(Request $request, array $webhooks): ?string
+    private function campaignPlanForRequest(Request $request, array $webhooks, array $payload): ?string
     {
         foreach ($webhooks as $plan => $secret) {
-            if (is_string($secret) && $secret !== '' && $this->hasValidSecret($request, $secret)) {
+            if (is_string($secret) && $secret !== '' && $this->hasValidSecret($request, $secret, $payload)) {
                 return (string) $plan;
             }
         }
@@ -79,7 +84,7 @@ class CaktoWebhookController extends Controller
         return null;
     }
 
-    private function hasValidSecret(Request $request, string $secret): bool
+    private function hasValidSecret(Request $request, string $secret, array $payload = []): bool
     {
         $authorization = (string) $request->header('Authorization');
         $bearer = Str::startsWith($authorization, 'Bearer ') ? Str::after($authorization, 'Bearer ') : null;
@@ -87,6 +92,7 @@ class CaktoWebhookController extends Controller
             ?? $request->header('X-Webhook-Secret')
             ?? $request->header('X-Cakto-Secret')
             ?? $bearer
+            ?? data_get($payload, 'secret')
             ?? $request->input('secret')
             ?? data_get($request->all(), 'data.secret');
 

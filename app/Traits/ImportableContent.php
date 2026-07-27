@@ -17,12 +17,15 @@ trait ImportableContent
     private function fetchTMDB(string $endpoint, array $params = [])
     {
         $config = AppConfig::getSettings();
-        $apiKey = $config->tmdb_key ?: env('TMDB_API_KEY', 'edcd52275afd8b8c152c82f1ce3933a2');
+        $apiKey = $config->tmdb_key ?: env('TMDB_API_KEY');
 
+        // The TMDB v3 key remains server-side. The browser never receives it.
         $params['api_key'] = $apiKey;
-        $params['endpoint'] = $endpoint;
 
-        return Http::get('https://joetank.online/tmdb.php', $params);
+        return Http::acceptJson()
+            ->timeout(20)
+            ->retry(2, 250)
+            ->get('https://api.themoviedb.org/3/' . ltrim($endpoint, '/'), $params);
     }
 
     private function getAgeRating(string $type, $tmdbId)

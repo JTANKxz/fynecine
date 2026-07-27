@@ -26,7 +26,7 @@ class CaktoActivationController extends Controller
 
         if (!$purchase) {
             return response()->json([
-                'message' => 'N?o encontramos uma compra aprovada pendente para este e-mail. Use o mesmo e-mail informado no checkout.',
+                'message' => 'Não encontramos uma compra aprovada pendente para este e-mail. Use o mesmo e-mail informado no checkout.',
             ], 404);
         }
 
@@ -38,18 +38,18 @@ class CaktoActivationController extends Controller
             );
             Mail::to($email)->send(new PasswordResetCodeMail($code, 'activation'));
         } catch (\Throwable $exception) {
-            \Log::error('N?o foi poss?vel enviar o c?digo de ativa??o Cakto.', [
+            \Log::error('Não foi possível enviar o código de ativação Cakto.', [
                 'purchase_id' => $purchase->id,
                 'error' => $exception->getMessage(),
             ]);
 
             return response()->json([
-                'message' => 'N?o foi poss?vel enviar o c?digo agora. Tente novamente em alguns minutos.',
+                'message' => 'Não foi possível enviar o código agora. Tente novamente em alguns minutos.',
             ], 503);
         }
 
         return response()->json([
-            'message' => 'Enviamos um c?digo de confirma??o para o e-mail usado na compra.',
+            'message' => 'Enviamos um código de confirmação para o e-mail usado na compra.',
         ]);
     }
 

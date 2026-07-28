@@ -31,7 +31,8 @@ class TvChannelController extends Controller
         $channels = $query->orderBy('name')->paginate($perPage)->withQueryString();
 
         $ids = $channels->getCollection()->pluck('id');
-        $now = now();
+        // EPG timestamps are stored in UTC; keep the database comparison in UTC.
+        $now = now('UTC');
         $current = \App\Models\EpgProgram::whereIn('tv_channel_id', $ids)->where('starts_at', '<=', $now)->where('ends_at', '>', $now)->get()->keyBy('tv_channel_id');
         $next = \App\Models\EpgProgram::whereIn('tv_channel_id', $ids)->where('starts_at', '>=', $now)->orderBy('starts_at')->get()->groupBy('tv_channel_id')->map->first();
         $channels->getCollection()->transform(function ($channel) use ($current, $next) {
@@ -99,7 +100,7 @@ class TvChannelController extends Controller
             }),
 
             'play_links' => $playLinks->values(),
-            'schedule' => \App\Models\EpgProgram::where('tv_channel_id', $channel->id)->where('ends_at', '>', now()->subHour())->orderBy('starts_at')->limit(24)->get(),
+            'schedule' => \App\Models\EpgProgram::where('tv_channel_id', $channel->id)->where('ends_at', '>', now('UTC')->subHour())->orderBy('starts_at')->limit(24)->get(),
         ]);
     }
 

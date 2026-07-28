@@ -28,7 +28,7 @@
         <div class="mt-4 rounded-lg border border-neutral-800 bg-neutral-950/50 p-3 text-xs text-neutral-400">
             <p class="mb-2 font-semibold text-neutral-200">Fontes gratuitas recomendadas</p>
             <div class="flex flex-wrap gap-2">
-                <button type="button" data-epg-name="IPTV-EPG Brasil" data-epg-url="https://iptv-epg.org/files/epg-br.xml" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">IPTV-EPG Brasil · recomendada</button>
+                <button type="button" data-epg-name="IPTV-EPG Brasil" data-epg-url="https://epgshare01.online/epgshare01/epg_ripper_BR1.xml.gz" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">IPTV-EPG Brasil · recomendada</button>
                 <button type="button" data-epg-name="EPGShare Brasil 1" data-epg-url="https://epgshare01.online/epgshare01/epg_ripper_BR1.xml.gz" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">EPGShare BR1</button>
                 <button type="button" data-epg-name="EPGShare Brasil 2" data-epg-url="https://epgshare01.online/epgshare01/epg_ripper_BR2.xml.gz" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">EPGShare BR2</button>
             </div>

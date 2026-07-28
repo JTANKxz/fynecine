@@ -59,7 +59,7 @@ class EpgSyncService
     private function autoMap(EpgSource $source): void
     {
         $catalog=EpgChannel::where('epg_source_id',$source->id)->get();
-        $used=TvChannelEpg::where('epg_source_id',$source->id)->pluck('tv_channel_id');
+        $used=TvChannelEpg::where('epg_source_id',$source->id)->whereNotNull('epg_channel_id')->pluck('tv_channel_id');
         TvChannel::whereNotIn('id',$used)->get()->each(function(TvChannel $channel) use($source,$catalog) {
             $name=$this->normal($channel->name); $match=$catalog->first(fn($item) => $this->normal($item->name)===$name) ?? $catalog->first(fn($item) => strlen($name)>4 && (str_contains($this->normal($item->name),$name) || str_contains($name,$this->normal($item->name))));
             if ($match) TvChannelEpg::updateOrCreate(['tv_channel_id'=>$channel->id],['epg_source_id'=>$source->id,'epg_channel_id'=>$match->id]);

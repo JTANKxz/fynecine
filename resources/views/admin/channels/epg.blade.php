@@ -28,7 +28,7 @@
         <div class="mt-4 rounded-lg border border-neutral-800 bg-neutral-950/50 p-3 text-xs text-neutral-400">
             <p class="mb-2 font-semibold text-neutral-200">Fontes gratuitas recomendadas</p>
             <div class="flex flex-wrap gap-2">
-                <button type="button" data-epg-name="IPTV-EPG Brasil" data-epg-url="https://iptv-epg.org/files/epg-br.xml" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">IPTV-EPG Brasil ? recomendada</button>
+                <button type="button" data-epg-name="IPTV-EPG Brasil" data-epg-url="https://iptv-epg.org/files/epg-br.xml" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">IPTV-EPG Brasil · recomendada</button>
                 <button type="button" data-epg-name="EPGShare Brasil 1" data-epg-url="https://epgshare01.online/epgshare01/epg_ripper_BR1.xml.gz" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">EPGShare BR1</button>
                 <button type="button" data-epg-name="EPGShare Brasil 2" data-epg-url="https://epgshare01.online/epgshare01/epg_ripper_BR2.xml.gz" class="rounded bg-neutral-800 px-3 py-1.5 hover:bg-neutral-700">EPGShare BR2</button>
             </div>
@@ -38,7 +38,7 @@
         <form method="POST" action="{{ route('admin.channels.epg.sync') }}" class="mt-4 flex flex-wrap items-center gap-3">
             @csrf
             <button class="rounded bg-purple-600 px-4 py-2 font-bold hover:bg-purple-500">Atualizar programação agora</button>
-            <span class="text-xs text-neutral-500">Última atualiza??o: {{ $source?->last_synced_at?->format('d/m/Y H:i') ?? 'nunca' }}</span>
+            <span class="text-xs text-neutral-500">Última atualização: {{ $source?->last_synced_at?->format('d/m/Y H:i') ?? 'nunca' }}</span>
         </form>
     </div>
 
@@ -55,7 +55,7 @@
                                 <select name="epg_channel_id" class="w-full rounded bg-neutral-800 p-2">
                                     <option value="">Sem programação</option>
                                     @foreach($epgChannels as $epg)
-                                        <option value="{{ $epg->id }}" @selected($channel->epgMapping?->epg_channel_id === $epg->id)>{{ $epg->name }} ? {{ $epg->xmltv_id }}</option>
+                                        <option value="{{ $epg->id }}" @selected($channel->epgMapping?->epg_channel_id === $epg->id)>{{ $epg->name }} — {{ $epg->xmltv_id }}</option>
                                     @endforeach
                                 </select>
                             </form>

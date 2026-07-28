@@ -6,7 +6,7 @@
 <section>
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Canais de TV ao Vivo</h2>
-        <div class="flex gap-2"><a href="{{ route('admin.channels.epg.index') }}" class="bg-purple-700 px-4 py-2 rounded hover:bg-purple-600 transition text-sm"><i class="fa-solid fa-calendar-days mr-2"></i>Programa??o EPG</a><a href="{{ route('admin.channels.create') }}" class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Novo Canal</a></div>
+        <div class="flex gap-2"><a href="{{ route('admin.channels.epg.index') }}" class="bg-purple-700 px-4 py-2 rounded hover:bg-purple-600 transition text-sm"><i class="fa-solid fa-calendar-days mr-2"></i>Programação EPG</a><a href="{{ route('admin.channels.create') }}" class="bg-netflix px-4 py-2 rounded hover:bg-red-700 transition text-sm"><i class="fa-solid fa-plus mr-2"></i>Novo Canal</a></div>
     </div>
 
     <!-- Form de Pesquisa -->

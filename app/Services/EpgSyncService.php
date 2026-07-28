@@ -17,17 +17,17 @@ class EpgSyncService
     public function sync(EpgSource $source): array
     {
         $response = Http::timeout(90)->accept('application/xml,text/xml,*/*')->get($source->url);
-        if (!$response->successful()) throw new \RuntimeException('Feed EPG indispon?vel (HTTP ' . $response->status() . ').');
+        if (!$response->successful()) throw new \RuntimeException('Feed EPG indisponível (HTTP ' . $response->status() . ').');
         $body = $response->body();
         if (substr($body, 0, 2) === "\x1f\x8b") {
             $decoded = gzdecode($body);
-            if ($decoded === false) throw new \RuntimeException('N?o foi poss?vel descompactar o feed EPG.');
+            if ($decoded === false) throw new \RuntimeException('Não foi possível descompactar o feed EPG.');
             $body = $decoded;
         }
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($body);
-        if (!$xml) throw new \RuntimeException('O feed EPG n?o cont?m XMLTV v?lido.');
+        if (!$xml) throw new \RuntimeException('O feed EPG não contém XMLTV válido.');
 
         $catalogRows = [];
         foreach ($xml->channel as $channel) {
@@ -48,7 +48,7 @@ class EpgSyncService
             $xmltvId=(string)$programme['channel']; if (!isset($channelIds[$xmltvId])) continue;
             $starts=$this->parseDate((string)$programme['start']); $ends=$this->parseDate((string)$programme['stop']);
             if (!$starts || !$ends || $ends->lessThan(now()->subHours(6))) continue;
-            $rows[]=['epg_source_id'=>$source->id,'tv_channel_id'=>$channelIds[$xmltvId],'xmltv_channel_id'=>$xmltvId,'title'=>(string)($programme->title[0] ?? 'Sem t?tulo'),'description'=>(string)($programme->desc[0] ?? '') ?: null,'category'=>(string)($programme->category[0] ?? '') ?: null,'icon_url'=>isset($programme->icon[0])?(string)$programme->icon[0]['src']:null,'starts_at'=>$starts,'ends_at'=>$ends,'created_at'=>now(),'updated_at'=>now()];
+            $rows[]=['epg_source_id'=>$source->id,'tv_channel_id'=>$channelIds[$xmltvId],'xmltv_channel_id'=>$xmltvId,'title'=>(string)($programme->title[0] ?? 'Sem título'),'description'=>(string)($programme->desc[0] ?? '') ?: null,'category'=>(string)($programme->category[0] ?? '') ?: null,'icon_url'=>isset($programme->icon[0])?(string)$programme->icon[0]['src']:null,'starts_at'=>$starts,'ends_at'=>$ends,'created_at'=>now(),'updated_at'=>now()];
             if (count($rows) === 500) { EpgProgram::upsert($rows,['epg_source_id','xmltv_channel_id','starts_at','ends_at'],['tv_channel_id','title','description','category','icon_url','updated_at']); $count+=count($rows); $rows=[]; }
         }
         if ($rows) { EpgProgram::upsert($rows,['epg_source_id','xmltv_channel_id','starts_at','ends_at'],['tv_channel_id','title','description','category','icon_url','updated_at']); $count+=count($rows); }

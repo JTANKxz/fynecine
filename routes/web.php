@@ -222,6 +222,10 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
 
     // ========== TV AO VIVO ==========
     Route::prefix('channels')->name('channels.')->group(function () {
+        Route::get('/epg', [\App\Http\Controllers\Admin\EpgController::class, 'index'])->name('epg.index');
+        Route::post('/epg/source', [\App\Http\Controllers\Admin\EpgController::class, 'source'])->name('epg.source');
+        Route::post('/epg/sync', [\App\Http\Controllers\Admin\EpgController::class, 'sync'])->name('epg.sync');
+        Route::put('/{channel}/epg', [\App\Http\Controllers\Admin\EpgController::class, 'mapping'])->name('epg.mapping');
         Route::get('/', [TvChannelController::class, 'index'])->name('index');
         Route::get('/create', [TvChannelController::class, 'create'])->name('create');
         Route::post('/', [TvChannelController::class, 'store'])->name('store');

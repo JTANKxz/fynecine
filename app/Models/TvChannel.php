@@ -36,4 +36,9 @@ class TvChannel extends Model
     {
         return $this->hasMany(TvChannelLink::class)->orderBy('order');
     }
+
+    public function epgMapping()
+    {
+        return $this->hasOne(TvChannelEpg::class);
+    }
 }

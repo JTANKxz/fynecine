@@ -27,7 +27,8 @@ class TvChannelController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $channels = $query->orderBy('name')->paginate(20);
+        $perPage = min(100, max(1, (int) $request->input('per_page', 100)));
+        $channels = $query->orderBy('name')->paginate($perPage)->withQueryString();
 
         return response()->json($channels);
     }

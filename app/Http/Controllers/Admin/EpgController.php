@@ -38,7 +38,7 @@ class EpgController extends Controller
         $source->fill($data)->save();
 
         return back()->with('success', $urlChanged
-            ? 'Fonte EPG alterada. Os v?nculos foram limpos; atualize a fonte e associe os canais novamente.'
+            ? 'Fonte EPG alterada. Os vínculos foram limpos; atualize a fonte e associe os canais novamente.'
             : 'Fonte EPG salva.');
     }
 
@@ -64,6 +64,6 @@ class EpgController extends Controller
             ['epg_source_id' => $source->id, 'epg_channel_id' => $data['epg_channel_id'] ?? null]
         );
 
-        return back()->with('success', 'V?nculo EPG atualizado.');
+        return back()->with('success', 'Vínculo EPG atualizado.');
     }
 }

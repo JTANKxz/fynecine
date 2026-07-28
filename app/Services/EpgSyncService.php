@@ -46,7 +46,7 @@ class EpgSyncService
         $rows=[]; $count=0;
         foreach ($xml->programme as $programme) {
             $xmltvId=(string)$programme['channel']; if (!isset($channelIds[$xmltvId])) continue;
-            $starts=$this->parseDate((string)$programme['start']); $ends=$this->parseDate((string)$programme['stop']);
+            $starts=$this->parseDate((string)$programme['start'], (int) ($source->time_offset_minutes ?? 0)); $ends=$this->parseDate((string)$programme['stop'], (int) ($source->time_offset_minutes ?? 0));
             if (!$starts || !$ends || $ends->lessThan(now()->subHours(6))) continue;
             $rows[]=['epg_source_id'=>$source->id,'tv_channel_id'=>$channelIds[$xmltvId],'xmltv_channel_id'=>$xmltvId,'title'=>(string)($programme->title[0] ?? 'Sem título'),'description'=>(string)($programme->desc[0] ?? '') ?: null,'category'=>(string)($programme->category[0] ?? '') ?: null,'icon_url'=>isset($programme->icon[0])?(string)$programme->icon[0]['src']:null,'starts_at'=>$starts,'ends_at'=>$ends,'created_at'=>now(),'updated_at'=>now()];
             if (count($rows) === 500) { EpgProgram::upsert($rows,['epg_source_id','xmltv_channel_id','starts_at','ends_at'],['tv_channel_id','title','description','category','icon_url','updated_at']); $count+=count($rows); $rows=[]; }
@@ -67,12 +67,12 @@ class EpgSyncService
     }
 
     private function normal(string $value): string { return preg_replace('/[^a-z0-9]/','',strtolower(Str::ascii($value))); }
-    private function parseDate(string $value): ?Carbon
+    private function parseDate(string $value, int $offsetMinutes = 0): ?Carbon
     {
         if (!preg_match('/^(\d{14})(?:\s*([+-]\d{4}))?/', trim($value), $matches)) return null;
 
         try {
-            return Carbon::createFromFormat('YmdHis O', $matches[1] . ' ' . ($matches[2] ?? '+0000'))->utc();
+            return Carbon::createFromFormat('YmdHis O', $matches[1] . ' ' . ($matches[2] ?? '+0000'))->utc()->addMinutes($offsetMinutes);
         } catch (\Throwable) {
             return null;
         }

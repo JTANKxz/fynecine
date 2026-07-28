@@ -17,10 +17,17 @@ class EpgSyncService
     public function sync(EpgSource $source): array
     {
         $response = Http::timeout(90)->accept('application/xml,text/xml,*/*')->get($source->url);
-        if (!$response->successful()) throw new \RuntimeException('Feed EPG indisponivel (HTTP ' . $response->status() . ').');
+        if (!$response->successful()) throw new \RuntimeException('Feed EPG indispon?vel (HTTP ' . $response->status() . ').');
+        $body = $response->body();
+        if (substr($body, 0, 2) === "\x1f\x8b") {
+            $decoded = gzdecode($body);
+            if ($decoded === false) throw new \RuntimeException('N?o foi poss?vel descompactar o feed EPG.');
+            $body = $decoded;
+        }
+
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($response->body());
-        if (!$xml) throw new \RuntimeException('O feed EPG nao contem XMLTV valido.');
+        $xml = simplexml_load_string($body);
+        if (!$xml) throw new \RuntimeException('O feed EPG n?o cont?m XMLTV v?lido.');
 
         $catalogRows = [];
         foreach ($xml->channel as $channel) {
@@ -41,7 +48,7 @@ class EpgSyncService
             $xmltvId=(string)$programme['channel']; if (!isset($channelIds[$xmltvId])) continue;
             $starts=$this->parseDate((string)$programme['start']); $ends=$this->parseDate((string)$programme['stop']);
             if (!$starts || !$ends || $ends->lessThan(now()->subHours(6))) continue;
-            $rows[]=['epg_source_id'=>$source->id,'tv_channel_id'=>$channelIds[$xmltvId],'xmltv_channel_id'=>$xmltvId,'title'=>(string)($programme->title[0] ?? 'Sem titulo'),'description'=>(string)($programme->desc[0] ?? '') ?: null,'category'=>(string)($programme->category[0] ?? '') ?: null,'icon_url'=>isset($programme->icon[0])?(string)$programme->icon[0]['src']:null,'starts_at'=>$starts,'ends_at'=>$ends,'created_at'=>now(),'updated_at'=>now()];
+            $rows[]=['epg_source_id'=>$source->id,'tv_channel_id'=>$channelIds[$xmltvId],'xmltv_channel_id'=>$xmltvId,'title'=>(string)($programme->title[0] ?? 'Sem t?tulo'),'description'=>(string)($programme->desc[0] ?? '') ?: null,'category'=>(string)($programme->category[0] ?? '') ?: null,'icon_url'=>isset($programme->icon[0])?(string)$programme->icon[0]['src']:null,'starts_at'=>$starts,'ends_at'=>$ends,'created_at'=>now(),'updated_at'=>now()];
             if (count($rows) === 500) { EpgProgram::upsert($rows,['epg_source_id','xmltv_channel_id','starts_at','ends_at'],['tv_channel_id','title','description','category','icon_url','updated_at']); $count+=count($rows); $rows=[]; }
         }
         if ($rows) { EpgProgram::upsert($rows,['epg_source_id','xmltv_channel_id','starts_at','ends_at'],['tv_channel_id','title','description','category','icon_url','updated_at']); $count+=count($rows); }
@@ -60,5 +67,14 @@ class EpgSyncService
     }
 
     private function normal(string $value): string { return preg_replace('/[^a-z0-9]/','',strtolower(Str::ascii($value))); }
-    private function parseDate(string $value): ?Carbon { try { return Carbon::createFromFormat('YmdHis O',substr($value,0,15))->utc(); } catch (\Throwable) { return null; } }
+    private function parseDate(string $value): ?Carbon
+    {
+        if (!preg_match('/^(\d{14})(?:\s*([+-]\d{4}))?/', trim($value), $matches)) return null;
+
+        try {
+            return Carbon::createFromFormat('YmdHis O', $matches[1] . ' ' . ($matches[2] ?? '+0000'))->utc();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
 }

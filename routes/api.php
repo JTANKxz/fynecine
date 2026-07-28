@@ -153,6 +153,11 @@ Route::middleware('api.token')->group(function () {
             Route::delete('/{id}',     [PlaylistController::class, 'destroy']);
         });
 
+        // Watch Party de canais ao vivo
+        Route::post('/channel-watch-parties', [\App\Http\Controllers\Api\ChannelWatchPartyController::class, 'store']);
+        Route::get('/channel-watch-parties/{code}', [\App\Http\Controllers\Api\ChannelWatchPartyController::class, 'show']);
+        Route::put('/channel-watch-parties/{code}/source', [\App\Http\Controllers\Api\ChannelWatchPartyController::class, 'updateSource']);
+
         // Assinaturas e Cupons
         Route::post('/subscription/redeem', [SubscriptionController::class, 'redeem']);
 

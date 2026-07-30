@@ -2,38 +2,51 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Contexts\ProfileContext;
-use Illuminate\Support\Facades\Auth;
+use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class SetActiveProfile
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next)
     {
-        // Aceita tanto Profile-Id (padrão) quanto X-Profile-Id (Android legado ou específico)
         $profileId = $request->header('Profile-Id') ?: $request->header('X-Profile-Id');
 
-        if ($profileId) {
-            // Tenta obter o usuário do request primeiro
-            $user = $request->user();
+        if (!$profileId) {
+            return $next($request);
+        }
 
-            // Se não houver usuário no request mas houver token de autorização, tenta autenticar via Sanctum
-            if (!$user && $request->hasHeader('Authorization')) {
-                $user = Auth::guard('sanctum')->user();
-            }
-            
-            if ($user) {
-                // Busca o perfil pertencente a este usuário
-                $profile = $user->profiles()->find($profileId);
-                if ($profile) {
-                    ProfileContext::set($profile);
-                }
+        $user = $request->user();
+        if (!$user && $request->hasHeader('Authorization')) {
+            $user = Auth::guard('sanctum')->user();
+        }
+
+        if (!$user) {
+            return $next($request);
+        }
+
+        $profile = $user->profiles()->find($profileId);
+        if (!$profile) {
+            return response()->json(['message' => 'Perfil invalido para esta conta.'], 403);
+        }
+
+        // Profile management and PIN verification must remain accessible even
+        // when the profile currently stored in the browser is protected.
+        if (!$request->is('api/profiles*') && !$request->is('api/auth/*') && !empty($profile->pin)) {
+            $tokenId = $user->currentAccessToken()?->id;
+            $isUnlocked = $tokenId && Cache::has("profile_pin_access:{$tokenId}:{$profile->id}");
+
+            if (!$isUnlocked) {
+                return response()->json([
+                    'message' => 'Este perfil exige PIN antes de ser utilizado.',
+                    'code' => 'PROFILE_PIN_REQUIRED',
+                ], 403);
             }
         }
+
+        ProfileContext::set($profile);
 
         return $next($request);
     }

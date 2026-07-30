@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProfileController extends Controller
 {
@@ -235,6 +236,14 @@ class ProfileController extends Controller
         if ((string) $profile->pin !== (string) $request->pin) {
             return response()->json(['message' => 'PIN incorreto. Tente novamente.'], 403);
         }
+
+        $tokenId = $user->currentAccessToken()?->id;
+        if (!$tokenId) {
+            return response()->json(['message' => 'Sessao invalida. Faca login novamente.'], 401);
+        }
+
+        // The unlock is stored server-side and bound to this Sanctum session.
+        Cache::put("profile_pin_access:{$tokenId}:{$profile->id}", true, now()->addDays(30));
 
         return response()->json(['message' => 'Acesso autorizado.', 'profile_id' => $profile->id]);
     }

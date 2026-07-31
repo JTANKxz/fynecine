@@ -161,22 +161,30 @@ class CaktoActivationController extends Controller
 
     private function applyPlan(User $user, CaktoCampaignPurchase $purchase): void
     {
-        $campaignPlan = Str::after($purchase->status, ':');
-        $planType = $campaignPlan === 'plus' ? 'premium' : 'basic';
-        $plan = SubscriptionPlan::where('plan_type', $planType)->where('is_active', true)->first();
+        // Campaign checkout products are only acquisition channels. Every
+        // approved campaign purchase grants the same Premium monthly access.
+        $plan = SubscriptionPlan::query()
+            ->where('plan_type', 'premium')
+            ->where('is_active', true)
+            ->where('duration_days', 30)
+            ->first();
+
         if (!$plan) {
-            abort(422, 'Plano da campanha não está disponível.');
+            abort(422, 'O plano Premium mensal da campanha nao esta disponivel.');
         }
 
-        $rank = ['free' => 0, 'basic' => 1, 'premium' => 2];
         $currentType = $user->plan_type ?: 'free';
-        $keepCurrent = ($rank[$currentType] ?? 0) > ($rank[$planType] ?? 0) && $user->plan_expires_at?->isFuture();
-        $start = $user->plan_expires_at && $user->plan_expires_at->isFuture() ? $user->plan_expires_at->copy() : now();
-        if (!$keepCurrent) {
-            $user->plan_type = $planType;
+        $currentExpiry = $user->plan_expires_at;
+        $start = $currentExpiry && $currentExpiry->isFuture() ? $currentExpiry->copy() : now();
+
+        // Preserve an existing Premium entitlement, but always extend access
+        // by one month. New/free/basic users receive Premium features.
+        if ($currentType !== 'premium' || !$currentExpiry?->isFuture()) {
+            $user->plan_type = 'premium';
             $user->features = $plan->features ?? [];
         }
-        $user->plan_expires_at = $start->addDays($plan->duration_days);
+
+        $user->plan_expires_at = $start->addDays(30);
         $user->save();
     }
 }

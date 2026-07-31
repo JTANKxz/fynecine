@@ -3,7 +3,7 @@
 @section('title', 'Configurações Globais')
 
 @section('content')
-<section class="max-w-6xl pb-20">
+<section class="w-full max-w-none pb-20">
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-white">Configurações do Sistema</h2>
         <p class="text-sm text-neutral-500">Ajuste chaves de API, modos de segurança e comportamento do app.</p>
@@ -15,104 +15,26 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="w-full space-y-8">
         @csrf
         @method('PUT')
 
-        <!-- MODO SEGURANÇA -->
-        <div class="grid lg:grid-cols-2 gap-8">
-            <div class="bg-red-900/10 border border-red-900/30 p-6 rounded-xl">
-                <div class="flex items-start gap-4">
-                    <div class="bg-red-600 p-3 rounded-lg">
-                        <i class="fa-solid fa-shield-halved text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold text-lg mb-1 text-red-500">Modo de Segurança (Loja)</h3>
-                        <p class="text-neutral-400 text-xs mb-4 leading-relaxed">
-                            Oculta links de reprodução para aprovações em lojas.
-                        </p>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="security_mode" value="1" {{ $config->security_mode ? 'checked' : '' }} class="sr-only peer">
-                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                            <span class="ml-3 text-xs font-medium text-red-500 uppercase tracking-widest" id="security-mode-label">{{ $config->security_mode ? 'ATIVO' : 'DESATIVADO' }}</span>
-                        </label>
-                    </div>
-                </div>
+        <!-- CONTROLES GLOBAIS -->
+        <section class="rounded-xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6">
+            <div class="mb-5 flex items-start gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-netflix/15 text-netflix"><i class="fa-solid fa-sliders"></i></div><div><h3 class="font-bold text-white">Controles globais</h3><p class="mt-1 text-xs text-neutral-500">Ativações que afetam todo o aplicativo e a plataforma.</p></div></div>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <label class="flex items-center justify-between gap-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4 cursor-pointer"><span><span class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-shield-halved text-red-400"></i> Segurança da loja</span><span class="mt-1 block text-xs text-neutral-500">Oculta links para aprovação.</span></span><input type="checkbox" name="security_mode" value="1" {{ $config->security_mode ? 'checked' : '' }} class="h-5 w-5 accent-red-500"></label>
+                <label class="flex items-center justify-between gap-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4 cursor-pointer"><span><span class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-screwdriver-wrench text-orange-400"></i> Manutenção</span><span class="mt-1 block text-xs text-neutral-500">Exibe a tela de manutenção.</span></span><input type="checkbox" name="maintenance_mode" value="1" {{ $config->maintenance_mode ? 'checked' : '' }} class="h-5 w-5 accent-orange-500"></label>
+                <label class="flex items-center justify-between gap-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4 cursor-pointer"><span><span class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-eye-slash text-red-400"></i> Modo adulto</span><span class="mt-1 block text-xs text-neutral-500">Libera conteúdo adulto autorizado.</span></span><input type="checkbox" name="is_adult_active" value="1" {{ $config->is_adult_active ? 'checked' : '' }} class="h-5 w-5 accent-red-500"></label>
+                <label class="flex items-center justify-between gap-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4 cursor-pointer"><span><span class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-tv text-blue-400"></i> Canais de TV</span><span class="mt-1 block text-xs text-neutral-500">Mostra a área de canais no app.</span></span><input type="checkbox" name="is_channels_active" value="1" {{ $config->is_channels_active ? 'checked' : '' }} class="h-5 w-5 accent-blue-500"></label>
+                <label class="flex items-center justify-between gap-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4 cursor-pointer"><span><span class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-comments text-netflix"></i> Comentários</span><span class="mt-1 block text-xs text-neutral-500">Ativa posts e listagem globalmente.</span></span><input type="checkbox" name="comments_status" value="1" {{ $config->comments_status ? 'checked' : '' }} class="h-5 w-5 accent-red-600"></label>
+                <label class="flex items-center justify-between gap-4 rounded-lg border border-neutral-800 bg-neutral-950/40 p-4 cursor-pointer"><span><span class="flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-gift text-yellow-400"></i> Recompensas</span><span class="mt-1 block text-xs text-neutral-500">Check-in e pontos no aplicativo.</span></span><input type="checkbox" name="rewards_status" value="1" {{ $config->rewards_status ? 'checked' : '' }} class="h-5 w-5 accent-yellow-500"></label>
             </div>
-
-            <div class="bg-blue-900/10 border border-blue-900/30 p-6 rounded-xl">
-                <div class="flex items-start gap-4">
-                    <div class="bg-blue-600 p-3 rounded-lg">
-                        <i class="fa-solid fa-user-shield text-white text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-white font-bold text-lg mb-4 text-blue-400">Segurança de Rede</h3>
-                        
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <span class="block text-sm font-bold text-white mb-0.5">Bloquear VPN</span>
-                                <span class="text-[10px] text-neutral-500 block leading-tight">Impede acesso via conexões VPN.</span>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer scale-75">
-                                <input type="checkbox" name="block_vpn" value="1" {{ $config->block_vpn ? 'checked' : '' }} class="sr-only peer">
-                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="block text-sm font-bold text-white mb-0.5">Bloquear DNS Privado</span>
-                                <span class="text-[10px] text-neutral-500 block leading-tight">Detecta DoH/DNS adblockers.</span>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer scale-75">
-                                <input type="checkbox" name="block_dns" value="1" {{ $config->block_dns ? 'checked' : '' }} class="sr-only peer">
-                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODO MANUTENÇÃO -->
-        <div class="bg-orange-900/10 border border-orange-900/30 p-6 rounded-xl mt-8">
-            <div class="flex items-start gap-4">
-                <div class="bg-orange-600 p-3 rounded-lg">
-                    <i class="fa-solid fa-screwdriver-wrench text-white text-xl"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-white font-bold text-lg mb-1 text-orange-500">Modo de Manutenção Global</h3>
-                            <p class="text-neutral-400 text-xs leading-relaxed">
-                                Quando ativo, todos os usuários verão apenas a tela de manutenção no aplicativo.
-                            </p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="maintenance_mode" value="1" {{ $config->maintenance_mode ? 'checked' : '' }} class="sr-only peer">
-                            <div class="w-14 h-7 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-600"></div>
-                            <span class="ml-3 text-xs font-bold text-orange-500 uppercase tracking-widest">{{ $config->maintenance_mode ? 'ATIVO' : 'DESLIGADO' }}</span>
-                        </label>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Título da Manutenção</label>
-                            <input type="text" name="maintenance_title" value="{{ old('maintenance_title', $config->maintenance_title) }}" placeholder="Ex: Manutenção em andamento"
-                                   class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2.5 focus:ring-2 focus:ring-orange-500 outline-none text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-neutral-500 uppercase mb-2">Descrição da Manutenção</label>
-                            <textarea name="maintenance_description" rows="2" placeholder="Ex: Estamos realizando melhorias para sua experiência. Voltamos em breve!"
-                                      class="w-full bg-neutral-800 border border-neutral-700 text-white rounded px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none text-sm">{{ old('maintenance_description', $config->maintenance_description) }}</textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid lg:grid-cols-2 gap-8">
-            <div class="space-y-8">
+            <div class="mt-4 grid grid-cols-1 gap-4 border-t border-neutral-800 pt-4 md:grid-cols-2"><div class="rounded-lg bg-neutral-950/40 p-4"><div class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-network-wired text-blue-400"></i> Segurança de rede</div><div class="flex flex-wrap gap-5"><label class="flex items-center gap-2 text-xs text-neutral-300"><input type="checkbox" name="block_vpn" value="1" {{ $config->block_vpn ? 'checked' : '' }} class="h-4 w-4 accent-blue-500"> Bloquear VPN</label><label class="flex items-center gap-2 text-xs text-neutral-300"><input type="checkbox" name="block_dns" value="1" {{ $config->block_dns ? 'checked' : '' }} class="h-4 w-4 accent-blue-500"> Bloquear DNS privado</label></div></div><div class="rounded-lg bg-neutral-950/40 p-4"><div class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-comment-dots text-netflix"></i> Moderação</div><label class="flex items-center gap-2 text-xs text-neutral-300"><input type="checkbox" name="comments_auto_approve" value="1" {{ $config->comments_auto_approve ? 'checked' : '' }} class="h-4 w-4 accent-red-600"> Aprovar comentários automaticamente</label></div></div>
+            <div class="mt-4 grid grid-cols-1 gap-4 border-t border-neutral-800 pt-4 md:grid-cols-2"><div><label class="mb-2 block text-xs font-bold uppercase text-neutral-500">Título da manutenção</label><input type="text" name="maintenance_title" value="{{ old('maintenance_title', $config->maintenance_title) }}" class="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-orange-500"></div><div><label class="mb-2 block text-xs font-bold uppercase text-neutral-500">Descrição da manutenção</label><textarea name="maintenance_description" rows="2" class="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-orange-500">{{ old('maintenance_description', $config->maintenance_description) }}</textarea></div></div>
+        </section>
+        <div class="grid grid-cols-1 gap-6">
+            <div class="w-full space-y-8">
             <!-- APP INFO -->
             <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                 <h3 class="text-white font-bold flex items-center gap-2">
@@ -175,39 +97,8 @@
                 </div>
             </div>
 
-            <!-- COMMENTS CONTROL -->
-            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
-                <h3 class="text-white font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-comments text-purple-500"></i> Motor de Comentários
-                </h3>
-                
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="block text-sm font-bold text-white mb-1">Comentários Ativos</span>
-                            <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Mestre: Ativa ou desativa a listagem e os posts no app inteiro.</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer scale-75">
-                            <input type="checkbox" name="comments_status" value="1" {{ $config->comments_status ? 'checked' : '' }} class="sr-only peer">
-                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between border-t border-neutral-800 pt-4">
-                        <div>
-                            <span class="block text-sm font-bold text-white mb-1">Aprovação Automática</span>
-                            <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Ao desligar, novos posts ficarão ocultos aguardando liberação.</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer scale-75">
-                            <input type="checkbox" name="comments_auto_approve" value="1" {{ $config->comments_auto_approve ? 'checked' : '' }} class="sr-only peer">
-                            <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
-                        </label>
-                    </div>
-                </div>
             </div>
-
-            </div>
-            <div class="space-y-8">
+            <div class="w-full space-y-8">
                 <!-- AUTOEMBED MULTI-SOURCES -->
                 <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                     <h3 class="text-white font-bold flex items-center justify-between">
@@ -216,7 +107,7 @@
                     
                     <p class="text-[10px] text-neutral-500 leading-tight">Múltiplas opções de auto player. Use tags como <code>{tmdb_id}</code>, <code>{season}</code> e <code>{episode}</code>.</p>
 
-                    <div class="space-y-8">
+                    <div class="w-full space-y-8">
                         {{-- Movies Section --}}
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
@@ -395,7 +286,7 @@
         </div>
 
         <!-- SOCIAL & LEGAL -->
-        <div class="grid lg:grid-cols-2 gap-8 mt-8">
+        <div class="grid grid-cols-1 gap-6">
             <!-- SOCIAL MEDIA -->
             <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
                 <h3 class="text-white font-bold flex items-center gap-2">
@@ -451,66 +342,6 @@
                         <input type="url" name="whatsapp_url" value="{{ old('whatsapp_url', $config->whatsapp_url) }}" 
                                class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none" placeholder="https://wa.me/551199999999">
                     </div>
-                </div>
-            </div>
-
-            <!-- REWARDS SYSTEM -->
-            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
-                <h3 class="text-white font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-gift text-netflix"></i> Sistema de Recompensas
-                </h3>
-                
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="block text-sm font-bold text-white mb-1">Check-in Diário Ativo</span>
-                        <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Ativa ou desativa o sistema de pontos e resgate por prêmios no aplicativo móvel.</span>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer scale-75">
-                        <input type="checkbox" name="rewards_status" value="1" {{ $config->rewards_status ? 'checked' : '' }} class="sr-only peer">
-                        <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
-                    </label>
-                </div>
-            </div>
-
-            <!-- ADULT MODE -->
-            <div class="bg-purple-900/10 border border-purple-900/30 p-6 rounded-xl">
-                <div class="flex items-start gap-4">
-                    <div class="bg-purple-600 p-3 rounded-lg">
-                        <i class="fa-solid fa-explicit text-white text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <h3 class="text-white font-bold text-lg mb-1 text-purple-400">Modo Adulto Global</h3>
-                                <p class="text-neutral-400 text-xs leading-relaxed">
-                                    Habilita a seção de modelos e galerias no aplicativo para perfis autorizados.
-                                </p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="is_adult_active" value="1" {{ $config->is_adult_active ? 'checked' : '' }} class="sr-only peer">
-                                <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                                <span class="ml-3 text-xs font-bold text-purple-400 uppercase tracking-widest">{{ $config->is_adult_active ? 'LIGADO' : 'DESLIGADO' }}</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TV CHANNELS -->
-            <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-xl space-y-6">
-                <h3 class="text-white font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-tv text-blue-500"></i> Canais de TV
-                </h3>
-                
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="block text-sm font-bold text-white mb-1">Canais Ativos</span>
-                        <span class="text-xs text-neutral-500 max-w-[200px] block leading-tight">Ativa ou desativa a seção de canais no aplicativo. Se desativado, o botão "Canais" será ocultado na navegação.</span>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer scale-75">
-                        <input type="checkbox" name="is_channels_active" value="1" {{ $config->is_channels_active ? 'checked' : '' }} class="sr-only peer">
-                        <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
                 </div>
             </div>
 
@@ -603,7 +434,7 @@
                 <i class="fa-solid fa-rectangle-ad text-yellow-500"></i> Gerenciamento de Anúncios
             </h3>
 
-            <div class="grid lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 gap-6">
                 <!-- AdMob Config -->
                 <div class="space-y-6">
                     <h4 class="text-xs font-bold text-neutral-500 uppercase flex items-center gap-2">

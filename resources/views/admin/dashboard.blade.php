@@ -198,18 +198,18 @@
     </section>
 </div>
 
-<div class="grid lg:grid-cols-2 gap-6 mb-8">
+<div class="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-2">
     <!-- ÚLTIMOS USUÁRIOS -->
-    <section>
-        <div class="flex justify-between items-center mb-3">
+    <section class="min-w-0">
+        <div class="flex items-center justify-between gap-3 mb-3">
             <h2 class="text-lg font-bold flex items-center gap-2">
                 <i class="fa-solid fa-users text-green-400"></i> Últimos Usuários
             </h2>
             <a href="{{ route('admin.users.index') }}" class="text-netflix text-xs hover:underline font-bold">Ver todos →</a>
         </div>
-        <div class="bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden">
-            <div class="overflow-x-auto" style="overflow-x: auto !important;">
-                <table class="w-full text-left text-sm" style="min-width: 800px !important;">
+        <div class="max-w-full overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900">
+            <div class="max-w-full overflow-x-auto overscroll-x-contain">
+                <table class="w-full min-w-[520px] text-left text-sm">
                     <thead class="bg-neutral-800/50">
                         <tr>
                             <th class="p-3 text-xs text-neutral-400 uppercase">Usuário</th>
@@ -252,33 +252,33 @@
         <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
             <i class="fa-solid fa-bolt text-yellow-400"></i> Ações Rápidas
         </h2>
-        <div class="grid grid-cols-2 gap-3">
-            <a href="{{ route('admin.tmdb') }}" class="bg-neutral-900 p-5 rounded-xl hover:bg-neutral-800 transition group border border-neutral-800 hover:border-netflix/50">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <a href="{{ route('admin.tmdb') }}" class="group flex min-h-[112px] flex-col justify-center rounded-xl border border-neutral-800 bg-neutral-900 p-4 transition hover:border-netflix/50 hover:bg-neutral-800 sm:p-5">
                 <i class="fa-solid fa-cloud-arrow-down text-xl text-netflix mb-2 group-hover:scale-110 transition block"></i>
                 <h3 class="font-bold text-sm">Importar TMDB</h3>
                 <p class="text-[10px] text-neutral-500 mt-0.5">Filmes e séries</p>
             </a>
-            <a href="{{ route('admin.events.create') }}" class="bg-neutral-900 p-5 rounded-xl hover:bg-neutral-800 transition group border border-neutral-800 hover:border-netflix/50">
+            <a href="{{ route('admin.events.create') }}" class="group flex min-h-[112px] flex-col justify-center rounded-xl border border-neutral-800 bg-neutral-900 p-4 transition hover:border-netflix/50 hover:bg-neutral-800 sm:p-5">
                 <i class="fa-solid fa-trophy text-xl text-orange-500 mb-2 group-hover:scale-110 transition block"></i>
                 <h3 class="font-bold text-sm">Novo Evento</h3>
                 <p class="text-[10px] text-neutral-500 mt-0.5">Criar evento ao vivo</p>
             </a>
-            <a href="{{ route('admin.requests.index') }}" class="bg-neutral-900 p-5 rounded-xl hover:bg-neutral-800 transition group border border-neutral-800 hover:border-netflix/50">
+            <a href="{{ route('admin.requests.index') }}" class="group flex min-h-[112px] flex-col justify-center rounded-xl border border-neutral-800 bg-neutral-900 p-4 transition hover:border-netflix/50 hover:bg-neutral-800 sm:p-5">
                 <i class="fa-solid fa-hand-holding-heart text-xl text-yellow-500 mb-2 group-hover:scale-110 transition block"></i>
                 <h3 class="font-bold text-sm">Pedidos</h3>
                 <p class="text-[10px] text-neutral-500 mt-0.5">{{ $stats['requests'] }} pendentes</p>
             </a>
-            <a href="{{ route('admin.settings.edit') }}" class="bg-neutral-900 p-5 rounded-xl hover:bg-neutral-800 transition group border border-neutral-800 hover:border-netflix/50">
+            <a href="{{ route('admin.settings.edit') }}" class="group flex min-h-[112px] flex-col justify-center rounded-xl border border-neutral-800 bg-neutral-900 p-4 transition hover:border-netflix/50 hover:bg-neutral-800 sm:p-5">
                 <i class="fa-solid fa-gear text-xl text-neutral-400 mb-2 group-hover:scale-110 transition block"></i>
                 <h3 class="font-bold text-sm">Configurações</h3>
                 <p class="text-[10px] text-neutral-500 mt-0.5">Ajustes do App</p>
             </a>
-            <a href="{{ route('admin.teams.index') }}" class="bg-neutral-900 p-5 rounded-xl hover:bg-neutral-800 transition group border border-neutral-800 hover:border-netflix/50">
+            <a href="{{ route('admin.teams.index') }}" class="group flex min-h-[112px] flex-col justify-center rounded-xl border border-neutral-800 bg-neutral-900 p-4 transition hover:border-netflix/50 hover:bg-neutral-800 sm:p-5">
                 <i class="fa-solid fa-shield-halved text-xl text-green-500 mb-2 group-hover:scale-110 transition block"></i>
                 <h3 class="font-bold text-sm">Times</h3>
                 <p class="text-[10px] text-neutral-500 mt-0.5">{{ $stats['teams'] }} cadastrados</p>
             </a>
-            <a href="{{ route('admin.sections.index') }}" class="bg-neutral-900 p-5 rounded-xl hover:bg-neutral-800 transition group border border-neutral-800 hover:border-netflix/50">
+            <a href="{{ route('admin.sections.index') }}" class="group flex min-h-[112px] flex-col justify-center rounded-xl border border-neutral-800 bg-neutral-900 p-4 transition hover:border-netflix/50 hover:bg-neutral-800 sm:p-5">
                 <i class="fa-solid fa-wand-magic-sparkles text-xl text-purple-500 mb-2 group-hover:scale-110 transition block"></i>
                 <h3 class="font-bold text-sm">Páginas</h3>
                 <p class="text-[10px] text-neutral-500 mt-0.5">Customizar Home</p>
@@ -289,7 +289,7 @@
 
 <!-- NETWORKS -->
 <section class="mb-8">
-    <div class="flex justify-between items-center mb-3">
+    <div class="flex items-center justify-between gap-3 mb-3">
         <h2 class="text-lg font-bold flex items-center gap-2">
             <i class="fa-solid fa-tower-broadcast text-cyan-400"></i> Networks / Plataformas
         </h2>

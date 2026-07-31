@@ -89,7 +89,8 @@ class RequestController extends Controller
             'tmdb_id' => 'nullable|string',
             'type' => 'required|in:movie,tv',
             'title' => 'required|string',
-            'year' => 'required|string'
+            'year' => 'required|string',
+            'poster_path' => 'nullable|string|max:500'
         ]);
 
         $user = $request->user();
@@ -108,6 +109,20 @@ class RequestController extends Controller
             ], 429);
         }
 
+        // Never accept a TMDB request for content that is already available.
+        // This server-side guard also protects the endpoint from direct calls.
+        if ($request->tmdb_id) {
+            $contentExists = $request->type === 'movie'
+                ? Movie::where('tmdb_id', $request->tmdb_id)->exists()
+                : Serie::where('tmdb_id', $request->tmdb_id)->exists();
+
+            if ($contentExists) {
+                return response()->json([
+                    'message' => 'Este conteúdo já está disponível no catálogo.',
+                    'already_in_db' => true,
+                ], 409);
+            }
+        }
         // Previne Duplicidades Pessoais (apenas se tiver tmdb_id)
         if ($request->tmdb_id && ContentRequest::where('user_id', $user->id)->where('tmdb_id', $request->tmdb_id)->exists()) {
             return response()->json(['message' => 'Você já pediu este título.'], 409);
@@ -120,6 +135,7 @@ class RequestController extends Controller
             'type'    => $request->type,
             'title'   => $request->title,
             'year'    => $request->year,
+            'poster_path' => $request->poster_path,
             'status'  => 'pending'
         ]);
 

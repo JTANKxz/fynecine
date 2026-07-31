@@ -53,7 +53,7 @@
                                         </div>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-neutral-300">
-                                        <div class="text-white font-semibold flex items-center gap-2">
+                                        <div class="flex items-center gap-3"><img src="{{ $req->poster_path ?: asset('img/no-poster.jpg') }}" alt="" class="h-14 w-10 rounded object-cover bg-neutral-800"><div><div class="text-white font-semibold flex items-center gap-2">
                                             @if($req->type === 'movie')
                                             <span class="bg-blue-900 text-blue-200 text-xs px-1.5 py-0.5 rounded">FILME</span>
                                             @else
@@ -61,7 +61,7 @@
                                             @endif
                                             {{ $req->title }} ({{ $req->year ?? 'Ano N/D' }})
                                         </div>
-                                        <div class="text-xs text-neutral-500 mt-1">ID TMDB: {{ $req->tmdb_id }}</div>
+                                        <div class="text-xs text-neutral-500 mt-1">ID TMDB: {{ $req->tmdb_id ?? 'Pedido manual' }}</div></div></div>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-neutral-400">
                                         {{ $req->created_at->format('d/m/Y H:i') }}

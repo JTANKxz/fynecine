@@ -12,6 +12,7 @@ class ContentRequest extends Model
         'type',
         'title',
         'year',
+        'poster_path',
         'status'
     ];
 

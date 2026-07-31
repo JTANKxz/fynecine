@@ -45,10 +45,23 @@ class Slider extends Model
         return $this->content_type === 'movie' ? $content->title : $content->name;
     }
 
-    public function getImageUrlAttribute()
+    public function getImageUrlAttribute(): ?string
     {
         $content = $this->content;
-        if (!$content) return null;
-        return $content->backdrop_url ?? $content->poster_url ?? null;
+        if (!$content) {
+            return null;
+        }
+
+        // Movie and series imports store the TMDB image path in these fields.
+        // `backdrop_url`/`poster_url` do not exist on the models, which made
+        // the custom-page slider render without an image.
+        $image = $content->backdrop_path ?: $content->poster_path;
+        if (!$image) {
+            return null;
+        }
+
+        return filter_var($image, FILTER_VALIDATE_URL)
+            ? $image
+            : 'https://image.tmdb.org/t/p/original' . $image;
     }
 }

@@ -76,7 +76,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse ($sliders as $slider)
                 <div class="group relative bg-neutral-950 border border-neutral-900 rounded-2xl overflow-hidden hover:border-netflix/50 transition-all duration-300">
-                    <img src="{{ $slider->image_url }}" alt="Slider" class="w-full aspect-video object-cover opacity-60 group-hover:opacity-100 transition-opacity">
+                    @if($slider->image_url)
+                        <img src="{{ $slider->image_url }}" alt="{{ $slider->title ?? 'Slider' }}" class="w-full aspect-video object-cover opacity-60 transition-opacity group-hover:opacity-100">
+                    @else
+                        <div class="flex aspect-video items-center justify-center bg-neutral-900 text-neutral-600"><i class="fa-solid fa-image text-2xl"></i></div>
+                    @endif
                     <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
                     
                     <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">

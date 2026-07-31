@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordResetCodeMail;
+use App\Models\AppConfig;
 use App\Models\Avatar;
 use App\Models\CaktoCampaignPurchase;
 use App\Models\SubscriptionPlan;
@@ -94,6 +95,7 @@ class CaktoActivationController extends Controller
             'code' => ['required', 'string', 'size:6'],
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'min:3', 'max:255', 'regex:/^[a-z0-9._-]+$/', Rule::unique('users', 'username')],
+            'avatar' => ['nullable', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
         $email = strtolower($validated['email']);
@@ -117,8 +119,21 @@ class CaktoActivationController extends Controller
                     'email' => $email,
                     'password' => Hash::make($validated['password']),
                 ]);
-                $avatar = Avatar::where('is_default', true)->first();
-                $user->profiles()->create(['name' => 'Perfil 1', 'is_main' => true, 'avatar' => $avatar?->image]);
+                // The panel default is used when the customer does not choose an avatar.
+                $config = AppConfig::getSettings();
+                $avatar = Avatar::find($config->default_avatar_p1)
+                    ?? Avatar::where('is_default', true)->first();
+                $selectedAvatar = null;
+                if (!empty($validated['avatar'])) {
+                    $selectedAvatar = Avatar::query()->get()->first(function (Avatar $candidate) use ($validated) {
+                        return $candidate->image === $validated['avatar'] || $candidate->image_url === $validated['avatar'];
+                    });
+                }
+                $user->profiles()->create([
+                    'name' => 'Perfil 1',
+                    'is_main' => true,
+                    'avatar' => ($selectedAvatar ?? $avatar)?->image,
+                ]);
                 $this->applyPlan($user, $purchase);
                 $purchase->update(['claimed_by_user_id' => $user->id, 'activated_at' => now()]);
                 return $user;

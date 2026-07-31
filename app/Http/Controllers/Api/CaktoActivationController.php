@@ -128,7 +128,14 @@ class CaktoActivationController extends Controller
         }
 
         DB::table('password_reset_codes')->where('email', $email)->delete();
-        return response()->json(['message' => 'Conta criada e plano ativado com sucesso.', 'email' => $user->email], 201);
+        $token = $user->createToken('campaign-activation')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Conta criada e plano ativado com sucesso.',
+            'email' => $user->email,
+            'user' => $user->fresh(),
+            'token' => $token,
+        ], 201);
     }
 
     private function pendingPurchase(string $email, bool $lock = false): ?CaktoCampaignPurchase

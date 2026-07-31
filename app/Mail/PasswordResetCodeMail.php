@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -17,40 +16,26 @@ class PasswordResetCodeMail extends Mailable
     public $code;
     public $purpose;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($code, string $purpose = "reset")
+    public function __construct($code, string $purpose = 'reset')
     {
         $this->code = $code;
         $this->purpose = $purpose;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Seu código de recuperação - ' . config('app.name'),
-        );
+        $subject = $this->purpose === 'activation'
+            ? 'Confirme sua compra - '
+            : 'Seu código de recuperação - ';
+
+        return new Envelope(subject: $subject . config('app.name'));
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.password-reset-code',
-        );
+        return new Content(view: 'emails.password-reset-code');
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         return [];

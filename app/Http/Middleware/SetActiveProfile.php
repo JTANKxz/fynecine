@@ -14,7 +14,9 @@ class SetActiveProfile
     {
         $profileId = $request->header('Profile-Id') ?: $request->header('X-Profile-Id');
 
-        if (!$profileId) {
+        // Authentication and profile-management routes must not be coupled to
+        // a Profile-Id left over from a previous account in the browser.
+        if (!$profileId || $request->is('api/auth/*') || $request->is('api/profiles*')) {
             return $next($request);
         }
 
@@ -34,7 +36,7 @@ class SetActiveProfile
 
         // Profile management and PIN verification must remain accessible even
         // when the profile currently stored in the browser is protected.
-        if (!$request->is('api/profiles*') && !$request->is('api/auth/*') && !empty($profile->pin)) {
+        if (!empty($profile->pin)) {
             $tokenId = $user->currentAccessToken()?->id;
             $isUnlocked = $tokenId && Cache::has("profile_pin_access:{$tokenId}:{$profile->id}");
 

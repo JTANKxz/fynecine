@@ -23,6 +23,12 @@ class CaktoActivationController extends Controller
     {
         $validated = $request->validate(['email' => ['required', 'email', 'max:255']]);
         $email = strtolower($validated['email']);
+
+        // Campaign activation is only for a new account. An existing account
+        // must never receive another activation code or consume a purchase.
+        if ($this->userForEmail($email)) {
+            return $this->existingAccountResponse();
+        }
         $purchase = $this->pendingPurchase($email);
 
         if (!$purchase) {
@@ -61,6 +67,12 @@ class CaktoActivationController extends Controller
             'code' => ['required', 'string', 'size:6'],
         ]);
         $email = strtolower($validated['email']);
+
+        // Campaign activation is only for a new account. An existing account
+        // must never receive another activation code or consume a purchase.
+        if ($this->userForEmail($email)) {
+            return $this->existingAccountResponse();
+        }
         $purchase = $this->pendingPurchase($email);
         if (!$purchase || !$this->validCode($email, $validated['code'])) {
             return response()->json(['message' => 'Código inválido, expirado ou compra não disponível.'], 422);
@@ -99,6 +111,12 @@ class CaktoActivationController extends Controller
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
         $email = strtolower($validated['email']);
+
+        // Campaign activation is only for a new account. An existing account
+        // must never receive another activation code or consume a purchase.
+        if ($this->userForEmail($email)) {
+            return $this->existingAccountResponse();
+        }
         if (!$this->validCode($email, $validated['code'])) {
             return response()->json(['message' => 'Código inválido ou expirado.'], 422);
         }
@@ -171,6 +189,17 @@ class CaktoActivationController extends Controller
         return DB::table('password_reset_codes')->where('email', $email)->where('code', $code)->where('expires_at', '>', now())->exists();
     }
 
+    private function userForEmail(string $email): ?User
+    {
+        return User::whereRaw('LOWER(email) = ?', [strtolower($email)])->first();
+    }
+
+    private function existingAccountResponse(): JsonResponse
+    {
+        return response()->json([
+            'message' => 'Já existe uma conta ativada para este e-mail. Faça login para continuar.',
+        ], 409);
+    }
     private function suggestUsername(string $name): string
     {
         $base = Str::of(Str::ascii($name))->lower()->replaceMatches('/[^a-z0-9]+/', '.')->trim('.')->value() ?: 'usuario';

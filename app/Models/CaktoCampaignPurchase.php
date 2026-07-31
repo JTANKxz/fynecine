@@ -17,6 +17,8 @@ class CaktoCampaignPurchase extends Model
         'status',
         'payload',
         'approved_at',
+        'claimed_by_user_id',
+        'activated_at',
     ];
 
     protected function casts(): array

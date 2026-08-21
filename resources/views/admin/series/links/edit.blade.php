@@ -74,6 +74,15 @@
                         <option value="premium" {{ old('player_sub', $link->player_sub) == 'premium' ? 'selected' : '' }}>Premium</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Disponível em</label>
+                    <select name="client_platform" class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
+                        <option value="both" {{ old('client_platform', $link->client_platform ?? 'both') == 'both' ? 'selected' : '' }}>Android e Site</option>
+                        <option value="android" {{ old('client_platform', $link->client_platform ?? 'both') == 'android' ? 'selected' : '' }}>Somente Android</option>
+                        <option value="web" {{ old('client_platform', $link->client_platform ?? 'both') == 'web' ? 'selected' : '' }}>Somente Site</option>
+                    </select>
+                    <p class="mt-1 text-[10px] text-neutral-500">Links antigos permanecem em ambas as plataformas.</p>
+                </div>
 
             </div>
 

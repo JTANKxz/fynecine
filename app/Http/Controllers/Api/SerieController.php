@@ -116,7 +116,7 @@ class SerieController extends Controller
         ]);
     }
 
-    public function show($idOrSlug)
+    public function show(Request $request, $idOrSlug)
     {
 
         $serie = Serie::with([
@@ -149,6 +149,7 @@ class SerieController extends Controller
         $related = app(\App\Services\RelatedContentService::class)->for($serie);
 
         $config = \App\Models\AppConfig::getSettings();
+        $platform = \App\Support\PlaybackPlatform::fromRequest($request);
 
         return response()->json([
 
@@ -194,13 +195,13 @@ class SerieController extends Controller
                 ];
             }),
 
-            'seasons' => $serie->seasons->map(function ($season) use ($serie, $config) {
+            'seasons' => $serie->seasons->map(function ($season) use ($serie, $config, $platform) {
 
                 return [
                     'id' => $season->id,
                     'season_number' => $season->season_number,
 
-                    'episodes' => $season->episodes->map(function ($episode) use ($serie, $season, $config) {
+                    'episodes' => $season->episodes->map(function ($episode) use ($serie, $season, $config, $platform) {
 
                         $links = collect();
                         $embedUrl = null;
@@ -210,7 +211,10 @@ class SerieController extends Controller
                             $user = Auth::guard('sanctum')->user();
                             $hasPlan = $user && $user->hasPlan();
 
-                            $links = $episode->links->sortBy('order')->map(function($link) use ($hasPlan) {
+                            $links = $episode->links
+                                ->filter(fn ($link) => \App\Support\PlaybackPlatform::matches($link->client_platform, $platform))
+                                ->sortBy('order')
+                                ->map(function($link) use ($hasPlan, $platform) {
                                 $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
                                 if ($url && ($link->type === 'private' || $link->type === 'mp4')) {
                                     $url = url("/api/links/episode/{$link->id}/play");
@@ -228,19 +232,19 @@ class SerieController extends Controller
                                     'skip_ending_end' => $link->skip_ending_end,
                                     'skip_recap_start' => $link->skip_recap_start,
                                     'skip_recap_end' => $link->skip_recap_end,
-                                    'headers' => [
+                                    'headers' => $platform === 'android' ? [
                                         'user_agent' => $link->user_agent,
                                         'referer' => $link->referer,
                                         'origin' => $link->origin,
                                         'cookie' => $link->cookie,
-                                    ]
+                                    ] : []
                                 ];
                             });
 
                             if ($config->autoembed_series && $serie->use_autoembed && $season->use_autoembed) {
                                 $excluded = $serie->excluded_autoembeds ?? [];
                                 
-                                $autoSources = collect($config->autoembed_serie_sources ?? [])->map(function($s) use ($serie, $season, $episode) {
+                                $autoSources = collect($config->autoembed_serie_sources ?? [])->filter(fn ($s) => \App\Support\PlaybackPlatform::matches($s['client_platform'] ?? 'both', $platform))->map(function($s) use ($serie, $season, $episode, $platform) {
                                     $autoSub = $s['player_sub'] ?? 'free';
                                     return [
                                         'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
@@ -253,12 +257,7 @@ class SerieController extends Controller
                                         'type' => $s['type'] ?? 'embed',
                                         'quality' => $s['quality'] ?? 'HD',
                                         'player_sub' => $autoSub,
-                                        'headers' => [
-                                            'user_agent' => $s['user_agent'] ?? null,
-                                            'referer' => $s['referer'] ?? null,
-                                            'origin' => $s['origin'] ?? null,
-                                            'cookie' => $s['cookie'] ?? null,
-                                        ]
+                                        'headers' => \App\Support\PlaybackPlatform::sourceHeaders($s, $platform)
                                     ];
                                 });
 

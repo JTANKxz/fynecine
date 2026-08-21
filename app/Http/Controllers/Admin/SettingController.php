@@ -45,6 +45,7 @@ class SettingController extends Controller
             'autoembed_movie_sources.*.quality' => ['nullable', 'string', 'max:50'],
             'autoembed_movie_sources.*.type' => ['nullable', 'string', 'max:50'],
             'autoembed_movie_sources.*.player_sub' => ['nullable', 'string', 'max:50'],
+            'autoembed_movie_sources.*.client_platform' => ['nullable', 'in:both,android,web'],
 
             'autoembed_serie_sources' => ['nullable', 'array'],
             'autoembed_serie_sources.*.name' => ['required_with:autoembed_serie_sources', 'string', 'max:50'],
@@ -52,6 +53,7 @@ class SettingController extends Controller
             'autoembed_serie_sources.*.quality' => ['nullable', 'string', 'max:50'],
             'autoembed_serie_sources.*.type' => ['nullable', 'string', 'max:50'],
             'autoembed_serie_sources.*.player_sub' => ['nullable', 'string', 'max:50'],
+            'autoembed_serie_sources.*.client_platform' => ['nullable', 'in:both,android,web'],
             
             'autoembed_movie_url' => ['nullable', 'string'],
             'autoembed_movie_name' => ['nullable', 'string', 'max:50'],

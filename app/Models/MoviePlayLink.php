@@ -14,6 +14,7 @@ class MoviePlayLink extends Model
         'url',
         'type',
         'player_sub',
+        'client_platform',
         'link_path',
         'expiration_hours',
         'user_agent',

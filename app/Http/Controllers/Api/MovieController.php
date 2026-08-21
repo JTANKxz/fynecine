@@ -101,7 +101,7 @@ class MovieController extends Controller
         return response()->json($movies);
     }
 
-    public function show($idOrSlug)
+    public function show(Request $request, $idOrSlug)
     {
 
         $movie = Movie::with([
@@ -134,13 +134,14 @@ class MovieController extends Controller
         $related = app(\App\Services\RelatedContentService::class)->for($movie);
 
         $config = \App\Models\AppConfig::getSettings();
+        $platform = \App\Support\PlaybackPlatform::fromRequest($request);
         
         $user = Auth::guard('sanctum')->user();
         $hasPlan = $user && $user->hasPlan();
 
         $playLinks = collect();
         if (!$config->security_mode) {
-            foreach ($movie->playLinks->sortBy('order') as $link) {
+            foreach ($movie->playLinks->filter(fn ($link) => \App\Support\PlaybackPlatform::matches($link->client_platform, $platform))->sortBy('order') as $link) {
                 $url = ($hasPlan || $link->player_sub === 'free') ? $link->url : null;
                 if ($url && ($link->type === 'private' || $link->type === 'mp4')) {
                     $url = url("/api/links/movie/{$link->id}/play");
@@ -156,19 +157,19 @@ class MovieController extends Controller
                     'skip_intro_end' => $link->skip_intro_end,
                     'skip_ending_start' => $link->skip_ending_start,
                     'skip_ending_end' => $link->skip_ending_end,
-                    'headers' => [
+                    'headers' => $platform === 'android' ? [
                         'user_agent' => $link->user_agent,
                         'referer' => $link->referer,
                         'origin' => $link->origin,
                         'cookie' => $link->cookie,
-                    ]
+                    ] : []
                 ]);
             }
 
             if ($config->autoembed_movies && $movie->use_autoembed) {
                 $excluded = $movie->excluded_autoembeds ?? [];
                 
-                $autoSources = collect($config->autoembed_movie_sources ?? [])->map(function($s) use ($movie) {
+                $autoSources = collect($config->autoembed_movie_sources ?? [])->filter(fn ($s) => \App\Support\PlaybackPlatform::matches($s['client_platform'] ?? 'both', $platform))->map(function($s) use ($movie, $platform) {
                     $autoSub = $s['player_sub'] ?? 'free';
                     return [
                         'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
@@ -177,12 +178,7 @@ class MovieController extends Controller
                         'type' => $s['type'] ?? 'embed',
                         'quality' => $s['quality'] ?? 'HD',
                         'player_sub' => $autoSub,
-                        'headers' => [
-                            'user_agent' => $s['user_agent'] ?? null,
-                            'referer' => $s['referer'] ?? null,
-                            'origin' => $s['origin'] ?? null,
-                            'cookie' => $s['cookie'] ?? null,
-                        ]
+                        'headers' => \App\Support\PlaybackPlatform::sourceHeaders($s, $platform)
                     ];
                 });
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AppConfig;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ConfigController extends Controller
@@ -14,9 +15,10 @@ class ConfigController extends Controller
      * vitais como versão, update_url e force login.
      * GET /api/settings
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $config = AppConfig::getSettings();
+        $platform = \App\Support\PlaybackPlatform::fromRequest($request);
 
         return response()->json([
             'app_name' => $config->app_name,
@@ -64,7 +66,7 @@ class ConfigController extends Controller
             // Corporate and Multi-Embed
             'app_version' => $config->app_version,
             'contact_email' => $config->contact_email,
-            'autoembed_movie_sources' => collect($config->autoembed_movie_sources ?? [])->map(function($s) {
+            'autoembed_movie_sources' => collect($config->autoembed_movie_sources ?? [])->filter(fn ($s) => \App\Support\PlaybackPlatform::matches($s['client_platform'] ?? 'both', $platform))->map(function($s) use ($platform) {
                 return [
                     'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
                     'name' => $s['name'] ?? 'Auto Player',
@@ -72,15 +74,11 @@ class ConfigController extends Controller
                     'type' => $s['type'] ?? 'embed',
                     'quality' => $s['quality'] ?? 'HD',
                     'player_sub' => $s['player_sub'] ?? 'free',
-                    'headers' => [
-                        'user_agent' => $s['user_agent'] ?? null,
-                        'referer' => $s['referer'] ?? null,
-                        'origin' => $s['origin'] ?? null,
-                        'cookie' => $s['cookie'] ?? null,
-                    ]
+                    'headers' => \App\Support\PlaybackPlatform::sourceHeaders($s, $platform)
+
                 ];
             })->values(),
-            'autoembed_serie_sources' => collect($config->autoembed_serie_sources ?? [])->map(function($s) {
+            'autoembed_serie_sources' => collect($config->autoembed_serie_sources ?? [])->filter(fn ($s) => \App\Support\PlaybackPlatform::matches($s['client_platform'] ?? 'both', $platform))->map(function($s) use ($platform) {
                 return [
                     'id' => \Illuminate\Support\Str::slug($s['name'] ?? 'player'),
                     'name' => $s['name'] ?? 'Auto Player',
@@ -88,12 +86,8 @@ class ConfigController extends Controller
                     'type' => $s['type'] ?? 'embed',
                     'quality' => $s['quality'] ?? 'HD',
                     'player_sub' => $s['player_sub'] ?? 'free',
-                    'headers' => [
-                        'user_agent' => $s['user_agent'] ?? null,
-                        'referer' => $s['referer'] ?? null,
-                        'origin' => $s['origin'] ?? null,
-                        'cookie' => $s['cookie'] ?? null,
-                    ]
+                    'headers' => \App\Support\PlaybackPlatform::sourceHeaders($s, $platform)
+
                 ];
             })->values(),
 

@@ -14,6 +14,7 @@ class EpisodeLink extends Model
         'url',
         'type',
         'player_sub',
+        'client_platform',
         'skip_intro_start',
         'skip_intro_end',
         'skip_ending_start',

@@ -28,6 +28,7 @@
                             <th class="text-left p-4">Tipo</th>
                             <th class="text-left p-4">Order</th>
                             <th class="text-left p-4">Subscription</th>
+                            <th class="text-left p-4">Plataforma</th>
                             <th class="text-left p-4">Ações</th>
                         </tr>
                     </thead>
@@ -70,6 +71,10 @@
                                     @endif
                                 </td>
 
+                                <td class="p-4">
+                                    {{ match($link->client_platform ?? 'both') { 'android' => 'Android', 'web' => 'Site', default => 'Android e Site' } }}
+                                </td>
+
                                 <td class="p-4 flex items-center gap-3">
 
                                     {{-- editar --}}
@@ -95,7 +100,7 @@
                         @empty
 
                             <tr>
-                                <td colspan="8" class="text-center p-6 text-neutral-400">
+                                <td colspan="9" class="text-center p-6 text-neutral-400">
                                     Nenhum link encontrado
                                 </td>
                             </tr>

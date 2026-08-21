@@ -124,7 +124,7 @@
                                     <div class="bg-neutral-800/40 p-4 rounded-lg border border-neutral-700/30 relative group source-item">
                                         <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] hidden group-hover:flex items-center justify-center">×</button>
                                         <input type="text" name="autoembed_movie_sources[{{$index}}][url]" value="{{ $source['url'] ?? '' }}" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-2" placeholder="URL do player">
-                                        <div class="grid grid-cols-2 gap-2">
+                                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][name]" value="{{ $source['name'] ?? '' }}" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][quality]" value="{{ $source['quality'] ?? '' }}" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                                             <select name="autoembed_movie_sources[{{$index}}][type]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
@@ -136,9 +136,15 @@
                                                 <option value="private" {{ ($source['type'] ?? '') == 'private' ? 'selected' : '' }}>Private</option>
                                             </select>
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][player_sub]" value="{{ $source['player_sub'] ?? '' }}" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <select name="autoembed_movie_sources[{{$index}}][client_platform]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                                <option value="both" {{ ($source['client_platform'] ?? 'both') === 'both' ? 'selected' : '' }}>Android e Site</option>
+                                                <option value="android" {{ ($source['client_platform'] ?? 'both') === 'android' ? 'selected' : '' }}>Somente Android</option>
+                                                <option value="web" {{ ($source['client_platform'] ?? 'both') === 'web' ? 'selected' : '' }}>Somente Site</option>
+                                            </select>
                                         </div>
+                                        <p class="mt-2 text-[9px] text-neutral-500">Headers e cookies são enviados somente ao Android; o site nunca recebe esses dados.</p>
                                         <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
-                                            <input type="text" name="autoembed_movie_sources[{{$index}}][user_agent]" value="{{ $source['user_agent'] ?? '' }}" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_movie_sources[{{$index}}][user_agent]" value="{{ $source['user_agent'] ?? '' }}" placeholder="User-Agent (Android)" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][referer]" value="{{ $source['referer'] ?? '' }}" placeholder="Referer" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][origin]" value="{{ $source['origin'] ?? '' }}" placeholder="Origin" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_movie_sources[{{$index}}][cookie]" value="{{ $source['cookie'] ?? '' }}" placeholder="Cookies" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
@@ -164,7 +170,7 @@
                                     <div class="bg-neutral-800/40 p-4 rounded-lg border border-neutral-700/30 relative group source-item">
                                         <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] hidden group-hover:flex items-center justify-center">×</button>
                                         <input type="text" name="autoembed_serie_sources[{{$index}}][url]" value="{{ $source['url'] ?? '' }}" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-2" placeholder="URL do player">
-                                        <div class="grid grid-cols-2 gap-2">
+                                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][name]" value="{{ $source['name'] ?? '' }}" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][quality]" value="{{ $source['quality'] ?? '' }}" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                                             <select name="autoembed_serie_sources[{{$index}}][type]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
@@ -176,9 +182,15 @@
                                                 <option value="private" {{ ($source['type'] ?? '') == 'private' ? 'selected' : '' }}>Private</option>
                                             </select>
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][player_sub]" value="{{ $source['player_sub'] ?? '' }}" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                            <select name="autoembed_serie_sources[{{$index}}][client_platform]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                                                <option value="both" {{ ($source['client_platform'] ?? 'both') === 'both' ? 'selected' : '' }}>Android e Site</option>
+                                                <option value="android" {{ ($source['client_platform'] ?? 'both') === 'android' ? 'selected' : '' }}>Somente Android</option>
+                                                <option value="web" {{ ($source['client_platform'] ?? 'both') === 'web' ? 'selected' : '' }}>Somente Site</option>
+                                            </select>
                                         </div>
+                                        <p class="mt-2 text-[9px] text-neutral-500">Headers e cookies são enviados somente ao Android; o site nunca recebe esses dados.</p>
                                         <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
-                                            <input type="text" name="autoembed_serie_sources[{{$index}}][user_agent]" value="{{ $source['user_agent'] ?? '' }}" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                                            <input type="text" name="autoembed_serie_sources[{{$index}}][user_agent]" value="{{ $source['user_agent'] ?? '' }}" placeholder="User-Agent (Android)" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][referer]" value="{{ $source['referer'] ?? '' }}" placeholder="Referer" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][origin]" value="{{ $source['origin'] ?? '' }}" placeholder="Origin" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                                             <input type="text" name="autoembed_serie_sources[{{$index}}][cookie]" value="{{ $source['cookie'] ?? '' }}" placeholder="Cookies" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
@@ -646,7 +658,7 @@
             <div class="bg-neutral-800 border border-purple-900/20 p-4 rounded-lg relative group source-item animate-pulse-once">
                 <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center shadow-lg">×</button>
                 <input type="text" name="autoembed_${type}_sources[${index}][url]" class="w-full bg-neutral-900 border border-neutral-700 text-white text-xs rounded px-3 py-2 outline-none mb-2" placeholder="URL do player">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                     <input type="text" name="autoembed_${type}_sources[${index}][name]" value="Auto Player" placeholder="Nome" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                     <input type="text" name="autoembed_${type}_sources[${index}][quality]" value="HD" placeholder="Qualidade" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
                     <select name="autoembed_${type}_sources[${index}][type]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
@@ -658,9 +670,15 @@
                         <option value="private">Private</option>
                     </select>
                     <input type="text" name="autoembed_${type}_sources[${index}][player_sub]" value="free" placeholder="VIP/FREE" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                    <select name="autoembed_${type}_sources[${index}][client_platform]" class="bg-neutral-900 border border-neutral-700 text-white text-[10px] rounded px-2 py-1.5 outline-none">
+                        <option value="both" selected>Android e Site</option>
+                        <option value="android">Somente Android</option>
+                        <option value="web">Somente Site</option>
+                    </select>
                 </div>
-                <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
-                    <input type="text" name="autoembed_${type}_sources[${index}][user_agent]" placeholder="User-Agent" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
+                <p class="mt-2 text-[9px] text-neutral-500">Headers e cookies são enviados somente ao Android; o site nunca recebe esses dados.</p>
+                                        <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-neutral-700/30">
+                    <input type="text" name="autoembed_${type}_sources[${index}][user_agent]" placeholder="User-Agent (Android)" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                     <input type="text" name="autoembed_${type}_sources[${index}][referer]" placeholder="Referer" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                     <input type="text" name="autoembed_${type}_sources[${index}][origin]" placeholder="Origin" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">
                     <input type="text" name="autoembed_${type}_sources[${index}][cookie]" placeholder="Cookies" class="bg-neutral-900 border border-neutral-700 text-white text-[8px] rounded px-2 py-1.5 outline-none">

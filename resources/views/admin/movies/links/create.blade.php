@@ -75,6 +75,15 @@
                         <option value="premium" {{ old('player_sub', 'premium') == 'premium' ? 'selected' : '' }}>Premium</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-sm text-neutral-400 mb-1">Disponível em</label>
+                    <select name="client_platform" class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
+                        <option value="both" {{ old('client_platform', 'both') == 'both' ? 'selected' : '' }}>Android e Site</option>
+                        <option value="android" {{ old('client_platform', 'both') == 'android' ? 'selected' : '' }}>Somente Android</option>
+                        <option value="web" {{ old('client_platform', 'both') == 'web' ? 'selected' : '' }}>Somente Site</option>
+                    </select>
+                    <p class="mt-1 text-[10px] text-neutral-500">Links antigos permanecem em ambas as plataformas.</p>
+                </div>
 
             </div>
 
@@ -97,11 +106,11 @@
             {{-- Header fields --}}
             <div class="border-t border-neutral-800 pt-4">
                 <h3 class="text-sm font-bold text-blue-500 mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-gears text-xs"></i> Configurações Avançadas (Headers)
+                    <i class="fa-solid fa-gears text-xs"></i> Configurações Android (Headers)
                 </h3>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm text-neutral-400 mb-1">User-Agent</label>
+                        <label class="block text-sm text-neutral-400 mb-1">User-Agent <span class="text-neutral-600">(Android)</span></label>
                         <input type="text" name="user_agent" value="{{ old('user_agent') }}" class="w-full p-2 bg-neutral-800 rounded outline-none" placeholder="ExoPlayer/2.18.1">
                     </div>
                     <div>

@@ -121,7 +121,7 @@ class User extends Authenticatable
             return 'none';
         }
 
-        if ($this->plan_expires_at && $this->plan_expires_at->isPast()) {
+        if ($this->plan_type === 'expired' || ($this->plan_expires_at && $this->plan_expires_at->isPast())) {
             return 'expired';
         }
 
@@ -175,7 +175,7 @@ class User extends Authenticatable
 
     public function hasPlan(): bool
     {
-        if (!$this->plan_type || $this->plan_type === 'free') {
+        if (!$this->plan_type || in_array($this->plan_type, ['free', 'expired'], true)) {
             return false;
         }
 

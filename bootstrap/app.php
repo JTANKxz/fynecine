@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('notifications:cleanup')->dailyAt('03:00');
         $schedule->command('epg:sync')->everySixHours()->withoutOverlapping();
+        $schedule->command('plans:expire')->everyMinute()->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([

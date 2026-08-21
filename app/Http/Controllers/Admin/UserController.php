@@ -53,13 +53,14 @@ class UserController extends Controller
             $days = intval($request->input('premium_days', 0));
             if ($days > 0) {
                 $planExpiresAt = now()->addDays($days);
-            }
-            
-            $plan = \App\Models\SubscriptionPlan::where('plan_type', $validated['plan_type'])
-                ->where('is_active', true)
-                ->first();
-            if ($plan) {
-                $features = $plan->features ?? [];
+
+                $plan = \App\Models\SubscriptionPlan::where('plan_type', $validated['plan_type'])
+                    ->where('is_active', true)
+                    ->first();
+                $features = $plan?->features ?? [];
+            } else {
+                // A newly created user without paid days has never subscribed.
+                $validated['plan_type'] = 'free';
             }
         }
 
@@ -95,7 +96,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'nullable|in:admin,editor,user',
-            'plan_type' => 'required|in:free,basic,premium',
+            'plan_type' => 'required|in:free,basic,premium,expired',
             'premium_days' => 'nullable|integer|min:0',
             'password' => 'nullable|string|min:6',
         ]);
@@ -120,27 +121,27 @@ class UserController extends Controller
         $user->email = $validated['email'];
 
         if (isset($validated['plan_type'])) {
-            $user->plan_type = $validated['plan_type'];
-            
-            if ($user->plan_type === 'free') {
+            $requestedPlan = $validated['plan_type'];
+            $days = intval($validated['premium_days'] ?? 0);
+
+            if ($requestedPlan === 'free') {
+                $user->plan_type = 'free';
                 $user->plan_expires_at = null;
                 $user->features = [];
+            } elseif ($requestedPlan === 'expired' || $days <= 0) {
+                // Zero days must never create an unlimited paid plan. Keep the
+                // account's subscription history visible as expired instead.
+                $user->plan_type = 'expired';
+                $user->plan_expires_at = now();
+                $user->features = [];
             } else {
-                $days = intval($validated['premium_days'] ?? 0);
-                if ($days > 0) {
-                    $user->plan_expires_at = now()->addDays($days);
-                } else {
-                    $user->plan_expires_at = null;
-                }
-                
-                $plan = \App\Models\SubscriptionPlan::where('plan_type', $user->plan_type)
+                $user->plan_type = $requestedPlan;
+                $user->plan_expires_at = now()->addDays($days);
+
+                $plan = \App\Models\SubscriptionPlan::where('plan_type', $requestedPlan)
                     ->where('is_active', true)
                     ->first();
-                if ($plan) {
-                    $user->features = $plan->features ?? [];
-                } else {
-                    $user->features = [];
-                }
+                $user->features = $plan?->features ?? [];
             }
         }
 

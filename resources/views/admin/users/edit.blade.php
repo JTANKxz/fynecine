@@ -49,6 +49,7 @@
                     <option value="free" {{ $user->plan_type === 'free' ? 'selected' : '' }}>Free (Grátis)</option>
                     <option value="basic" {{ $user->plan_type === 'basic' ? 'selected' : '' }}>Basic (Básico)</option>
                     <option value="premium" {{ $user->plan_type === 'premium' ? 'selected' : '' }}>Premium (VIP)</option>
+                    <option value="expired" {{ $user->plan_type === 'expired' ? 'selected' : '' }}>Assinatura vencida</option>
                 </select>
                 @else
                 <input type="text" class="w-full bg-neutral-800 border border-neutral-700 text-neutral-400 rounded px-4 py-2 outline-none cursor-not-allowed" value="{{ ucfirst($user->plan_type) }}" readonly>

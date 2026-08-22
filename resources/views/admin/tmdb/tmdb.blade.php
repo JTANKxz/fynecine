@@ -12,7 +12,7 @@
                 <h2 class="text-xl font-bold">Importacao e atualizacao TMDB</h2>
                 <p class="mt-1 text-sm text-neutral-400">Defina o elenco padrao e atualize metadados sem alterar links, categorias ou tags manuais.</p>
             </div>
-            <div class="flex items-end gap-2">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
                 <label class="block text-sm font-semibold text-neutral-300">Atores por conteudo
                     <input id="castLimit" type="number" min="1" max="30" value="{{ $castLimit }}" class="mt-1 block w-24 rounded bg-neutral-800 px-3 py-2 text-white outline-none ring-1 ring-neutral-700 focus:ring-netflix">
                 </label>
@@ -31,7 +31,41 @@
             <p id="batchCurrent" class="mt-2 truncate text-xs text-neutral-500"></p>
         </div>
     </div>
-    <h2 class="text-xl font-bold mb-4">Buscar no TMDB (pt-BR)</h2>
+    <div class="mb-5 rounded-xl border border-neutral-800 bg-neutral-900 p-4 sm:p-5">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-netflix/15 text-netflix"><i class="fa-solid fa-fire"></i></span>
+                    <div>
+                        <h2 class="text-lg font-bold">Radar TMDb</h2>
+                        <p class="text-xs text-neutral-400">Acompanhe o hype e importe títulos que ainda não estão no catálogo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] text-neutral-400">
+                <i class="fa-solid fa-filter text-netflix"></i>
+                Curadoria sem títulos de origem indiana
+            </div>
+        </div>
+
+        <div id="radarTabs" class="mt-5 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            <button type="button" data-radar="trending_movies" class="radar-tab shrink-0 rounded-lg bg-netflix px-3 py-2 text-xs font-bold text-white">Filmes em alta</button>
+            <button type="button" data-radar="trending_series" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Séries em alta</button>
+            <button type="button" data-radar="popular_movies" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Filmes populares</button>
+            <button type="button" data-radar="now_playing" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Em cartaz</button>
+            <button type="button" data-radar="popular_series" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Séries populares</button>
+            <button type="button" data-radar="on_the_air" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Em exibição</button>
+            <button type="button" data-radar="upcoming_series" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Próximas estreias</button>
+        </div>
+
+        <div id="radarLoading" class="py-8 text-center text-sm text-neutral-400">
+            <i class="fa-solid fa-spinner fa-spin mr-2 text-netflix"></i>Carregando radar...
+        </div>
+        <div id="radarResults" class="hidden grid-flow-col auto-cols-[145px] gap-3 overflow-x-auto pb-2 sm:auto-cols-[165px]"></div>
+        <div id="radarEmpty" class="hidden rounded-lg border border-neutral-800 bg-neutral-950/50 p-5 text-center text-sm text-neutral-400"></div>
+    </div>
+
+    <h2 class="mb-4 text-xl font-bold">Buscar no TMDb (pt-BR)</h2>
     <div class="bg-neutral-900 p-5 rounded space-y-4">
         <!-- Filtros Avançados -->
         <div class="grid md:grid-cols-5 gap-3">
@@ -83,42 +117,42 @@
             </select>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-3">
+        <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)_minmax(0,1.25fr)_auto]">
             <select id="type" class="p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none">
                 <option value="movie">Filmes</option>
                 <option value="tv">Séries</option>
             </select>
 
-            <div class="flex items-center gap-6 p-2 bg-neutral-800 rounded-xl border border-neutral-700">
-                <label class="relative inline-flex items-center cursor-pointer group">
+            <div class="grid grid-cols-1 gap-2 rounded-xl border border-neutral-700 bg-neutral-800 p-2 sm:grid-cols-2">
+                <label class="relative flex min-h-10 items-center rounded-lg px-2 transition hover:bg-neutral-700/60 cursor-pointer group">
                     <input type="checkbox" id="modeAnime" class="sr-only peer">
                     <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
-                    <span class="ml-3 text-sm font-bold text-neutral-400 group-hover:text-white transition-colors uppercase tracking-tighter">Modo Anime</span>
+                    <span class="ml-3 text-xs font-bold text-neutral-400 group-hover:text-white transition-colors uppercase">Modo Anime</span>
                 </label>
 
-                <label class="relative inline-flex items-center cursor-pointer group">
+                <label class="relative flex min-h-10 items-center rounded-lg px-2 transition hover:bg-neutral-700/60 cursor-pointer group">
                     <input type="checkbox" id="modeDorama" class="sr-only peer">
                     <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                    <span class="ml-3 text-sm font-bold text-neutral-400 group-hover:text-white transition-colors uppercase tracking-tighter">Modo Dorama</span>
+                    <span class="ml-3 text-xs font-bold text-neutral-400 group-hover:text-white transition-colors uppercase">Modo Dorama</span>
                 </label>
             </div>
 
-            <div class="flex items-center gap-4">
-                <label class="flex items-center gap-2 cursor-pointer">
+            <div class="grid grid-cols-1 gap-2 rounded-xl border border-neutral-700 bg-neutral-800 p-2 sm:grid-cols-2">
+                <label class="flex min-h-10 items-center gap-2 rounded-lg px-2 hover:bg-neutral-700/60 cursor-pointer">
                     <input type="checkbox" id="adult" class="rounded accent-netflix w-5 h-5">
                     <span class="text-sm">Adulto</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer">
+                <label class="flex min-h-10 items-center gap-2 rounded-lg px-2 hover:bg-neutral-700/60 cursor-pointer">
                     <input type="checkbox" id="importCast" class="rounded accent-netflix w-5 h-5" checked>
-                    <span class="text-sm">Importar Elenco (usa o limite acima)</span>
+                    <span class="text-xs">Importar elenco</span>
                 </label>
             </div>
 
-            <div class="flex gap-2">
-                <button onclick="searchTMDB()" class="bg-netflix rounded p-2 flex-1 hover:bg-red-700 transition">
+            <div class="flex gap-2 lg:w-44">
+                <button type="button" onclick="searchTMDB()" class="bg-netflix rounded p-2 flex-1 hover:bg-red-700 transition">
                     <i class="fa-solid fa-search mr-2"></i>Buscar
                 </button>
-                <button onclick="clearFilters()"
+                <button type="button" onclick="clearFilters()"
                     class="bg-neutral-700 rounded p-2 px-4 hover:bg-neutral-600 transition">
                     <i class="fa-solid fa-eraser"></i>
                 </button>
@@ -135,6 +169,81 @@
 <script>
     let currentPage = 1;
     let selectedTMDB = null;
+    let selectedImportButtonId = null;
+
+    const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+    }[character]));
+
+    async function loadRadar(collection = 'trending_movies') {
+        const loading = document.getElementById('radarLoading');
+        const results = document.getElementById('radarResults');
+        const empty = document.getElementById('radarEmpty');
+
+        loading.classList.remove('hidden');
+        results.classList.add('hidden');
+        results.classList.remove('grid');
+        empty.classList.add('hidden');
+
+        document.querySelectorAll('.radar-tab').forEach((tab) => {
+            const active = tab.dataset.radar === collection;
+            tab.classList.toggle('bg-netflix', active);
+            tab.classList.toggle('text-white', active);
+            tab.classList.toggle('bg-neutral-800', !active);
+            tab.classList.toggle('text-neutral-300', !active);
+        });
+
+        try {
+            const response = await fetch(`/dashzin/tmdb/radar?collection=${encodeURIComponent(collection)}`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Não foi possível carregar o radar.');
+
+            loading.classList.add('hidden');
+            if (!data.results?.length) {
+                empty.textContent = 'Nenhum título disponível nesta curadoria agora.';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            const imageBase = 'https://image.tmdb.org/t/p/w342';
+            results.innerHTML = data.results.map((item) => {
+                const title = escapeHtml(item.title || item.name || 'Sem título');
+                const date = item.release_date || item.first_air_date || '';
+                const year = date ? date.substring(0, 4) : '—';
+                const rating = Number(item.vote_average || 0).toFixed(1);
+                const buttonId = `btn-radar-${collection}-${item.id}`;
+                const action = item.imported
+                    ? '<span class="mt-2 block rounded bg-emerald-500/15 px-2 py-1 text-center text-[10px] font-bold text-emerald-400">Já importado</span>'
+                    : `<button id="${buttonId}" type="button" onclick="handleRadarImport(${item.id}, '${data.type}', '${buttonId}')" class="mt-2 w-full rounded bg-netflix px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-red-700"><i class="fa-solid fa-plus mr-1"></i>Importar</button>`;
+
+                return `
+                    <article class="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-600">
+                        <img src="${imageBase}${item.poster_path}" alt="" loading="lazy" class="aspect-[2/3] w-full object-cover" onerror="this.closest('article').style.display='none'">
+                        <div class="p-2.5">
+                            <p class="truncate text-xs font-bold text-white" title="${title}">${title}</p>
+                            <div class="mt-1 flex items-center justify-between text-[10px] text-neutral-400"><span>${year}</span><span class="text-amber-400"><i class="fa-solid fa-star mr-1"></i>${rating}</span></div>
+                            ${action}
+                        </div>
+                    </article>`;
+            }).join('');
+            results.classList.remove('hidden');
+            results.classList.add('grid');
+        } catch (error) {
+            loading.classList.add('hidden');
+            empty.textContent = error.message || 'Erro ao carregar o radar.';
+            empty.classList.remove('hidden');
+        }
+    }
+
+    function handleRadarImport(id, type, buttonId) {
+        if (type === 'tv') {
+            selectedImportButtonId = buttonId;
+            openImportModal(id);
+            return;
+        }
+
+        importItem(id, type, 'full', buttonId);
+    }
 
     async function searchTMDB(page = 1) {
 
@@ -263,6 +372,7 @@
 
         if (type === "tv") {
 
+            selectedImportButtonId = `btn-import-${id}`;
             openImportModal(id);
             return;
 
@@ -271,9 +381,9 @@
         importItem(id, type, "full");
     }
 
-    async function importItem(id, type, mode = "full") {
+    async function importItem(id, type, mode = "full", buttonId = `btn-import-${id}`) {
 
-        const button = document.getElementById(`btn-import-${id}`);
+        const button = document.getElementById(buttonId);
 
         if (button) {
 
@@ -348,14 +458,14 @@
 
     function importDetails() {
 
-        importItem(selectedTMDB, "tv", "details");
+        importItem(selectedTMDB, "tv", "details", selectedImportButtonId || `btn-import-${selectedTMDB}`);
 
         closeModal();
     }
 
     function fullImport() {
 
-        importItem(selectedTMDB, "tv", "full");
+        importItem(selectedTMDB, "tv", "full", selectedImportButtonId || `btn-import-${selectedTMDB}`);
 
         closeModal();
     }
@@ -410,6 +520,11 @@
                 if (modeDorama.checked) modeAnime.checked = false;
             });
         }
+
+        document.querySelectorAll('.radar-tab').forEach((tab) => {
+            tab.addEventListener('click', () => loadRadar(tab.dataset.radar));
+        });
+        loadRadar();
     });
 
     let batchCancelled = false;

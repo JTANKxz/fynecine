@@ -111,6 +111,93 @@ class TMDBController extends Controller
         }
     }
 
+    /**
+     * Curadoria rápida do catálogo TMDb para o painel administrativo.
+     *
+     * Esta rota mantém a chave do TMDb no servidor e aplica a mesma indicação
+     * de "já importado" usada pela busca manual.
+     */
+    public function radar(Request $request)
+    {
+        $collection = $request->validate([
+            'collection' => ['required', 'in:trending_movies,trending_series,popular_movies,now_playing,popular_series,on_the_air,upcoming_series'],
+            'page' => ['nullable', 'integer', 'min:1', 'max:20'],
+        ])['collection'];
+
+        $page = $request->integer('page', 1);
+        $today = now()->toDateString();
+        $withinNinetyDays = now()->addDays(90)->toDateString();
+
+        $collections = [
+            'trending_movies' => ['endpoint' => 'trending/movie/day', 'type' => 'movie', 'label' => 'Filmes em alta agora', 'params' => []],
+            'trending_series' => ['endpoint' => 'trending/tv/day', 'type' => 'tv', 'label' => 'Séries em alta agora', 'params' => []],
+            'popular_movies' => ['endpoint' => 'movie/popular', 'type' => 'movie', 'label' => 'Filmes populares', 'params' => ['region' => 'BR']],
+            'now_playing' => ['endpoint' => 'movie/now_playing', 'type' => 'movie', 'label' => 'Em cartaz no cinema', 'params' => ['region' => 'BR']],
+            'popular_series' => ['endpoint' => 'tv/popular', 'type' => 'tv', 'label' => 'Séries populares', 'params' => []],
+            'on_the_air' => ['endpoint' => 'tv/on_the_air', 'type' => 'tv', 'label' => 'Séries em exibição', 'params' => []],
+            'upcoming_series' => ['endpoint' => 'discover/tv', 'type' => 'tv', 'label' => 'Próximas estreias de séries', 'params' => [
+                'sort_by' => 'popularity.desc',
+                'first_air_date.gte' => $today,
+                'first_air_date.lte' => $withinNinetyDays,
+            ]],
+        ];
+
+        $definition = $collections[$collection];
+        $response = $this->fetchTMDB($definition['endpoint'], array_merge($definition['params'], [
+            'language' => 'pt-BR',
+            'page' => $page,
+            'include_adult' => false,
+        ]));
+
+        if (!$response->successful()) {
+            return response()->json([
+                'error' => $response->json('status_message') ?? 'Não foi possível carregar o radar do TMDb.',
+            ], $response->status());
+        }
+
+        $data = $response->json();
+        $results = $this->filterRadarResults($data['results'] ?? []);
+        $tmdbIds = collect($results)->pluck('id');
+        $imported = $definition['type'] === 'movie'
+            ? Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id')
+            : Serie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+
+        $results = collect($results)->map(function (array $item) use ($imported) {
+            $item['imported'] = $imported->contains($item['id']);
+            return $item;
+        })->values();
+
+        return response()->json([
+            'collection' => $collection,
+            'label' => $definition['label'],
+            'type' => $definition['type'],
+            'results' => $results,
+            'page' => $data['page'] ?? $page,
+            'total_pages' => $data['total_pages'] ?? 1,
+        ]);
+    }
+
+    /**
+     * Remove produções indianas do radar editorial padrão solicitado pelo admin.
+     * A busca manual continua sem este filtro para não esconder resultados buscados.
+     */
+    private function filterRadarResults(array $results): array
+    {
+        $indianLanguages = ['hi', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'pa', 'gu', 'ur'];
+
+        return collect($results)
+            ->filter(function (array $item) use ($indianLanguages) {
+                $countries = $item['origin_country'] ?? $item['production_countries'] ?? [];
+                $countryCodes = collect($countries)->map(fn ($country) => is_array($country) ? ($country['iso_3166_1'] ?? null) : $country);
+
+                return !in_array($item['original_language'] ?? null, $indianLanguages, true)
+                    && !$countryCodes->contains('IN');
+            })
+            ->filter(fn (array $item) => !empty($item['poster_path']))
+            ->values()
+            ->all();
+    }
+
     public function import(Request $request)
     {
         $tmdbId = $request->tmdb_id;

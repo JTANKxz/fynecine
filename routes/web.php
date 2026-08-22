@@ -68,6 +68,7 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
 
     Route::get('/tmdb', [TMDBController::class, 'index'])->name('tmdb');
     Route::get('/tmdb/search', [TMDBController::class, 'search']);
+    Route::get('/tmdb/radar', [TMDBController::class, 'radar'])->name('tmdb.radar');
     Route::post('/tmdb/import', [TMDBController::class, 'import']);
     Route::get('/tmdb/seasons/{tmdbId}', [TMDBController::class, 'fetchSeasonsForSync'])->name('tmdb.seasons');
     Route::get('/tmdb/episodes/{tmdbId}/{seasonNumber}', [TMDBController::class, 'fetchEpisodesForSync'])->name('tmdb.episodes');

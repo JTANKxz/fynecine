@@ -164,6 +164,7 @@ class SerieController extends Controller
 
             'poster' => $serie->poster_path,
             'backdrop' => $serie->backdrop_path,
+            'logo' => $serie->logo_path,
             'tag_text' => $serie->api_tag_text,
 
             'trailer' => [

@@ -19,11 +19,13 @@
                 <button type="button" onclick="saveCastLimit()" class="rounded bg-neutral-700 px-4 py-2 text-sm font-bold hover:bg-neutral-600">Salvar padrao</button>
             </div>
         </div>
-        <div class="mt-5 grid gap-3 md:grid-cols-2">
+        <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             <button type="button" onclick="startBatch('movie','cast')" class="rounded-lg bg-blue-700 px-4 py-3 text-left font-bold hover:bg-blue-600">Atualizar elenco de todos os filmes</button>
             <button type="button" onclick="startBatch('tv','cast')" class="rounded-lg bg-blue-700 px-4 py-3 text-left font-bold hover:bg-blue-600">Atualizar elenco de todas as series</button>
             <button type="button" onclick="startBatch('movie','keywords')" class="rounded-lg bg-purple-700 px-4 py-3 text-left font-bold hover:bg-purple-600">Atualizar palavras-chave dos filmes</button>
             <button type="button" onclick="startBatch('tv','keywords')" class="rounded-lg bg-purple-700 px-4 py-3 text-left font-bold hover:bg-purple-600">Atualizar palavras-chave das series</button>
+            <button type="button" onclick="startBatch('movie','logos', true)" class="rounded-lg bg-emerald-700 px-4 py-3 text-left font-bold hover:bg-emerald-600">Buscar logos dos filmes sem logo</button>
+            <button type="button" onclick="startBatch('tv','logos', true)" class="rounded-lg bg-emerald-700 px-4 py-3 text-left font-bold hover:bg-emerald-600">Buscar logos das series sem logo</button>
         </div>
         <div id="batchProgress" class="mt-4 hidden rounded-lg border border-neutral-700 bg-neutral-950 p-4">
             <div class="flex items-center justify-between text-sm"><span id="batchText">Preparando...</span><button type="button" onclick="cancelBatch()" class="text-red-400 hover:text-red-300">Cancelar</button></div>
@@ -56,6 +58,20 @@
             <button type="button" data-radar="popular_series" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Séries populares</button>
             <button type="button" data-radar="on_the_air" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Em exibição</button>
             <button type="button" data-radar="upcoming_series" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Próximas estreias</button>
+        </div>
+
+        <div class="mt-4 grid gap-3 border-t border-neutral-800 pt-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <label for="radarProvider" class="shrink-0 text-xs font-bold text-neutral-300">Filtrar por streaming</label>
+                <select id="radarProvider" class="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-netflix sm:max-w-xs">
+                    <option value="">Todos os streamings</option>
+                </select>
+                <span class="text-[10px] text-neutral-500">Disponibilidade no Brasil via TMDb / JustWatch.</span>
+            </div>
+            <label class="flex min-h-10 items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 text-xs text-neutral-300 cursor-pointer hover:bg-neutral-700">
+                <input type="checkbox" id="showImportedRadar" class="h-4 w-4 rounded accent-netflix">
+                Mostrar já importados
+            </label>
         </div>
 
         <div id="radarLoading" class="py-8 text-center text-sm text-neutral-400">
@@ -124,16 +140,14 @@
             </select>
 
             <div class="grid grid-cols-1 gap-2 rounded-xl border border-neutral-700 bg-neutral-800 p-2 sm:grid-cols-2">
-                <label class="relative flex min-h-10 items-center rounded-lg px-2 transition hover:bg-neutral-700/60 cursor-pointer group">
-                    <input type="checkbox" id="modeAnime" class="sr-only peer">
-                    <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-netflix"></div>
-                    <span class="ml-3 text-xs font-bold text-neutral-400 group-hover:text-white transition-colors uppercase">Modo Anime</span>
+                <label class="flex min-h-10 items-center gap-2 rounded-lg px-2 transition hover:bg-neutral-700/60 cursor-pointer group">
+                    <input type="checkbox" id="modeAnime" class="h-4 w-4 rounded accent-netflix">
+                    <span class="text-xs font-bold text-neutral-400 group-hover:text-white transition-colors uppercase">Modo Anime</span>
                 </label>
 
-                <label class="relative flex min-h-10 items-center rounded-lg px-2 transition hover:bg-neutral-700/60 cursor-pointer group">
-                    <input type="checkbox" id="modeDorama" class="sr-only peer">
-                    <div class="w-11 h-6 bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                    <span class="ml-3 text-xs font-bold text-neutral-400 group-hover:text-white transition-colors uppercase">Modo Dorama</span>
+                <label class="flex min-h-10 items-center gap-2 rounded-lg px-2 transition hover:bg-neutral-700/60 cursor-pointer group">
+                    <input type="checkbox" id="modeDorama" class="h-4 w-4 rounded accent-purple-500">
+                    <span class="text-xs font-bold text-neutral-400 group-hover:text-white transition-colors uppercase">Modo Dorama</span>
                 </label>
             </div>
 
@@ -170,20 +184,28 @@
     let currentPage = 1;
     let selectedTMDB = null;
     let selectedImportButtonId = null;
+    let radarCollection = 'trending_movies';
+    let radarPage = 1;
+    let radarTotalPages = 1;
 
     const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, (character) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
     }[character]));
 
-    async function loadRadar(collection = 'trending_movies') {
+    async function loadRadar(collection = radarCollection, page = 1) {
         const loading = document.getElementById('radarLoading');
         const results = document.getElementById('radarResults');
         const empty = document.getElementById('radarEmpty');
+        const provider = document.getElementById('radarProvider').value;
+        const showImported = document.getElementById('showImportedRadar').checked;
+        const append = page > 1;
 
         loading.classList.remove('hidden');
-        results.classList.add('hidden');
-        results.classList.remove('grid');
-        empty.classList.add('hidden');
+        if (!append) {
+            results.classList.add('hidden');
+            results.classList.remove('grid');
+            empty.classList.add('hidden');
+        }
 
         document.querySelectorAll('.radar-tab').forEach((tab) => {
             const active = tab.dataset.radar === collection;
@@ -194,19 +216,24 @@
         });
 
         try {
-            const response = await fetch(`/dashzin/tmdb/radar?collection=${encodeURIComponent(collection)}`);
+            const params = new URLSearchParams({ collection, page });
+            if (provider) params.set('provider', provider);
+            const response = await fetch(`/dashzin/tmdb/radar?${params}`);
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível carregar o radar.');
 
             loading.classList.add('hidden');
-            if (!data.results?.length) {
-                empty.textContent = 'Nenhum título disponível nesta curadoria agora.';
+            const items = (data.results || []).filter((item) => showImported || !item.imported);
+            if (!items.length && !append) {
+                empty.textContent = showImported
+                    ? 'Nenhum título disponível nesta curadoria agora.'
+                    : 'Todos os títulos desta página já foram importados. Marque “Mostrar já importados” para conferi-los.';
                 empty.classList.remove('hidden');
                 return;
             }
 
             const imageBase = 'https://image.tmdb.org/t/p/w342';
-            results.innerHTML = data.results.map((item) => {
+            const cards = items.map((item) => {
                 const title = escapeHtml(item.title || item.name || 'Sem título');
                 const date = item.release_date || item.first_air_date || '';
                 const year = date ? date.substring(0, 4) : '—';
@@ -226,12 +253,52 @@
                         </div>
                     </article>`;
             }).join('');
+            const oldLoadMore = document.getElementById('radarLoadMore');
+            if (oldLoadMore) oldLoadMore.remove();
+            if (append) {
+                results.insertAdjacentHTML('beforeend', cards);
+            } else {
+                results.innerHTML = cards;
+            }
+
+            radarCollection = collection;
+            radarPage = data.page || page;
+            radarTotalPages = data.total_pages || 1;
             results.classList.remove('hidden');
             results.classList.add('grid');
+            if (radarPage < radarTotalPages) {
+                results.insertAdjacentHTML('beforeend', `
+                    <div id="radarLoadMore" class="flex items-center justify-center">
+                        <button type="button" onclick="loadMoreRadar()" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-xs font-bold text-white transition hover:border-netflix hover:bg-neutral-700">
+                            <i class="fa-solid fa-plus mr-1"></i>Carregar mais
+                        </button>
+                    </div>`);
+            }
         } catch (error) {
             loading.classList.add('hidden');
-            empty.textContent = error.message || 'Erro ao carregar o radar.';
-            empty.classList.remove('hidden');
+            if (!append) {
+                empty.textContent = error.message || 'Erro ao carregar o radar.';
+                empty.classList.remove('hidden');
+            }
+        }
+    }
+
+    function loadMoreRadar() {
+        if (radarPage < radarTotalPages) loadRadar(radarCollection, radarPage + 1);
+    }
+
+    async function loadRadarProviders() {
+        const select = document.getElementById('radarProvider');
+        try {
+            const response = await fetch('/dashzin/tmdb/radar/providers');
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Erro ao carregar provedores.');
+
+            select.innerHTML = '<option value="">Todos os streamings</option>' + (data.providers || []).map((provider) =>
+                `<option value="${provider.id}">${escapeHtml(provider.name)}</option>`
+            ).join('');
+        } catch (_) {
+            select.innerHTML = '<option value="">Não foi possível carregar provedores</option>';
         }
     }
 
@@ -522,8 +589,11 @@
         }
 
         document.querySelectorAll('.radar-tab').forEach((tab) => {
-            tab.addEventListener('click', () => loadRadar(tab.dataset.radar));
+            tab.addEventListener('click', () => loadRadar(tab.dataset.radar, 1));
         });
+        document.getElementById('radarProvider').addEventListener('change', () => loadRadar(radarCollection, 1));
+        document.getElementById('showImportedRadar').addEventListener('change', () => loadRadar(radarCollection, 1));
+        loadRadarProviders();
         loadRadar();
     });
 
@@ -539,15 +609,18 @@
 
     function cancelBatch() { batchCancelled = true; }
 
-    async function startBatch(type, action) {
-        if (!confirm('Iniciar esta atualizacao? Mantenha esta pagina aberta ate terminar.')) return;
+    async function startBatch(type, action, missingLogoOnly = false) {
+        const label = action === 'logos' ? 'Buscar clear logos para os títulos sem logo?' : 'Iniciar esta atualizacao? Mantenha esta pagina aberta ate terminar.';
+        if (!confirm(label)) return;
         batchCancelled = false;
         const progress = document.getElementById('batchProgress');
         const text = document.getElementById('batchText');
         const current = document.getElementById('batchCurrent');
         const bar = document.getElementById('batchBar');
         progress.classList.remove('hidden'); bar.style.width = '0%'; text.textContent = 'Buscando conteudos...';
-        const response = await fetch(`/dashzin/tmdb/batch-items?type=${type}`);
+        const params = new URLSearchParams({type});
+        if (missingLogoOnly) params.set('missing_logo', '1');
+        const response = await fetch(`/dashzin/tmdb/batch-items?${params}`);
         const data = await response.json();
         const items = data.items || []; let completed = 0; let errors = 0;
         for (const item of items) {

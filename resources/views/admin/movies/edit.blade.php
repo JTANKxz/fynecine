@@ -105,6 +105,13 @@
                            class="w-full px-4 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-700 focus:border-netflix focus:outline-none transition">
                 </div>
 
+                <div class="md:col-span-2 space-y-2">
+                    <label class="block text-sm font-bold text-neutral-400">Logo do título (Clear Logo URL)</label>
+                    <input type="text" name="logo_path" value="{{ old('logo_path', $movie->logo_path) }}"
+                           class="w-full px-4 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-700 focus:border-netflix focus:outline-none transition">
+                    <p class="text-xs text-neutral-500">Importada automaticamente pelo TMDb; use apenas para corrigir ou substituir a arte do nome.</p>
+                </div>
+
                 <!-- Gêneros -->
                 <div class="md:col-span-2 space-y-2">
                     <label class="block text-sm font-bold text-neutral-400 mb-2">Gêneros</label>

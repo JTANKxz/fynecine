@@ -20,6 +20,7 @@ class Serie extends Model
         'overview',
         'poster_path',
         'backdrop_path',
+        'logo_path',
         'trailer_key',
         'trailer_url',
         'content_type',

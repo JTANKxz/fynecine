@@ -226,6 +226,7 @@ class MovieController extends Controller
 
             'poster' => $movie->poster_path,
             'backdrop' => $movie->backdrop_path,
+            'logo' => $movie->logo_path,
             'tag_text' => $movie->api_tag_text,
 
             'trailer' => [

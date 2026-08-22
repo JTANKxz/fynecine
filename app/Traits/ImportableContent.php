@@ -112,6 +112,7 @@ trait ImportableContent
                 'overview' => $data['overview'] ?? '',
                 'poster_path' => ($data['poster_path'] ?? null) ? $baseImage . $data['poster_path'] : null,
                 'backdrop_path' => ($data['backdrop_path'] ?? null) ? $baseImage . $data['backdrop_path'] : null,
+                'logo_path' => $this->fetchTmdbLogo('movie', $tmdbId),
                 'trailer_key' => $trailerKey,
                 'trailer_url' => $trailerKey ? "https://www.youtube.com/watch?v=" . $trailerKey : null,
                 'content_type' => 'movie',
@@ -197,6 +198,7 @@ trait ImportableContent
                 'overview' => $data['overview'] ?? '',
                 'poster_path' => ($data['poster_path'] ?? null) ? $baseImage . $data['poster_path'] : null,
                 'backdrop_path' => ($data['backdrop_path'] ?? null) ? $baseImage . $data['backdrop_path'] : null,
+                'logo_path' => $this->fetchTmdbLogo('tv', $tmdbId),
                 'trailer_key' => $trailerKey,
                 'trailer_url' => $trailerKey ? "https://www.youtube.com/watch?v=" . $trailerKey : null,
                 'content_type' => 'series',
@@ -317,6 +319,45 @@ trait ImportableContent
         $content->keywords()->sync($ids);
     }
 
+    /**
+     * Busca o clear logo (nome estilizado/transparente) priorizando português,
+     * depois inglês e, por fim, logos sem idioma definido no TMDb.
+     */
+    protected function fetchTmdbLogo(string $type, int $tmdbId): ?string
+    {
+        $endpoint = $type === 'movie' ? "movie/{$tmdbId}/images" : "tv/{$tmdbId}/images";
+        try {
+            $response = $this->fetchTMDB($endpoint, [
+                'language' => 'pt-BR',
+                'include_image_language' => 'pt,en,null',
+            ]);
+        } catch (\Throwable $exception) {
+            \Log::warning("TMDb logo request failed for {$type} {$tmdbId}: " . $exception->getMessage());
+            return null;
+        }
+
+        if (!$response->successful()) {
+            \Log::warning("TMDb logo fetch failed for {$type} {$tmdbId}: " . $response->status());
+            return null;
+        }
+
+        $logo = collect($response->json('logos') ?? [])
+            ->filter(fn (array $item) => !empty($item['file_path']))
+            ->sortBy([
+                [fn (array $item) => match ($item['iso_639_1'] ?? null) {
+                    'pt' => 0,
+                    'en' => 1,
+                    null => 2,
+                    default => 3,
+                }, 'asc'],
+                [fn (array $item) => (int) ($item['vote_count'] ?? 0), 'desc'],
+                [fn (array $item) => (float) ($item['vote_average'] ?? 0), 'desc'],
+            ])
+            ->first();
+
+        return $logo ? 'https://image.tmdb.org/t/p/original' . $logo['file_path'] : null;
+    }
+
     public function refreshMovieFromTmdb(Movie $movie, ?int $castLimit = null, bool $syncCast = true, bool $syncKeywords = true): array
     {
         $data = $this->fetchTMDB("movie/{$movie->tmdb_id}", ['language' => 'pt-BR'])->json();
@@ -328,6 +369,7 @@ trait ImportableContent
             'vote_count' => $data['vote_count'] ?? $movie->vote_count, 'overview' => $data['overview'] ?? $movie->overview,
             'poster_path' => !empty($data['poster_path']) ? $base . $data['poster_path'] : $movie->poster_path,
             'backdrop_path' => !empty($data['backdrop_path']) ? $base . $data['backdrop_path'] : $movie->backdrop_path,
+            'logo_path' => $this->fetchTmdbLogo('movie', $movie->tmdb_id) ?? $movie->logo_path,
             'age_rating' => $this->getAgeRating('movie', $movie->tmdb_id),
         ]);
         $this->syncGenres($movie, $data['genres'] ?? []);
@@ -348,6 +390,7 @@ trait ImportableContent
             'rating' => $data['vote_average'] ?? $series->rating, 'vote_count' => $data['vote_count'] ?? $series->vote_count,
             'overview' => $data['overview'] ?? $series->overview, 'poster_path' => !empty($data['poster_path']) ? $base . $data['poster_path'] : $series->poster_path,
             'backdrop_path' => !empty($data['backdrop_path']) ? $base . $data['backdrop_path'] : $series->backdrop_path,
+            'logo_path' => $this->fetchTmdbLogo('tv', $series->tmdb_id) ?? $series->logo_path,
             'age_rating' => $this->getAgeRating('tv', $series->tmdb_id),
         ]);
         $this->syncGenres($series, $data['genres'] ?? []);

@@ -228,6 +228,7 @@ class MovieController extends Controller
             'overview' => 'nullable|string',
             'poster_path' => 'nullable|string|max:500',
             'backdrop_path' => 'nullable|string|max:500',
+            'logo_path' => 'nullable|string|max:1000',
             'trailer_key' => 'nullable|string|max:255',
             'age_rating' => 'nullable|string|max:10',
             'content_category_id' => 'nullable|exists:content_categories,id',

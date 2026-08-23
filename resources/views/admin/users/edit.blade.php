@@ -131,20 +131,20 @@
 
                     <div class="flex flex-wrap items-center gap-6">
                         {{-- Modo Adulto --}}
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-bold text-neutral-500 uppercase">Modo Adulto</span>
+                        <div class="flex flex-col gap-1 {{ $profile->is_kids ? 'opacity-50' : '' }}">
+                            <span class="text-[10px] font-bold text-neutral-500 uppercase">Modo Adulto {{ $profile->is_kids ? '(perfil Kids)' : '' }}</span>
                             <label class="relative inline-flex items-center cursor-pointer scale-90 -ml-1">
-                                <input type="checkbox" name="profiles[{{ $profile->id }}][is_adult_enabled]" value="1" {{ $profile->is_adult_enabled ? 'checked' : '' }} class="sr-only peer">
+                                <input type="checkbox" name="profiles[{{ $profile->id }}][is_adult_enabled]" value="1" {{ $profile->is_adult_enabled ? 'checked' : '' }} {{ $profile->is_kids ? 'disabled' : '' }} class="sr-only peer">
                                 <div class="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                             </label>
                         </div>
 
                         {{-- PIN Adulto --}}
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-1 {{ $profile->is_kids ? 'opacity-50' : '' }}">
                             <span class="text-[10px] font-bold text-neutral-500 uppercase">PIN Adulto (4 Dígitos)</span>
-                            <input type="text" name="profiles[{{ $profile->id }}][adult_pin]" value="{{ $profile->adult_pin }}" 
-                                   maxlength="4" placeholder="0000"
-                                   class="bg-black border border-neutral-800 text-purple-400 font-mono text-sm rounded px-3 py-1.5 focus:border-purple-500 outline-none w-24 text-center">
+                            <input type="password" name="profiles[{{ $profile->id }}][adult_pin]" value=""
+                                   inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="Manter PIN"
+                                   {{ $profile->is_kids ? 'disabled' : '' }} class="bg-black border border-neutral-800 text-purple-400 font-mono text-sm rounded px-3 py-1.5 focus:border-purple-500 outline-none w-24 text-center">
                         </div>
                     </div>
                 </div>

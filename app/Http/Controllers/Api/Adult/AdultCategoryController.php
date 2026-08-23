@@ -12,7 +12,7 @@ class AdultCategoryController extends Controller
 {
     public function show($slug)
     {
-        $category = AdultCategory::where('slug', $slug)->firstOrFail();
+        $category = AdultCategory::where('slug', $slug)->where('is_active', true)->firstOrFail();
 
         // Get videos related to this category (either directly or via gallery)
         $videos = AdultMedia::where('is_active', true)
@@ -28,7 +28,7 @@ class AdultCategoryController extends Controller
 
         // Get photos related to this category (either directly or via gallery)
         $photos = AdultMedia::where('is_active', true)
-            ->where('type', 'photo')
+            ->where('type', 'image')
             ->where(function($q) use ($category) {
                 $q->where('adult_category_id', $category->id)
                   ->orWhereHas('gallery', function($g) use ($category) {

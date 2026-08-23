@@ -15,8 +15,34 @@ class AdultGalleryController extends Controller
 {
     public function index()
     {
-        $galleries = AdultGallery::with(['model', 'category'])->orderByDesc('created_at')->get();
+        $query = AdultGallery::with(['model', 'category'])->withCount('media');
+        if (request('status') === 'active') {
+            $query->where('is_active', true);
+        } elseif (request('status') === 'inactive') {
+            $query->where('is_active', false);
+        }
+        if (request('type') && in_array(request('type'), ['photo', 'video', 'both'], true)) {
+            $query->where('type', request('type'));
+        }
+        if (request('q')) {
+            $query->where('title', 'like', '%' . request('q') . '%');
+        }
+
+        $galleries = $query->orderBy('order')->orderByDesc('created_at')->get();
         return view('admin.adult.galleries.index', compact('galleries'));
+    }
+
+    public function bulkStatus(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:adult_galleries,id'],
+            'status' => ['required', 'boolean'],
+        ]);
+
+        AdultGallery::whereIn('id', $data['ids'])->update(['is_active' => $data['status']]);
+
+        return back()->with('success', 'Status das galerias atualizado.');
     }
 
     public function create()

@@ -27,7 +27,15 @@ class MediaController extends Controller
 
     public function show($id)
     {
-        $media = AdultMedia::with(['gallery.model', 'gallery.category'])->findOrFail($id);
+        $media = AdultMedia::where('is_active', true)
+            ->with(['gallery.model', 'gallery.category'])
+            ->findOrFail($id);
+
+        if ($media->gallery && (!$media->gallery->is_active
+            || ($media->gallery->model && !$media->gallery->model->is_active)
+            || ($media->gallery->category && !$media->gallery->category->is_active))) {
+            abort(404);
+        }
         
         // Get model and category from gallery if available
         $modelId = $media->adult_model_id ?: ($media->gallery ? $media->gallery->adult_model_id : null);

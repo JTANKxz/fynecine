@@ -349,6 +349,10 @@
                     <i class="fa-solid fa-chevron-down text-sm transition-transform" id="arrow-adultSubmenu"></i>
                 </button>
                 <div id="adultSubmenu" class="{{ request()->is('dashzin/adult*') ? '' : 'hidden' }} pl-8 space-y-1">
+                    <a href="{{ route('admin.adult.dashboard') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.dashboard') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-gauge-high w-4 mr-1"></i> Visão geral
+                    </a>
                     <a href="{{ route('admin.adult.categories.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.adult.categories.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-tags w-4 mr-1"></i> Categorias

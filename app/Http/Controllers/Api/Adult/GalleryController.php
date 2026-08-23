@@ -11,7 +11,16 @@ class GalleryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AdultGallery::where('is_active', true)->with(['model', 'category']);
+        $query = AdultGallery::where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('adult_model_id')
+                    ->orWhereHas('model', fn ($model) => $model->where('is_active', true));
+            })
+            ->where(function ($query) {
+                $query->whereNull('adult_category_id')
+                    ->orWhereHas('category', fn ($category) => $category->where('is_active', true));
+            })
+            ->with(['model', 'category']);
 
         if ($request->has('category_id')) {
             $query->where('adult_category_id', $request->category_id);
@@ -31,10 +40,20 @@ class GalleryController extends Controller
 
     public function show($idOrSlug)
     {
-        $gallery = AdultGallery::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
+        $gallery = AdultGallery::where('is_active', true)
+            ->where(function ($query) use ($idOrSlug) {
+                $query->where('id', $idOrSlug)->orWhere('slug', $idOrSlug);
+            })
+            ->where(function ($query) {
+                $query->whereNull('adult_model_id')
+                    ->orWhereHas('model', fn ($model) => $model->where('is_active', true));
+            })
+            ->where(function ($query) {
+                $query->whereNull('adult_category_id')
+                    ->orWhereHas('category', fn ($category) => $category->where('is_active', true));
+            })
             ->with(['model', 'category', 'media' => function($q) {
-                $q->orderBy('order');
+                $q->where('is_active', true)->orderBy('order');
             }])
             ->firstOrFail();
 

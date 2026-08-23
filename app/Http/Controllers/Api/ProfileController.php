@@ -7,6 +7,8 @@ use App\Models\Profile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -79,6 +81,11 @@ class ProfileController extends Controller
         $isKids = $request->boolean('is_kids');
         $profileData = $request->only('avatar', 'is_kids', 'pin', 'is_adult_enabled', 'adult_pin');
         $config = \App\Models\AppConfig::getSettings();
+
+        $this->validateAdultProfileSettings($isKids, $request->boolean('is_adult_enabled'), $profileData['adult_pin'] ?? null);
+        if (!empty($profileData['adult_pin'])) {
+            $profileData['adult_pin'] = Hash::make($profileData['adult_pin']);
+        }
         
         if ($isKids) {
             $profileData['name'] = 'Kids';
@@ -172,8 +179,15 @@ class ProfileController extends Controller
             $validated['pin'] = $request->pin;
         }
 
+        $isKids = array_key_exists('is_kids', $validated) ? (bool) $validated['is_kids'] : $profile->is_kids;
+        $adultEnabled = array_key_exists('is_adult_enabled', $validated)
+            ? (bool) $validated['is_adult_enabled']
+            : $profile->is_adult_enabled;
+        $incomingAdultPin = $request->has('adult_pin') ? $request->adult_pin : null;
+        $this->validateAdultProfileSettings($isKids, $adultEnabled, $incomingAdultPin, (bool) $profile->adult_pin, $request->has('adult_pin'));
+
         if ($request->has('adult_pin')) {
-            $validated['adult_pin'] = $request->adult_pin;
+            $validated['adult_pin'] = $incomingAdultPin ? Hash::make($incomingAdultPin) : null;
         }
 
         $profile->update($validated);
@@ -261,10 +275,62 @@ class ProfileController extends Controller
         $user = $request->user();
         $profile = $user->profiles()->findOrFail($id);
 
-        if ((string) $profile->adult_pin !== (string) $request->pin) {
+        if (!\App\Models\AppConfig::getSettings()->is_adult_active) {
+            return response()->json(['message' => 'O modo adulto está desativado no momento.'], 403);
+        }
+
+        if (!$profile->is_adult_enabled || $profile->is_kids || empty($profile->adult_pin)) {
+            return response()->json(['message' => 'O modo adulto não está autorizado para este perfil.'], 403);
+        }
+
+        $storedPin = (string) $profile->adult_pin;
+        $isHashed = str_starts_with($storedPin, '$2y$') || str_starts_with($storedPin, '$argon2');
+        $validPin = $isHashed
+            ? Hash::check((string) $request->pin, $storedPin)
+            : hash_equals($storedPin, (string) $request->pin);
+
+        if (!$validPin) {
             return response()->json(['message' => 'PIN Adulto incorreto.'], 403);
         }
 
+        // Compatibilidade com PINs antigos: após a primeira confirmação válida,
+        // ele deixa de existir em texto puro no banco.
+        if (!$isHashed) {
+            $profile->update(['adult_pin' => Hash::make($storedPin)]);
+            $profile->refresh();
+        }
+
+        $tokenId = $user->currentAccessToken()?->id;
+        if (!$tokenId) {
+            return response()->json(['message' => 'Sessão inválida. Faça login novamente.'], 401);
+        }
+
+        Cache::put(
+            \App\Http\Middleware\EnsureAdultAccess::accessKey($tokenId, $profile->id, $profile->adult_pin),
+            true,
+            now()->addMinutes(30)
+        );
+
         return response()->json(['message' => 'Acesso autorizado.', 'profile_id' => $profile->id]);
+    }
+
+    private function validateAdultProfileSettings(
+        bool $isKids,
+        bool $adultEnabled,
+        ?string $adultPin,
+        bool $hasExistingAdultPin = false,
+        bool $adultPinWasSent = true
+    ): void {
+        if ($isKids && $adultEnabled) {
+            throw ValidationException::withMessages([
+                'is_adult_enabled' => 'Perfis infantis não podem habilitar o modo adulto.',
+            ]);
+        }
+
+        if ($adultEnabled && (!$hasExistingAdultPin || $adultPinWasSent) && empty($adultPin)) {
+            throw ValidationException::withMessages([
+                'adult_pin' => 'Defina um PIN adulto de 4 dígitos para habilitar este modo.',
+            ]);
+        }
     }
 }

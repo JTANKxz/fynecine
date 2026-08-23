@@ -23,10 +23,10 @@ class HomeController extends Controller
             
             switch ($section->type) {
                 case 'trending':
-                    $items = AdultGallery::where('is_active', true)->orderByDesc('created_at')->limit($section->limit)->get();
+                    $items = $this->activeGalleries()->orderByDesc('created_at')->limit($section->limit)->get();
                     break;
                 case 'recent':
-                    $galleries = AdultGallery::where('is_active', true)->orderByDesc('id')->limit($section->limit)->get();
+                    $galleries = $this->activeGalleries()->orderByDesc('id')->limit($section->limit)->get();
                     $media = AdultMedia::whereNull('adult_gallery_id')->where('is_active', true)->orderByDesc('id')->limit($section->limit)->get();
                     $items = $galleries->concat($media)->sortByDesc('created_at')->take($section->limit)->values();
                     break;
@@ -43,7 +43,7 @@ class HomeController extends Controller
                     $itemView = 'photo_grid';
                     break;
                 case 'galleries_grid':
-                    $items = AdultGallery::where('is_active', true)->orderByDesc('id')->limit($section->limit)->get();
+                    $items = $this->activeGalleries()->orderByDesc('id')->limit($section->limit)->get();
                     $itemView = 'galleries_grid';
                     break;
                 case 'collections':
@@ -77,5 +77,18 @@ class HomeController extends Controller
         });
 
         return response()->json($data);
+    }
+
+    private function activeGalleries()
+    {
+        return AdultGallery::where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('adult_model_id')
+                    ->orWhereHas('model', fn ($model) => $model->where('is_active', true));
+            })
+            ->where(function ($query) {
+                $query->whereNull('adult_category_id')
+                    ->orWhereHas('category', fn ($category) => $category->where('is_active', true));
+            });
     }
 }

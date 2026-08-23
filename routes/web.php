@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\AdultGalleryController;
 use App\Http\Controllers\Admin\AdultHomeSectionController;
 use App\Http\Controllers\Admin\AdultCollectionController;
 use App\Http\Controllers\Admin\AdultMediaController;
+use App\Http\Controllers\Admin\AdultDashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ChampionshipController;
@@ -338,11 +339,13 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
 
     // ========== MODO ADULTO ==========
     Route::prefix('adult')->name('adult.')->group(function () {
+        Route::get('/', [AdultDashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', AdultCategoryController::class)->names('categories');
         Route::resource('models', AdultModelController::class)->names('models');
         Route::resource('collections', AdultCollectionController::class)->names('collections');
         Route::patch('collections/{collection}/toggle', [AdultCollectionController::class, 'toggle'])->name('collections.toggle');
 
+        Route::patch('galleries/bulk-status', [AdultGalleryController::class, 'bulkStatus'])->name('galleries.bulk-status');
         Route::resource('galleries', AdultGalleryController::class)->names('galleries');
         Route::get('galleries/{gallery}/media', [AdultGalleryController::class, 'media'])->name('galleries.media');
         Route::post('galleries/{gallery}/media', [AdultGalleryController::class, 'addMedia'])->name('galleries.media.add');

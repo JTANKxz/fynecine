@@ -261,15 +261,33 @@ class UserController extends Controller
 
     public function updateProfiles(Request $request, User $user)
     {
+        $request->validate([
+            'profiles' => ['array'],
+            'profiles.*.adult_pin' => ['nullable', 'digits:4'],
+        ]);
+
         $profilesData = $request->input('profiles', []);
 
         foreach ($profilesData as $profileId => $data) {
             $profile = $user->profiles()->find($profileId);
             if ($profile) {
-                $profile->update([
-                    'is_adult_enabled' => isset($data['is_adult_enabled']),
-                    'adult_pin' => $data['adult_pin'] ?? null,
-                ]);
+                $adultEnabled = isset($data['is_adult_enabled']) && !$profile->is_kids;
+                $updates = ['is_adult_enabled' => $adultEnabled];
+
+                // PINs existentes nunca voltam ao formulário. Campo em branco
+                // significa "manter o PIN atual"; um valor novo é salvo em hash.
+                if (!empty($data['adult_pin'])) {
+                    $updates['adult_pin'] = \Illuminate\Support\Facades\Hash::make($data['adult_pin']);
+                }
+                if (!$adultEnabled) {
+                    $updates['adult_pin'] = null;
+                }
+
+                if ($adultEnabled && empty($updates['adult_pin']) && empty($profile->adult_pin)) {
+                    return back()->with('error', "Defina um PIN adulto para o perfil {$profile->name}.");
+                }
+
+                $profile->update($updates);
             }
         }
 

@@ -16,10 +16,17 @@ class AdultModelController extends Controller
 
     public function show($idOrSlug)
     {
-        $model = AdultModel::where('id', $idOrSlug)
-            ->orWhere('slug', $idOrSlug)
+        $model = AdultModel::where('is_active', true)
+            ->where(function ($query) use ($idOrSlug) {
+                $query->where('id', $idOrSlug)->orWhere('slug', $idOrSlug);
+            })
             ->with(['galleries' => function($q) {
-                $q->where('is_active', true)->orderBy('order');
+                $q->where('is_active', true)
+                    ->where(function ($gallery) {
+                        $gallery->whereNull('adult_category_id')
+                            ->orWhereHas('category', fn ($category) => $category->where('is_active', true));
+                    })
+                    ->orderBy('order');
             }, 'media' => function($q) {
                 $q->where('is_active', true)->whereNull('adult_gallery_id')->orderBy('order');
             }])

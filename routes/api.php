@@ -128,7 +128,7 @@ Route::middleware('api.token')->group(function () {
         // Perfis (Netflix Style - Max 5)
         Route::apiResource('profiles', ProfileController::class);
         Route::post('/profiles/{id}/verify-pin', [ProfileController::class, 'verifyPin'])->middleware('throttle:6,1');
-        Route::post('/profiles/{id}/verify-adult-pin', [ProfileController::class, 'verifyAdultPin']);
+        Route::post('/profiles/{id}/verify-adult-pin', [ProfileController::class, 'verifyAdultPin'])->middleware('throttle:6,1');
 
         // Conta (Titular)
         Route::post('/account/update', [\App\Http\Controllers\Api\AccountController::class, 'update']);
@@ -189,7 +189,7 @@ Route::middleware('api.token')->group(function () {
         Route::post('/rewards/redeem', [RewardController::class, 'redeem']);
 
         // ========== MODO ADULTO API ==========
-        Route::prefix('adult')->group(function () {
+        Route::prefix('adult')->middleware('adult.access')->group(function () {
             Route::get('/home', [\App\Http\Controllers\Api\Adult\HomeController::class, 'index']);
             Route::get('/models', [\App\Http\Controllers\Api\Adult\AdultModelController::class, 'index']);
             Route::get('/models/{idOrSlug}', [\App\Http\Controllers\Api\Adult\AdultModelController::class, 'show']);

@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin'=>App\Http\Middleware\AdminMiddleware::class,
             'api.token'=>App\Http\Middleware\CheckApiToken::class,
+            'adult.access'=>App\Http\Middleware\EnsureAdultAccess::class,
         ]);
         $middleware->api(append: [
             \App\Http\Middleware\CheckBanned::class,

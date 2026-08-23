@@ -9,6 +9,7 @@ use App\Models\Serie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Movie;
 use App\Models\Genre;
@@ -20,7 +21,10 @@ class TMDBController extends Controller
 
     public function index()
     {
-        return view('admin.tmdb.tmdb', ['castLimit' => \App\Models\AppConfig::getSettings()->tmdb_cast_limit ?? 10]);
+        return view('admin.tmdb.tmdb', [
+            'castLimit' => \App\Models\AppConfig::getSettings()->tmdb_cast_limit ?? 10,
+            'networks' => \App\Models\Network::orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function search(Request $request)
@@ -248,24 +252,77 @@ class TMDBController extends Controller
 
     public function import(Request $request)
     {
-        $tmdbId = $request->tmdb_id;
-        $type = $request->type;
-        $mode = $request->mode;
-        $categoryId = $request->category_id;
-        $importCast = $request->input('import_cast', true);
-        $castLimit = $request->integer('cast_limit') ?: null;
+        $validated = $request->validate([
+            'tmdb_id' => ['required', 'integer'],
+            'type' => ['required', 'in:movie,tv'],
+            'mode' => ['nullable', 'in:details,full'],
+            'category_id' => ['nullable', 'exists:content_categories,id'],
+            'network_id' => ['nullable', 'exists:networks,id'],
+            'import_cast' => ['nullable', 'boolean'],
+            'cast_limit' => ['nullable', 'integer', 'min:1', 'max:30'],
+        ]);
+
+        $tmdbId = $validated['tmdb_id'];
+        $type = $validated['type'];
+        $mode = $validated['mode'] ?? 'full';
+        $categoryId = $validated['category_id'] ?? null;
+        $networkId = $validated['network_id'] ?? null;
+        $importCast = $validated['import_cast'] ?? true;
+        $castLimit = $validated['cast_limit'] ?? null;
 
         if ($type === 'tv') {
+            $existingSeries = Serie::where('tmdb_id', $tmdbId)->first();
+            if ($existingSeries) {
+                $this->attachContentToNetwork($networkId, $existingSeries, 'series');
+                return response()->json([
+                    'success' => true,
+                    'series' => $existingSeries,
+                    'network_id' => $networkId,
+                    'already_imported' => true,
+                ]);
+            }
+
             $fullImport = ($mode === 'full');
             $result = $this->performSeriesImport($tmdbId, $fullImport, $categoryId, $importCast, $castLimit);
             
             if (!$result['success']) {
                 return response()->json(['error' => $result['error']], 404);
             }
-            return response()->json($result);
+            $this->attachContentToNetwork($networkId, $result['series'], 'series');
+            return response()->json($result + ['network_id' => $networkId]);
         }
 
-        return $this->importMovie($tmdbId, $categoryId, $importCast, $castLimit);
+        $existingMovie = Movie::where('tmdb_id', $tmdbId)->first();
+        if ($existingMovie) {
+            $this->attachContentToNetwork($networkId, $existingMovie, 'movie');
+            return response()->json([
+                'success' => true,
+                'movie' => $existingMovie,
+                'network_id' => $networkId,
+                'already_imported' => true,
+            ]);
+        }
+
+        $result = $this->performMovieImport($tmdbId, $categoryId, $importCast, $castLimit);
+        if (!$result['success']) {
+            return response()->json(['error' => $result['error']], 404);
+        }
+
+        $this->attachContentToNetwork($networkId, $result['movie'], 'movie');
+        return response()->json($result + ['network_id' => $networkId]);
+    }
+
+    private function attachContentToNetwork(?int $networkId, $content, string $contentType): void
+    {
+        if (!$networkId || !$content) {
+            return;
+        }
+
+        DB::table('network_content')->insertOrIgnore([
+            'network_id' => $networkId,
+            'content_id' => $content->id,
+            'content_type' => $contentType,
+        ]);
     }
     
     public function importMovie($tmdbId, $categoryId = null, $importCast = true, ?int $castLimit = null)

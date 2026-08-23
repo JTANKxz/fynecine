@@ -60,11 +60,18 @@
             <button type="button" data-radar="upcoming_series" class="radar-tab shrink-0 rounded-lg bg-neutral-800 px-3 py-2 text-xs font-bold text-neutral-300 hover:bg-neutral-700">Próximas estreias</button>
         </div>
 
-        <div class="mt-4 grid gap-3 border-t border-neutral-800 pt-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div class="mt-4 grid gap-3 border-t border-neutral-800 pt-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+            <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                 <label for="radarProvider" class="shrink-0 text-xs font-bold text-neutral-300">Filtrar por streaming</label>
                 <select id="radarProvider" class="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-netflix sm:max-w-xs">
                     <option value="">Todos os streamings</option>
+                </select>
+                <label for="targetNetwork" class="shrink-0 text-xs font-bold text-neutral-300">Vincular à rede</label>
+                <select id="targetNetwork" class="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-netflix sm:max-w-xs">
+                    <option value="">Não vincular a uma rede</option>
+                    @foreach($networks as $network)
+                        <option value="{{ $network->id }}">{{ $network->name }}</option>
+                    @endforeach
                 </select>
                 <span class="text-[10px] text-neutral-500">Disponibilidade no Brasil via TMDb / JustWatch.</span>
             </div>
@@ -238,14 +245,19 @@
                 const date = item.release_date || item.first_air_date || '';
                 const year = date ? date.substring(0, 4) : '—';
                 const rating = Number(item.vote_average || 0).toFixed(1);
+                const typeLabel = data.type === 'movie' ? 'Filme' : 'Série';
                 const buttonId = `btn-radar-${collection}-${item.id}`;
+                const targetNetworkId = document.getElementById('targetNetwork').value;
                 const action = item.imported
-                    ? '<span class="mt-2 block rounded bg-emerald-500/15 px-2 py-1 text-center text-[10px] font-bold text-emerald-400">Já importado</span>'
+                    ? (targetNetworkId
+                        ? `<button id="${buttonId}" type="button" onclick="handleRadarImport(${item.id}, '${data.type}', '${buttonId}')" class="mt-2 w-full rounded bg-sky-600 px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-sky-500"><i class="fa-solid fa-link mr-1"></i>Vincular à rede</button>`
+                        : '<span class="mt-2 block rounded bg-emerald-500/15 px-2 py-1 text-center text-[10px] font-bold text-emerald-400">Já importado</span>')
                     : `<button id="${buttonId}" type="button" onclick="handleRadarImport(${item.id}, '${data.type}', '${buttonId}')" class="mt-2 w-full rounded bg-netflix px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-red-700"><i class="fa-solid fa-plus mr-1"></i>Importar</button>`;
 
                 return `
-                    <article class="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-600">
+                    <article class="relative overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-600">
                         <img src="${imageBase}${item.poster_path}" alt="" loading="lazy" class="aspect-[2/3] w-full object-cover" onerror="this.closest('article').style.display='none'">
+                        <span class="absolute left-2 top-2 rounded-md border border-white/15 bg-black/80 px-1.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-white backdrop-blur">${typeLabel}</span>
                         <div class="p-2.5">
                             <p class="truncate text-xs font-bold text-white" title="${title}">${title}</p>
                             <div class="mt-1 flex items-center justify-between text-[10px] text-neutral-400"><span>${year}</span><span class="text-amber-400"><i class="fa-solid fa-star mr-1"></i>${rating}</span></div>
@@ -387,9 +399,10 @@
                    </button>`;
 
                 results.innerHTML += `
-                <div class="bg-neutral-800 rounded overflow-hidden hover:scale-105 transition shadow">
+                <div class="relative bg-neutral-800 rounded overflow-hidden hover:scale-105 transition shadow">
 
                     <img src="${poster}" class="movie-poster">
+                    <span class="absolute left-2 top-2 rounded bg-black/80 px-1.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-white">${mediaType}</span>
 
                     <div class="p-2">
 
@@ -473,6 +486,7 @@
             }
 
             const importCast = document.getElementById("importCast").checked;
+            const networkId = document.getElementById("targetNetwork").value;
 
             const response = await fetch('/dashzin/tmdb/import', {
                 method: 'POST',
@@ -485,6 +499,7 @@
                     type: type,
                     mode: mode,
                     category_id: categoryId,
+                    network_id: networkId || null,
                     import_cast: importCast,
                     cast_limit: Number(document.getElementById("castLimit").value)
                 })
@@ -494,7 +509,11 @@
 
             if (data.success && button) {
 
-                button.innerHTML = "✔ Importado";
+                const selectedNetwork = networkId
+                    ? document.querySelector('#targetNetwork option:checked')?.textContent?.trim()
+                    : null;
+                button.innerHTML = selectedNetwork ? "✔ Vinculado" : "✔ Importado";
+                if (selectedNetwork) button.title = `Importado e vinculado à rede ${selectedNetwork}`;
                 button.classList.remove("bg-yellow-600");
                 button.classList.add("bg-green-600");
 
@@ -592,6 +611,7 @@
             tab.addEventListener('click', () => loadRadar(tab.dataset.radar, 1));
         });
         document.getElementById('radarProvider').addEventListener('change', () => loadRadar(radarCollection, 1));
+        document.getElementById('targetNetwork').addEventListener('change', () => loadRadar(radarCollection, 1));
         document.getElementById('showImportedRadar').addEventListener('change', () => loadRadar(radarCollection, 1));
         loadRadarProviders();
         loadRadar();

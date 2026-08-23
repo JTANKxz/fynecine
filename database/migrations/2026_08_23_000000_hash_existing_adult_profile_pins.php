@@ -1,13 +1,21 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        // O schema antigo limitava o PIN a quatro caracteres. O bcrypt
+        // precisa de espaço para aproximadamente 60 caracteres.
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->string('adult_pin', 255)->nullable()->change();
+        });
+
         DB::table('profiles')
             ->whereNotNull('adult_pin')
             ->where('adult_pin', '!=', '')

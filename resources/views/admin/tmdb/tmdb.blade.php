@@ -204,6 +204,7 @@
         const results = document.getElementById('radarResults');
         const empty = document.getElementById('radarEmpty');
         const provider = document.getElementById('radarProvider').value;
+        const targetNetworkId = document.getElementById('targetNetwork').value;
         const showImported = document.getElementById('showImportedRadar').checked;
         const append = page > 1;
 
@@ -225,16 +226,25 @@
         try {
             const params = new URLSearchParams({ collection, page });
             if (provider) params.set('provider', provider);
+            if (targetNetworkId) params.set('target_network_id', targetNetworkId);
             const response = await fetch(`/dashzin/tmdb/radar?${params}`);
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Não foi possível carregar o radar.');
 
             loading.classList.add('hidden');
-            const items = (data.results || []).filter((item) => showImported || !item.imported);
+            const items = (data.results || []).filter((item) => {
+                if (showImported || !item.imported) return true;
+
+                // Com uma rede selecionada, conteúdos já existentes continuam
+                // disponíveis enquanto ainda não estiverem vinculados a ela.
+                return Boolean(targetNetworkId) && !item.linked_to_target_network;
+            });
             if (!items.length && !append) {
                 empty.textContent = showImported
                     ? 'Nenhum título disponível nesta curadoria agora.'
-                    : 'Todos os títulos desta página já foram importados. Marque “Mostrar já importados” para conferi-los.';
+                    : (targetNetworkId
+                        ? 'Todos os títulos desta página já estão vinculados à rede selecionada.'
+                        : 'Todos os títulos desta página já foram importados. Marque “Mostrar já importados” para conferi-los.');
                 empty.classList.remove('hidden');
                 return;
             }
@@ -247,9 +257,8 @@
                 const rating = Number(item.vote_average || 0).toFixed(1);
                 const typeLabel = data.type === 'movie' ? 'Filme' : 'Série';
                 const buttonId = `btn-radar-${collection}-${item.id}`;
-                const targetNetworkId = document.getElementById('targetNetwork').value;
                 const action = item.imported
-                    ? (targetNetworkId
+                    ? (targetNetworkId && !item.linked_to_target_network
                         ? `<button id="${buttonId}" type="button" onclick="handleRadarImport(${item.id}, '${data.type}', '${buttonId}')" class="mt-2 w-full rounded bg-sky-600 px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-sky-500"><i class="fa-solid fa-link mr-1"></i>Vincular à rede</button>`
                         : '<span class="mt-2 block rounded bg-emerald-500/15 px-2 py-1 text-center text-[10px] font-bold text-emerald-400">Já importado</span>')
                     : `<button id="${buttonId}" type="button" onclick="handleRadarImport(${item.id}, '${data.type}', '${buttonId}')" class="mt-2 w-full rounded bg-netflix px-2 py-1.5 text-[10px] font-bold text-white transition hover:bg-red-700"><i class="fa-solid fa-plus mr-1"></i>Importar</button>`;

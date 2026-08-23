@@ -128,10 +128,12 @@ class TMDBController extends Controller
             'collection' => ['required', 'in:trending_movies,trending_series,popular_movies,now_playing,popular_series,on_the_air,upcoming_series'],
             'page' => ['nullable', 'integer', 'min:1', 'max:500'],
             'provider' => ['nullable', 'integer', 'min:1'],
+            'target_network_id' => ['nullable', 'exists:networks,id'],
         ])['collection'];
 
         $page = $request->integer('page', 1);
         $providerId = $request->integer('provider') ?: null;
+        $targetNetworkId = $request->integer('target_network_id') ?: null;
         $today = now()->toDateString();
         $withinNinetyDays = now()->addDays(90)->toDateString();
 
@@ -179,12 +181,22 @@ class TMDBController extends Controller
         $data = $response->json();
         $results = $this->filterRadarResults($data['results'] ?? []);
         $tmdbIds = collect($results)->pluck('id');
-        $imported = $definition['type'] === 'movie'
-            ? Movie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id')
-            : Serie::whereIn('tmdb_id', $tmdbIds)->pluck('tmdb_id');
+        $contentType = $definition['type'] === 'movie' ? 'movie' : 'series';
+        $importedContent = $definition['type'] === 'movie'
+            ? Movie::whereIn('tmdb_id', $tmdbIds)->get(['id', 'tmdb_id'])->keyBy('tmdb_id')
+            : Serie::whereIn('tmdb_id', $tmdbIds)->get(['id', 'tmdb_id'])->keyBy('tmdb_id');
+        $linkedContentIds = $targetNetworkId
+            ? DB::table('network_content')
+                ->where('network_id', $targetNetworkId)
+                ->where('content_type', $contentType)
+                ->whereIn('content_id', $importedContent->pluck('id'))
+                ->pluck('content_id')
+            : collect();
 
-        $results = collect($results)->map(function (array $item) use ($imported) {
-            $item['imported'] = $imported->contains($item['id']);
+        $results = collect($results)->map(function (array $item) use ($importedContent, $linkedContentIds) {
+            $content = $importedContent->get($item['id']);
+            $item['imported'] = (bool) $content;
+            $item['linked_to_target_network'] = $content && $linkedContentIds->contains($content->id);
             return $item;
         })->values();
 
@@ -196,6 +208,7 @@ class TMDBController extends Controller
             'page' => $data['page'] ?? $page,
             'total_pages' => $data['total_pages'] ?? 1,
             'provider_id' => $providerId,
+            'target_network_id' => $targetNetworkId,
         ]);
     }
 

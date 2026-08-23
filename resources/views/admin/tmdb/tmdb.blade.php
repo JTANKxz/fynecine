@@ -239,13 +239,31 @@
                 // disponíveis enquanto ainda não estiverem vinculados a ela.
                 return Boolean(targetNetworkId) && !item.linked_to_target_network;
             });
-            if (!items.length && !append) {
-                empty.textContent = showImported
-                    ? 'Nenhum título disponível nesta curadoria agora.'
-                    : (targetNetworkId
-                        ? 'Todos os títulos desta página já estão vinculados à rede selecionada.'
-                        : 'Todos os títulos desta página já foram importados. Marque “Mostrar já importados” para conferi-los.');
-                empty.classList.remove('hidden');
+
+            // A página do TMDb pode conter somente conteúdos já importados.
+            // Neste caso, seguimos automaticamente para a próxima até achar
+            // títulos disponíveis, sem obrigar o administrador a exibir itens já importados.
+            const fetchedPage = data.page || page;
+            const fetchedTotalPages = data.total_pages || 1;
+            if (!items.length) {
+                if (fetchedPage < fetchedTotalPages) {
+                    return loadRadar(collection, fetchedPage + 1);
+                }
+
+                const oldLoadMore = document.getElementById('radarLoadMore');
+                if (oldLoadMore) oldLoadMore.remove();
+                radarCollection = collection;
+                radarPage = fetchedPage;
+                radarTotalPages = fetchedTotalPages;
+
+                if (!results.querySelector('article')) {
+                    empty.textContent = showImported
+                        ? 'Nenhum título disponível nesta curadoria agora.'
+                        : (targetNetworkId
+                            ? 'Todos os títulos desta curadoria já estão vinculados à rede selecionada.'
+                            : 'Todos os títulos disponíveis nesta curadoria já foram importados.');
+                    empty.classList.remove('hidden');
+                }
                 return;
             }
 

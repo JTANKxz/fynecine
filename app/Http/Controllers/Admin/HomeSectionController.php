@@ -10,6 +10,7 @@ use App\Models\Network;
 use App\Models\Movie;
 use App\Models\Serie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class HomeSectionController extends Controller
 {
@@ -55,7 +56,8 @@ class HomeSectionController extends Controller
     {
         $validated = $request->validate([
             'title'               => 'required|string|max:255',
-            'type'                => 'required|in:custom,genre,trending,network,networks,recently_added,events,upcoming',
+            'slug'                => 'nullable|string|max:255|regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+            'type'                => 'required|in:custom,genre,trending,network,networks,recently_added,events,upcoming,top_10',
             'content_type'        => 'required|in:movie,series,both',
             'genre_id'            => 'nullable|exists:genres,id',
             'network_id'          => 'nullable|exists:networks,id',
@@ -66,6 +68,7 @@ class HomeSectionController extends Controller
 
         $validated['order'] = HomeSection::where('content_category_id', $validated['content_category_id'])->max('order') + 1;
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['slug'] = $this->uniqueSlug($validated['slug'] ?: $validated['title'], $validated['content_category_id']);
 
         HomeSection::create($validated);
 
@@ -85,7 +88,8 @@ class HomeSectionController extends Controller
     {
         $validated = $request->validate([
             'title'               => 'required|string|max:255',
-            'type'                => 'required|in:custom,genre,trending,network,networks,recently_added,events,upcoming',
+            'slug'                => 'nullable|string|max:255|regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+            'type'                => 'required|in:custom,genre,trending,network,networks,recently_added,events,upcoming,top_10',
             'content_type'        => 'required|in:movie,series,both',
             'genre_id'            => 'nullable|exists:genres,id',
             'network_id'          => 'nullable|exists:networks,id',
@@ -95,6 +99,7 @@ class HomeSectionController extends Controller
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['slug'] = $this->uniqueSlug($validated['slug'] ?: $validated['title'], $validated['content_category_id'], $section->id);
 
         $section->update($validated);
 
@@ -187,5 +192,27 @@ class HomeSectionController extends Controller
     {
         $item->delete();
         return back()->with('success', 'Item removido!');
+    }
+
+    private function uniqueSlug(string $value, ?int $categoryId, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($value) ?: 'secao';
+        $slug = $base;
+        $suffix = 2;
+
+        while (HomeSection::query()
+            ->where('slug', $slug)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->when(
+                $categoryId === null,
+                fn ($query) => $query->whereNull('content_category_id'),
+                fn ($query) => $query->where('content_category_id', $categoryId),
+            )
+            ->exists()) {
+            $slug = "{$base}-{$suffix}";
+            $suffix++;
+        }
+
+        return $slug;
     }
 }

@@ -91,7 +91,7 @@ class HomeController extends Controller
                     'title' => $section->title,
                     'type' => $section->type, // 'custom', 'genre', 'trending', 'network', 'networks', 'recently_added'
                     'content_type' => $section->content_type, // 'movie', 'series', 'both'
-                    'slug' => ($section->type === 'genre' && $section->genre) ? $section->genre->slug : null,
+                    'slug' => $section->slug,
                     'items' => $section->resolveItems()
                 ];
             });

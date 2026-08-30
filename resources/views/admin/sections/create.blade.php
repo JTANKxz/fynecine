@@ -40,6 +40,14 @@
             </div>
         </div>
 
+        <div>
+            <label class="block text-sm text-neutral-400 mb-1">Slug da URL pública</label>
+            <input type="text" name="slug" value="{{ old('slug') }}"
+                class="w-full p-2 bg-neutral-800 rounded focus:ring-2 focus:ring-netflix outline-none"
+                placeholder="Ex: filmes-em-alta">
+            <p class="mt-1 text-xs text-neutral-500">Opcional. Se ficar vazio, será criado a partir do título. Use letras minúsculas, números e hífens.</p>
+        </div>
+
         <div class="grid md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm text-neutral-400 mb-1">Página (Categoria)</label>

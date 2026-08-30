@@ -53,6 +53,7 @@ Route::middleware('api.token')->group(function () {
     // reprodução nunca são expostos por esta rota.
     Route::get('/seo/catalog/{type}', [\App\Http\Controllers\Api\SeoCatalogController::class, 'index'])
         ->whereIn('type', ['movies', 'series']);
+    Route::get('/seo/sections', [\App\Http\Controllers\Api\SeoCatalogController::class, 'sections']);
 
     // TV ao Vivo (Canais)
     Route::get('/channels', [\App\Http\Controllers\Api\TvChannelController::class, 'index']);
@@ -71,6 +72,8 @@ Route::middleware('api.token')->group(function () {
     Route::get('/networks/{idOrSlug}', [NetworkController::class, 'show']);
 
     // Custom Home Sections (View All)
+    Route::get('/public-sections/home/{slug}', [HomeSectionController::class, 'publicHome']);
+    Route::get('/public-sections/category/{categorySlug}/{slug}', [HomeSectionController::class, 'publicCategory']);
     Route::get('/sections/{id}', [HomeSectionController::class, 'show']);
 
     // Gerenciamento de Dispositivos (Apenas Usuário Autenticado)

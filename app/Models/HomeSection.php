@@ -9,6 +9,7 @@ class HomeSection extends Model
 {
     protected $fillable = [
         'title',
+        'slug',
         'type',
         'content_type',
         'genre_id',

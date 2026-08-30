@@ -49,6 +49,11 @@ Route::middleware('api.token')->group(function () {
     Route::get('/search', [SearchController::class, 'index']);
     Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
 
+    // Feed reduzido para geração do sitemap público do site. Os links de
+    // reprodução nunca são expostos por esta rota.
+    Route::get('/seo/catalog/{type}', [\App\Http\Controllers\Api\SeoCatalogController::class, 'index'])
+        ->whereIn('type', ['movies', 'series']);
+
     // TV ao Vivo (Canais)
     Route::get('/channels', [\App\Http\Controllers\Api\TvChannelController::class, 'index']);
     Route::get('/channels/categories', [\App\Http\Controllers\Api\TvChannelController::class, 'categories']);

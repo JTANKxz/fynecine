@@ -71,6 +71,10 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
     Route::get('/tmdb/search', [TMDBController::class, 'search']);
     Route::get('/tmdb/radar', [TMDBController::class, 'radar'])->name('tmdb.radar');
     Route::get('/tmdb/radar/providers', [TMDBController::class, 'radarProviders'])->name('tmdb.radar.providers');
+    Route::get('/tmdb/images/{type}/{tmdbId}', [TMDBController::class, 'images'])
+        ->whereIn('type', ['movie', 'tv'])
+        ->whereNumber('tmdbId')
+        ->name('tmdb.images');
     Route::post('/tmdb/import', [TMDBController::class, 'import']);
     Route::get('/tmdb/seasons/{tmdbId}', [TMDBController::class, 'fetchSeasonsForSync'])->name('tmdb.seasons');
     Route::get('/tmdb/episodes/{tmdbId}/{seasonNumber}', [TMDBController::class, 'fetchEpisodesForSync'])->name('tmdb.episodes');

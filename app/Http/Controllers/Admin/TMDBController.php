@@ -117,6 +117,89 @@ class TMDBController extends Controller
     }
 
     /**
+     * Lista as artes disponíveis no TMDb para seleção manual no painel.
+     * A chave da API permanece no servidor; o navegador recebe somente metadados e URLs públicas.
+     */
+    public function images(string $type, int $tmdbId)
+    {
+        if (!in_array($type, ['movie', 'tv'], true)) {
+            abort(404);
+        }
+
+        try {
+            $response = $this->fetchTMDB("{$type}/{$tmdbId}/images", [
+                'language' => 'pt-BR',
+                'include_image_language' => 'pt,en,null',
+            ]);
+
+            if (!$response->successful()) {
+                $message = $response->json('status_message') ?: 'Não foi possível buscar as imagens no TMDb.';
+
+                return response()->json(['message' => $message], $response->status());
+            }
+
+            $data = $response->json();
+
+            return response()->json([
+                'posters' => $this->normalizeTmdbImages($data['posters'] ?? [], 'poster'),
+                'backdrops' => $this->normalizeTmdbImages($data['backdrops'] ?? [], 'backdrop'),
+                'logos' => $this->normalizeTmdbImages($data['logos'] ?? [], 'logo'),
+            ]);
+        } catch (\Throwable $exception) {
+            \Log::warning('Falha ao consultar galeria de imagens do TMDb.', [
+                'type' => $type,
+                'tmdb_id' => $tmdbId,
+                'exception' => $exception::class,
+            ]);
+
+            return response()->json([
+                'message' => 'Falha ao consultar as imagens no TMDb. Tente novamente em instantes.',
+            ], 502);
+        }
+    }
+
+    private function normalizeTmdbImages(array $images, string $kind): array
+    {
+        $previewSize = match ($kind) {
+            'poster' => 'w342',
+            'backdrop' => 'w780',
+            default => 'w500',
+        };
+
+        $languageOrder = ['pt' => 0, 'en' => 1, '' => 2];
+
+        return collect($images)
+            ->filter(fn (array $image) => !empty($image['file_path']))
+            ->sort(function (array $left, array $right) use ($languageOrder) {
+                $leftLanguage = $left['iso_639_1'] ?? '';
+                $rightLanguage = $right['iso_639_1'] ?? '';
+                $languageComparison = ($languageOrder[$leftLanguage] ?? 3) <=> ($languageOrder[$rightLanguage] ?? 3);
+
+                if ($languageComparison !== 0) {
+                    return $languageComparison;
+                }
+
+                $votesComparison = ($right['vote_count'] ?? 0) <=> ($left['vote_count'] ?? 0);
+
+                return $votesComparison !== 0
+                    ? $votesComparison
+                    : ($right['vote_average'] ?? 0) <=> ($left['vote_average'] ?? 0);
+            })
+            ->values()
+            ->map(fn (array $image) => [
+                'path' => $image['file_path'],
+                'url' => 'https://image.tmdb.org/t/p/original' . $image['file_path'],
+                'preview_url' => "https://image.tmdb.org/t/p/{$previewSize}" . $image['file_path'],
+                'language' => $image['iso_639_1'],
+                'width' => $image['width'] ?? null,
+                'height' => $image['height'] ?? null,
+                'vote_average' => round((float) ($image['vote_average'] ?? 0), 1),
+                'vote_count' => (int) ($image['vote_count'] ?? 0),
+            ])
+            ->all();
+    }
+
+    /**
      * Curadoria rápida do catálogo TMDb para o painel administrativo.
      *
      * Esta rota mantém a chave do TMDb no servidor e aplica a mesma indicação

@@ -26,6 +26,16 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2 space-y-2">
+                    <label class="block text-sm font-bold text-neutral-400">ID do TMDb</label>
+                    <div class="relative">
+                        <input type="text" value="{{ $movie->tmdb_id }}" readonly aria-readonly="true"
+                               class="w-full cursor-not-allowed rounded-lg border border-neutral-800 bg-neutral-950 px-4 py-2 pr-12 font-mono text-neutral-500 outline-none">
+                        <i class="fa-solid fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-xs text-neutral-600"></i>
+                    </div>
+                    <p class="text-xs text-neutral-600">Identificador original do conteúdo. Ele não pode ser alterado nesta tela.</p>
+                </div>
+
                 <!-- Título -->
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-neutral-400">Título do Filme</label>
@@ -111,6 +121,8 @@
                            class="w-full px-4 py-2 bg-neutral-800 text-white rounded-lg border border-neutral-700 focus:border-netflix focus:outline-none transition">
                     <p class="text-xs text-neutral-500">Importada automaticamente pelo TMDb; use apenas para corrigir ou substituir a arte do nome.</p>
                 </div>
+
+                @include('admin.tmdb.partials.image-picker', ['type' => 'movie', 'tmdbId' => $movie->tmdb_id])
 
                 <!-- Gêneros -->
                 <div class="md:col-span-2 space-y-2">

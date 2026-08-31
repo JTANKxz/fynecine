@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\Serie;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class RelatedContentService
 {
@@ -13,34 +14,67 @@ class RelatedContentService
     {
         $class = $content instanceof Movie ? Movie::class : Serie::class;
         $content->loadMissing(['genres', 'keywords', 'cast']);
+        $week = now()->format('o-W');
+        $cacheKey = sprintf('related:v3:%s:%s:%s:%d', $content->getTable(), $content->getKey(), $week, $limit);
 
-        $candidates = $class::query()
-            ->whereKeyNot($content->getKey())
-            ->with(['genres', 'keywords', 'cast'])
-            ->get();
+        $ids = Cache::remember($cacheKey, now()->addHours(12), function () use ($class, $content, $limit, $week) {
+            $genreIds = $content->genres->pluck('id');
+            $keywordIds = $content->keywords->pluck('id');
+            $castIds = $content->cast->take(10)->pluck('id');
 
-        $scored = $candidates->map(function (Model $candidate) use ($content) {
-            return ['content' => $candidate, 'score' => $this->score($content, $candidate)];
-        })->filter(fn (array $item) => $item['score'] > 0)
-          ->sortByDesc('score')
-          ->take(80)
-          ->values();
+            $query = $class::query()->whereKeyNot($content->getKey());
+            if ($genreIds->isNotEmpty() || $keywordIds->isNotEmpty() || $castIds->isNotEmpty()) {
+                $query->where(function ($candidateQuery) use ($genreIds, $keywordIds, $castIds) {
+                    if ($genreIds->isNotEmpty()) {
+                        $candidateQuery->whereHas('genres', fn ($relation) => $relation->whereIn('genres.id', $genreIds));
+                    }
+                    if ($keywordIds->isNotEmpty()) {
+                        $method = $genreIds->isNotEmpty() ? 'orWhereHas' : 'whereHas';
+                        $candidateQuery->{$method}('keywords', fn ($relation) => $relation->whereIn('tmdb_keywords.id', $keywordIds));
+                    }
+                    if ($castIds->isNotEmpty()) {
+                        $method = ($genreIds->isNotEmpty() || $keywordIds->isNotEmpty()) ? 'orWhereHas' : 'whereHas';
+                        $candidateQuery->{$method}('cast', fn ($relation) => $relation->whereIn('casts.id', $castIds));
+                    }
+                });
+            }
 
-        $selected = collect();
-        $daySeed = now()->format('o-W');
-        while ($selected->count() < $limit && $scored->isNotEmpty()) {
-            $next = $scored->map(function (array $item) use ($selected, $content, $daySeed) {
-                $penalty = $selected->isEmpty() ? 0 : $selected->max(fn (array $chosen) => $this->similarityPenalty($item['content'], $chosen['content']));
-                $tie = hexdec(substr(sha1($daySeed . '|' . $content->getKey() . '|' . $item['content']->getKey()), 0, 4)) / 65535;
-                $item['effective_score'] = $item['score'] - $penalty + ($tie * 0.35);
-                return $item;
-            })->sortByDesc('effective_score')->first();
+            $candidates = $query->with(['genres', 'keywords', 'cast'])->limit(250)->get();
+            $scored = $candidates->map(fn (Model $candidate) => [
+                'content' => $candidate,
+                'score' => $this->score($content, $candidate),
+            ])->filter(fn (array $item) => $item['score'] > 0)->sortByDesc('score')->take(80)->values();
 
-            $selected->push($next);
-            $scored = $scored->reject(fn (array $item) => $item['content']->getKey() === $next['content']->getKey())->values();
+            $selected = collect();
+            while ($selected->count() < $limit && $scored->isNotEmpty()) {
+                $next = $scored->map(function (array $item) use ($selected, $content, $week) {
+                    $penalty = $selected->isEmpty() ? 0 : $selected->max(fn (array $chosen) => $this->similarityPenalty($item['content'], $chosen['content']));
+                    $tie = hexdec(substr(sha1($week . '|' . $content->getKey() . '|' . $item['content']->getKey()), 0, 4)) / 65535;
+                    $item['effective_score'] = $item['score'] - $penalty + ($tie * 0.35);
+                    return $item;
+                })->sortByDesc('effective_score')->first();
+
+                $selected->push($next);
+                $scored = $scored->reject(fn (array $item) => $item['content']->getKey() === $next['content']->getKey())->values();
+            }
+
+            return $selected->pluck('content')->pluck('id')->values()->all();
+        });
+
+        if (!$ids) {
+            return collect();
         }
 
-        return $selected->pluck('content')->values();
+        $rows = Cache::remember("{$cacheKey}:items", now()->addHours(12), function () use ($class, $ids) {
+            $positions = array_flip($ids);
+            return $class::query()->whereIn('id', $ids)->get()
+                ->sortBy(fn (Model $item) => $positions[$item->getKey()] ?? PHP_INT_MAX)
+                ->values()
+                ->map(fn (Model $item) => $item->getAttributes())
+                ->all();
+        });
+
+        return $class::hydrate($rows)->values();
     }
 
     private function score(Model $source, Model $candidate): float

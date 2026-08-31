@@ -263,7 +263,17 @@ class MovieController extends Controller
             'play_links'     => $playLinks->values(),
             'download_links' => $downloadLinks->values(),
 
-            'related' => $related
+            'related' => $related->map(fn ($item) => [
+                'id' => $item->id,
+                'type' => 'movie',
+                'title' => $item->title,
+                'slug' => $item->slug,
+                'year' => $item->release_year,
+                'rating' => $item->rating,
+                'poster' => $item->poster_path,
+                'backdrop' => $item->backdrop_path,
+                'logo' => $item->logo_path,
+            ])->values()
 
         ]);
     }

@@ -11,6 +11,32 @@ use Illuminate\Http\Request;
 
 class SeoCatalogController extends Controller
 {
+    public function show(string $type, string $idOrSlug): JsonResponse
+    {
+        $isMovie = $type === 'movie';
+        $model = $isMovie ? Movie::class : Serie::class;
+        $item = $model::query()
+            ->with('genres:id,name,slug')
+            ->where(is_numeric($idOrSlug) ? 'id' : 'slug', $idOrSlug)
+            ->firstOrFail();
+
+        return response()->json([
+            'id' => $item->id,
+            'slug' => $item->slug,
+            'title' => $isMovie ? $item->title : $item->name,
+            'overview' => $item->overview,
+            'poster' => $item->poster_path,
+            'backdrop' => $item->backdrop_path,
+            'year' => $isMovie ? $item->release_year : $item->first_air_year,
+            'rating' => $item->rating,
+            'genres' => $item->genres->map(fn ($genre) => [
+                'name' => $genre->name,
+                'slug' => $genre->slug,
+            ])->values(),
+            'updated_at' => $item->updated_at,
+        ]);
+    }
+
     /**
      * Lightweight catalog feed used only by the web application's sitemap.
      * It intentionally excludes playback URLs, downloads and user data.

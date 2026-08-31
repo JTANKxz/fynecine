@@ -53,6 +53,8 @@ Route::middleware('api.token')->group(function () {
     // reprodução nunca são expostos por esta rota.
     Route::get('/seo/catalog/{type}', [\App\Http\Controllers\Api\SeoCatalogController::class, 'index'])
         ->whereIn('type', ['movies', 'series']);
+    Route::get('/seo/content/{type}/{idOrSlug}', [\App\Http\Controllers\Api\SeoCatalogController::class, 'show'])
+        ->whereIn('type', ['movie', 'series']);
     Route::get('/seo/sections', [\App\Http\Controllers\Api\SeoCatalogController::class, 'sections']);
 
     // TV ao Vivo (Canais)

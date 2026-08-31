@@ -321,7 +321,17 @@ class SerieController extends Controller
             =========================
             */
 
-            'related' => $related
+            'related' => $related->map(fn ($item) => [
+                'id' => $item->id,
+                'type' => 'series',
+                'name' => $item->name,
+                'slug' => $item->slug,
+                'year' => $item->first_air_year,
+                'rating' => $item->rating,
+                'poster' => $item->poster_path,
+                'backdrop' => $item->backdrop_path,
+                'logo' => $item->logo_path,
+            ])->values()
 
         ]);
     }

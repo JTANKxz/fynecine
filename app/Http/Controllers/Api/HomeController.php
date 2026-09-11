@@ -62,6 +62,8 @@ class HomeController extends Controller
                     'poster' => $content->poster_path,
                     'backdrop' => $content->backdrop_path,
                     'logo' => $content->logo_path,
+                    'trailer_key' => $content->trailer_key,
+                    'trailer_url' => $content->trailer_url,
                     'tag_text' => $content->api_tag_text,
                 ];
             })->filter()->values();

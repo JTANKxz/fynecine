@@ -11,6 +11,10 @@ class Ticket extends Model
         'topic',
         'subtopic',
         'message',
+        'content_type',
+        'content_id',
+        'content_title',
+        'content_poster',
         'status'
     ];
 

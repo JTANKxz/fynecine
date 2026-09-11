@@ -51,7 +51,11 @@ class TicketController extends Controller
         $request->validate([
             'topic' => 'required|string|max:100',
             'subtopic' => 'nullable|string|max:100',
-            'message' => 'nullable|string|max:1000'
+            'message' => 'nullable|string|max:1000',
+            'content_type' => 'nullable|in:movie,series',
+            'content_id' => 'nullable|integer|min:1',
+            'content_title' => 'nullable|string|max:255',
+            'content_poster' => 'nullable|string|max:2048',
         ]);
 
         $user = $request->user();
@@ -74,6 +78,10 @@ class TicketController extends Controller
             'topic' => $request->topic,
             'subtopic' => $request->subtopic,
             'message' => $request->message,
+            'content_type' => $request->content_type,
+            'content_id' => $request->content_id,
+            'content_title' => $request->content_title,
+            'content_poster' => $request->content_poster,
             'status' => 'open'
         ]);
 

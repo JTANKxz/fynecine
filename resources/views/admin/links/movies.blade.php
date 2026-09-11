@@ -59,6 +59,11 @@
                                 <option value="free">FREE</option>
                                 <option value="premium">VIP</option>
                             </select>
+                            <select name="client_platform" class="bg-neutral-900 border border-neutral-800 rounded px-2 py-1 text-xs outline-none">
+                                <option value="both">APP + SITE</option>
+                                <option value="android">SÓ APP</option>
+                                <option value="web">SÓ SITE</option>
+                            </select>
                             
                             <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1 rounded text-[10px] hover:bg-neutral-700 transition">
                                 <i class="fa-solid fa-gears mr-1"></i> AVANÇADO
@@ -115,6 +120,11 @@
                                         <select name="player_sub" class="bg-transparent border-none text-[9px] p-0 outline-none {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-400' }}">
                                             <option value="free" {{ $link->player_sub == 'free' ? 'selected' : '' }}>FREE</option>
                                             <option value="premium" {{ $link->player_sub == 'premium' ? 'selected' : '' }}>VIP</option>
+                                        </select>
+                                        <select name="client_platform" class="bg-transparent border-none text-[9px] p-0 outline-none text-neutral-300">
+                                            <option value="both" {{ ($link->client_platform ?? 'both') === 'both' ? 'selected' : '' }}>APP + SITE</option>
+                                            <option value="android" {{ $link->client_platform === 'android' ? 'selected' : '' }}>SÓ APP</option>
+                                            <option value="web" {{ $link->client_platform === 'web' ? 'selected' : '' }}>SÓ SITE</option>
                                         </select>
                                     </div>
 

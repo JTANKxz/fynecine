@@ -49,6 +49,23 @@
                             {{ $ticket->message }}
                         </p>
 
+                        @if($ticket->content_title)
+                            <div class="mb-4 flex items-center gap-3 rounded-lg border border-purple-500/20 bg-purple-500/5 p-3">
+                                @if($ticket->content_poster)
+                                    <img src="{{ $ticket->content_poster }}" alt="{{ $ticket->content_title }}" class="h-14 w-10 rounded object-cover" loading="lazy">
+                                @else
+                                    <div class="flex h-14 w-10 items-center justify-center rounded bg-neutral-800 text-purple-400">
+                                        <i class="fa-solid fa-film"></i>
+                                    </div>
+                                @endif
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-wider text-purple-300">Conteúdo relacionado</p>
+                                    <p class="mt-0.5 text-sm font-bold text-white">{{ $ticket->content_title }}</p>
+                                    <p class="mt-0.5 text-xs text-neutral-500">{{ $ticket->content_type === 'series' ? 'Série' : 'Filme' }} #{{ $ticket->content_id }}</p>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="flex items-center gap-3">
                             <img src="{{ $ticket->user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($ticket->user->name) }}" class="w-6 h-6 rounded-full border border-neutral-800">
                             <span class="text-xs text-neutral-500">Enviado por <strong class="text-neutral-300">{{ $ticket->user->name }}</strong> ({{ $ticket->user->email }})</span>

@@ -73,6 +73,11 @@
                                                 <option value="free" {{ old('player_sub') == 'free' ? 'selected' : '' }}>FREE</option>
                                                 <option value="premium" {{ old('player_sub', 'premium') == 'premium' ? 'selected' : '' }}>VIP</option>
                                             </select>
+                                            <select name="client_platform" class="bg-neutral-800 rounded text-xs py-1.5 px-2 outline-none border-none">
+                                                <option value="both" {{ old('client_platform', 'both') === 'both' ? 'selected' : '' }}>APP + SITE</option>
+                                                <option value="android" {{ old('client_platform') === 'android' ? 'selected' : '' }}>SÓ APP</option>
+                                                <option value="web" {{ old('client_platform') === 'web' ? 'selected' : '' }}>SÓ SITE</option>
+                                            </select>
                                         </div>
 
                                         <button type="button" onclick="toggleAdvanced(this)" class="bg-neutral-800 text-neutral-400 px-2 py-1 rounded text-[10px] hover:bg-neutral-700 transition">
@@ -162,6 +167,11 @@
                                                         <select name="player_sub" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] {{ $link->player_sub == 'premium' ? 'text-yellow-500' : 'text-blue-500' }} outline-none">
                                                             <option value="free" {{ old('player_sub', $link->player_sub) == 'free' ? 'selected' : '' }}>FREE</option>
                                                             <option value="premium" {{ old('player_sub', $link->player_sub) == 'premium' ? 'selected' : '' }}>PREMIUM</option>
+                                                        </select>
+                                                        <select name="client_platform" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] text-neutral-300 outline-none">
+                                                            <option value="both" {{ old('client_platform', $link->client_platform ?? 'both') === 'both' ? 'selected' : '' }}>APP + SITE</option>
+                                                            <option value="android" {{ old('client_platform', $link->client_platform) === 'android' ? 'selected' : '' }}>SÓ APP</option>
+                                                            <option value="web" {{ old('client_platform', $link->client_platform) === 'web' ? 'selected' : '' }}>SÓ SITE</option>
                                                         </select>
                                                         <input type="number" name="order" value="{{ old('order', $link->order) }}" placeholder="Ordem" class="w-1/2 bg-neutral-800 border-none rounded px-2 py-1 text-[10px] outline-none">
                                                     </div>

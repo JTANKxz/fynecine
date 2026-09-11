@@ -65,6 +65,7 @@ class LinkController extends Controller
             'url' => 'nullable|string',
             'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'client_platform' => 'nullable|in:both,android,web',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
@@ -76,6 +77,7 @@ class LinkController extends Controller
             'subtitle_url' => 'nullable|string',
         ]);
 
+        $validated['client_platform'] = $validated['client_platform'] ?? 'both';
         $movie->playLinks()->create($validated);
 
         return back()->with('success', 'Link adicionado com sucesso!');
@@ -88,6 +90,7 @@ class LinkController extends Controller
             'url' => 'nullable|string',
             'type' => 'required|in:embed,mp4,m3u8,mkv,custom,private',
             'player_sub' => 'required|in:free,premium',
+            'client_platform' => 'nullable|in:both,android,web',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'link_path' => 'nullable|string|max:255',
@@ -132,6 +135,7 @@ class LinkController extends Controller
             'url' => 'nullable|string',
             'type' => 'required|string',
             'player_sub' => 'required|in:free,premium',
+            'client_platform' => 'nullable|in:both,android,web',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'skip_intro_start' => 'nullable|integer',
@@ -149,6 +153,7 @@ class LinkController extends Controller
             'subtitle_url' => 'nullable|string',
         ])->validate();
 
+        $validated['client_platform'] = $validated['client_platform'] ?? 'both';
         $episode->links()->create($validated);
 
         return back()->with('success', 'Link adicionado ao episódio!');
@@ -170,6 +175,7 @@ class LinkController extends Controller
             'url' => 'nullable|string',
             'type' => 'required|string',
             'player_sub' => 'required|in:free,premium',
+            'client_platform' => 'nullable|in:both,android,web',
             'quality' => 'nullable|string',
             'order' => 'nullable|integer',
             'skip_intro_start' => 'nullable|integer',

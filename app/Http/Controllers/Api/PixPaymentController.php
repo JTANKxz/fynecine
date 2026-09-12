@@ -36,6 +36,11 @@ class PixPaymentController extends Controller
             return response()->json(['message' => 'Este plano não está disponível.'], 422);
         }
 
+        // O valor cobrado nunca deve confiar no que o aplicativo exibiu.
+        // A promoção de primeira assinatura é calculada aqui, antes de criar o
+        // pagamento e antes de enviar o valor ao Mercado Pago.
+        $amount = $this->getPayableAmount($plan, $user);
+
         // Pega qualquer pagamento anterior pendente
         $existingPayment = PixPayment::where('user_id', $user->id)
             ->where('subscription_plan_id', $plan->id)
@@ -81,7 +86,7 @@ class PixPaymentController extends Controller
         $pixPayment = PixPayment::create([
             'user_id' => $user->id,
             'subscription_plan_id' => $plan->id,
-            'amount' => $plan->price,
+            'amount' => $amount,
             'status' => 'pending',
             'expires_at' => Carbon::now()->addMinutes(30),
         ]);
@@ -100,7 +105,7 @@ class PixPaymentController extends Controller
             $lastName = count($nameParts) > 1 ? end($nameParts) : 'FyneCine';
 
             $paymentData = [
-                "transaction_amount" => (float) $plan->price,
+                "transaction_amount" => $amount,
                 "description" => "Plano {$plan->name} - {$plan->duration_days} dias",
                 "payment_method_id" => "pix",
                 "external_reference" => (string) $pixPayment->id, // Ação Obrigatória (14 pts)
@@ -120,7 +125,7 @@ class PixPaymentController extends Controller
                             "description" => $plan->duration_days . " dias de acesso VIP",
                             "category_id" => "services",
                             "quantity" => 1,
-                            "unit_price" => (float) $plan->price
+                            "unit_price" => $amount
                         ]
                     ]
                 ]
@@ -157,6 +162,26 @@ class PixPaymentController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
+    }
+
+    private function getPayableAmount(SubscriptionPlan $plan, $user): float
+    {
+        $baseAmount = $plan->offer_price && $plan->offer_expires_at && $plan->offer_expires_at->isFuture()
+            ? (float) $plan->offer_price
+            : (float) $plan->price;
+
+        $firstDiscount = (float) ($plan->first_time_discount ?? 0);
+        $hasPreviousPixPurchase = PixPayment::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->exists();
+        $hasSubscribedBefore = $user->plan_expires_at !== null || $hasPreviousPixPurchase;
+
+        if ($firstDiscount > 0 && !$hasSubscribedBefore) {
+            $baseAmount -= $firstDiscount;
+        }
+
+        // Mercado Pago exige valor positivo para PIX.
+        return round(max($baseAmount, 0.01), 2);
     }
 
     /**

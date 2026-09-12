@@ -629,6 +629,34 @@
             </div>
         </div>
 
+        <!-- TEMA DO APLICATIVO ANDROID -->
+        <section class="rounded-xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6">
+            <div class="mb-5 flex items-start gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/15 text-purple-400"><i class="fa-solid fa-palette"></i></div>
+                <div><h3 class="font-bold text-white">Tema do aplicativo Android</h3><p class="mt-1 text-xs text-neutral-500">As cores são entregues pela API de configurações e entram em vigor no próximo carregamento do app.</p></div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                @php
+                    $themeColors = [
+                        'android_theme_background' => ['Fundo', '#0A0D12'],
+                        'android_theme_surface' => ['Superfície', '#10151C'],
+                        'android_theme_card' => ['Cards', '#171E27'],
+                        'android_theme_primary' => ['Cor principal', '#8B2FFF'],
+                        'android_theme_accent' => ['Destaque', '#00D4FF'],
+                    ];
+                @endphp
+                @foreach($themeColors as $field => [$label, $fallback])
+                    <label class="block rounded-lg border border-neutral-800 bg-neutral-950/40 p-3">
+                        <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-neutral-400">{{ $label }}</span>
+                        <div class="flex items-center gap-2">
+                            <input type="color" value="{{ old($field, $config->$field ?: $fallback) }}" oninput="this.nextElementSibling.value=this.value" class="h-10 w-11 cursor-pointer rounded border-0 bg-transparent p-0">
+                            <input type="text" name="{{ $field }}" value="{{ old($field, $config->$field ?: $fallback) }}" pattern="^#[0-9A-Fa-f]{6}$" maxlength="7" class="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-mono text-white outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+        </section>
+
         <!-- FOOTER ACTIONS -->
         <div class="mt-8 bg-neutral-900 border border-neutral-800 p-4 rounded-xl flex justify-end">
             <button type="submit" class="bg-netflix hover:bg-red-700 text-white font-bold px-10 py-3 rounded shadow-lg transition transform hover:scale-105 active:scale-95 w-full md:w-auto">

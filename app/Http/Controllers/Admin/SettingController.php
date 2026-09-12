@@ -118,6 +118,11 @@ class SettingController extends Controller
             'default_avatar_p6' => ['nullable', 'integer', 'exists:avatars,id'],
             'default_avatar_kids' => ['nullable', 'integer', 'exists:avatars,id'],
             'default_avatar_kids_url' => ['nullable', 'string'],
+            'android_theme_background' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'android_theme_surface' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'android_theme_card' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'android_theme_primary' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'android_theme_accent' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -236,6 +241,11 @@ class SettingController extends Controller
         $config->default_avatar_p6 = $request->default_avatar_p6;
         $config->default_avatar_kids = $request->default_avatar_kids;
         $config->default_avatar_kids_url = $request->default_avatar_kids_url;
+        $config->android_theme_background = $request->android_theme_background ?: '#0A0D12';
+        $config->android_theme_surface = $request->android_theme_surface ?: '#10151C';
+        $config->android_theme_card = $request->android_theme_card ?: '#171E27';
+        $config->android_theme_primary = $request->android_theme_primary ?: '#8B2FFF';
+        $config->android_theme_accent = $request->android_theme_accent ?: '#00D4FF';
 
         $config->save();
 

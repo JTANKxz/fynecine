@@ -83,6 +83,11 @@ class AppConfig extends Model
         'default_avatar_p6',
         'default_avatar_kids',
         'default_avatar_kids_url',
+        'android_theme_background',
+        'android_theme_surface',
+        'android_theme_card',
+        'android_theme_primary',
+        'android_theme_accent',
     ];
 
     protected $casts = [

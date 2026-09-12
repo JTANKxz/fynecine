@@ -22,6 +22,13 @@ class ConfigController extends Controller
 
         return response()->json([
             'app_name' => $config->app_name,
+            'android_theme' => [
+                'background' => $config->android_theme_background ?: '#0A0D12',
+                'surface' => $config->android_theme_surface ?: '#10151C',
+                'card' => $config->android_theme_card ?: '#171E27',
+                'primary' => $config->android_theme_primary ?: '#8B2FFF',
+                'accent' => $config->android_theme_accent ?: '#00D4FF',
+            ],
             'api_token_key' => $config->api_token_key,
             'custom_message' => $config->custom_message,
             'custom_message_status' => (bool) $config->custom_message_status,

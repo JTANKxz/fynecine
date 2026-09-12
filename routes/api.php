@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\NetworkController;
 use App\Http\Controllers\Api\HomeSectionController;
+use App\Http\Controllers\Api\ShortController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\LinkController;
 use App\Http\Controllers\Api\RewardController;
@@ -166,6 +167,10 @@ Route::middleware('api.token')->group(function () {
 
         // Assinaturas e Cupons
         Route::post('/subscription/redeem', [SubscriptionController::class, 'redeem']);
+
+        // Shorts: o feed é pessoal e sempre depende do Perfil ativo.
+        Route::get('/shorts/feed', [ShortController::class, 'feed']);
+        Route::post('/shorts/{short}/interaction', [ShortController::class, 'interaction']);
 
         // Comentários
         Route::post('/{type}/{idOrSlug}/comments', [CommentController::class, 'store'])->whereIn('type', ['movies', 'series']);

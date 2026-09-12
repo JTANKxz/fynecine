@@ -220,6 +220,14 @@
                 </div>
             </div>
 
+            {{-- Shorts --}}
+            <div>
+                <a href="{{ route('admin.shorts.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.shorts.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-mobile-screen-button w-5"></i> Shorts
+                </a>
+            </div>
+
             {{-- Em Breve --}}
             <div>
                 <a href="{{ route('admin.upcomings.index') }}"

@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\AdultHomeSectionController;
 use App\Http\Controllers\Admin\AdultCollectionController;
 use App\Http\Controllers\Admin\AdultMediaController;
 use App\Http\Controllers\Admin\AdultDashboardController;
+use App\Http\Controllers\Admin\ShortController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ChampionshipController;
@@ -323,6 +324,11 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
     Route::get('event-links/{link}/edit', [\App\Http\Controllers\Admin\EventController::class, 'editLink'])->name('events.links.edit');
     Route::put('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'updateLink'])->name('events.links.update');
     Route::delete('event-links/{link}', [\App\Http\Controllers\Admin\EventController::class, 'deleteLink'])->name('events.links.destroy');
+
+    // ========== SHORTS ===========
+    Route::get('shorts/inspect', [ShortController::class, 'inspect'])->name('shorts.inspect');
+    Route::get('shorts/search-related', [ShortController::class, 'searchRelated'])->name('shorts.search-related');
+    Route::resource('shorts', ShortController::class)->except(['show'])->names('shorts');
 
     // ========== TIMES / EQUIPES ==========
     Route::resource('teams', \App\Http\Controllers\Admin\TeamController::class)->names('teams');

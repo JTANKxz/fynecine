@@ -50,7 +50,12 @@ class TopRankingService
         $sections = HomeSection::query()
             ->with('category')
             ->where('is_active', true)
-            ->where('type', 'top_10')
+            // Instalações antigas podiam ter sido criadas como "trending"
+            // com título Top 10; ambas as configurações representam ranking.
+            ->where(function ($query) {
+                $query->where('type', 'top_10')
+                    ->orWhereRaw('LOWER(title) LIKE ?', ['%top 10%']);
+            })
             ->orderBy('order')
             ->get();
 

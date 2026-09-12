@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Slider;
 use App\Models\Genre;
 use App\Models\HomeSection;
+use App\Services\TopRankingService;
 
 class HomeController extends Controller
 {
@@ -27,6 +28,7 @@ class HomeController extends Controller
 
     private function getHomeData($categoryId = null)
     {
+        $topRanking = app(TopRankingService::class);
         /*
         ==================
         SLIDERS
@@ -39,10 +41,12 @@ class HomeController extends Controller
             )
             ->orderBy('position')
             ->get()
-            ->map(function ($slider) {
+            ->map(function ($slider) use ($topRanking) {
                 $content = $slider->content;
 
                 if (!$content) return null;
+
+                $ranking = $topRanking->for($slider->content_type, $content->id);
 
                 return [
                     'id' => $content->id,
@@ -65,6 +69,9 @@ class HomeController extends Controller
                     'trailer_key' => $content->trailer_key,
                     'trailer_url' => $content->trailer_url,
                     'tag_text' => $content->api_tag_text,
+                    'top_rank' => $ranking['rank'] ?? null,
+                    'top_label' => $ranking['label'] ?? null,
+                    'top_is_general' => $ranking['is_general'] ?? false,
                 ];
             })->filter()->values();
 
@@ -87,14 +94,14 @@ class HomeController extends Controller
             )
             ->orderBy('order')
             ->get()
-            ->map(function ($section) {
+            ->map(function ($section) use ($topRanking) {
                 return [
                     'id' => $section->id,
                     'title' => $section->title,
                     'type' => $section->type, // 'custom', 'genre', 'trending', 'network', 'networks', 'recently_added'
                     'content_type' => $section->content_type, // 'movie', 'series', 'both'
                     'slug' => $section->slug,
-                    'items' => $section->resolveItems()
+                    'items' => $topRanking->decorate($section->resolveItems())
                 ];
             });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Serie;
+use App\Services\TopRankingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -90,8 +91,10 @@ class SerieController extends Controller
 
         $series = $query->paginate(20);
 
+        $topRanking = app(TopRankingService::class);
         return response()->json([
-            'data' => $series->map(function ($serie) {
+            'data' => $series->map(function ($serie) use ($topRanking) {
+                $ranking = $topRanking->for('series', $serie->id);
 
                 return [
                     'id' => $serie->id,
@@ -105,6 +108,9 @@ class SerieController extends Controller
                     'poster' => $serie->poster_path,
                     'backdrop' => $serie->backdrop_path,
                     'tag_text' => $serie->api_tag_text,
+                    'top_rank' => $ranking['rank'] ?? null,
+                    'top_label' => $ranking['label'] ?? null,
+                    'top_is_general' => $ranking['is_general'] ?? false,
                 ];
 
             }),
@@ -147,6 +153,8 @@ class SerieController extends Controller
         */
 
         $related = app(\App\Services\RelatedContentService::class)->for($serie);
+        $topRanking = app(TopRankingService::class);
+        $ranking = $topRanking->for('series', $serie->id);
 
         $config = \App\Models\AppConfig::getSettings();
         $platform = \App\Support\PlaybackPlatform::fromRequest($request);
@@ -166,6 +174,9 @@ class SerieController extends Controller
             'backdrop' => $serie->backdrop_path,
             'logo' => $serie->logo_path,
             'tag_text' => $serie->api_tag_text,
+            'top_rank' => $ranking['rank'] ?? null,
+            'top_label' => $ranking['label'] ?? null,
+            'top_is_general' => $ranking['is_general'] ?? false,
 
             'trailer' => [
                 'key' => $serie->trailer_key,

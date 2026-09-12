@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
+use App\Services\TopRankingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -93,8 +94,13 @@ class MovieController extends Controller
 
         $movies = $query->paginate(20);
         
-        $movies->getCollection()->transform(function ($movie) {
+        $topRanking = app(TopRankingService::class);
+        $movies->getCollection()->transform(function ($movie) use ($topRanking) {
             $movie->tag_text = $movie->api_tag_text;
+            $ranking = $topRanking->for('movie', $movie->id);
+            $movie->top_rank = $ranking['rank'] ?? null;
+            $movie->top_label = $ranking['label'] ?? null;
+            $movie->top_is_general = $ranking['is_general'] ?? false;
             return $movie;
         });
 
@@ -132,6 +138,8 @@ class MovieController extends Controller
         */
 
         $related = app(\App\Services\RelatedContentService::class)->for($movie);
+        $topRanking = app(TopRankingService::class);
+        $ranking = $topRanking->for('movie', $movie->id);
 
         $config = \App\Models\AppConfig::getSettings();
         $platform = \App\Support\PlaybackPlatform::fromRequest($request);
@@ -228,6 +236,9 @@ class MovieController extends Controller
             'backdrop' => $movie->backdrop_path,
             'logo' => $movie->logo_path,
             'tag_text' => $movie->api_tag_text,
+            'top_rank' => $ranking['rank'] ?? null,
+            'top_label' => $ranking['label'] ?? null,
+            'top_is_general' => $ranking['is_general'] ?? false,
 
             'trailer' => [
                 'key' => $movie->trailer_key,

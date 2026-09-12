@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Serie;
+use App\Services\TopRankingService;
 use Illuminate\Http\Request;
 
 class GenreController extends Controller
@@ -44,7 +45,9 @@ class GenreController extends Controller
             $movieQuery->where('release_year', $year);
         }
 
-        $movies = $movieQuery->get()->map(function ($movie) {
+        $topRanking = app(TopRankingService::class);
+        $movies = $movieQuery->get()->map(function ($movie) use ($topRanking) {
+            $ranking = $topRanking->for('movie', $movie->id);
             return [
                 'id' => $movie->id,
                 'slug' => $movie->slug,
@@ -54,7 +57,10 @@ class GenreController extends Controller
                 'year' => $movie->release_year,
                 'poster' => $movie->poster_path,
                 'backdrop' => $movie->backdrop_path,
-                'created_at' => $movie->created_at
+                'created_at' => $movie->created_at,
+                'top_rank' => $ranking['rank'] ?? null,
+                'top_label' => $ranking['label'] ?? null,
+                'top_is_general' => $ranking['is_general'] ?? false,
             ];
         });
 
@@ -72,7 +78,8 @@ class GenreController extends Controller
             $serieQuery->where('first_air_year', $year);
         }
 
-        $series = $serieQuery->get()->map(function ($serie) {
+        $series = $serieQuery->get()->map(function ($serie) use ($topRanking) {
+            $ranking = $topRanking->for('series', $serie->id);
             return [
                 'id' => $serie->id,
                 'slug' => $serie->slug,
@@ -82,7 +89,10 @@ class GenreController extends Controller
                 'year' => $serie->first_air_year,
                 'poster' => $serie->poster_path,
                 'backdrop' => $serie->backdrop_path,
-                'created_at' => $serie->created_at
+                'created_at' => $serie->created_at,
+                'top_rank' => $ranking['rank'] ?? null,
+                'top_label' => $ranking['label'] ?? null,
+                'top_is_general' => $ranking['is_general'] ?? false,
             ];
         });
 

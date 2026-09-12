@@ -7,6 +7,7 @@ use App\Models\HomeSection;
 use App\Models\ContentCategory;
 use App\Models\Movie;
 use App\Models\Serie;
+use App\Services\TopRankingService;
 use Illuminate\Http\Request;
 
 class HomeSectionController extends Controller
@@ -52,6 +53,7 @@ class HomeSectionController extends Controller
         $content = $section->resolveItems(5000); 
         $paginated = $content->slice(($page - 1) * $perPage, $perPage)->values();
 
+        $topRanking = app(TopRankingService::class);
         return response()->json([
             'section' => [
                 'id' => $section->id,
@@ -61,8 +63,9 @@ class HomeSectionController extends Controller
                 'content_type' => $section->content_type ?? 'both',
                 'category' => $category ? ['name' => $category->name, 'slug' => $category->slug] : null,
             ],
-            'data' => $paginated->map(function ($item) {
+            'data' => $paginated->map(function ($item) use ($topRanking) {
                 if ($item instanceof Movie) {
+                    $ranking = $topRanking->for('movie', $item->id);
                     return [
                         'id' => $item->id,
                         'type' => 'movie',
@@ -72,10 +75,14 @@ class HomeSectionController extends Controller
                         'rating' => $item->rating,
                         'poster' => $item->poster_path,
                         'backdrop' => $item->backdrop_path,
+                        'top_rank' => $ranking['rank'] ?? null,
+                        'top_label' => $ranking['label'] ?? null,
+                        'top_is_general' => $ranking['is_general'] ?? false,
                     ];
                 }
 
                 if ($item instanceof Serie) {
+                    $ranking = $topRanking->for('series', $item->id);
                     return [
                         'id' => $item->id,
                         'type' => 'series',
@@ -85,6 +92,9 @@ class HomeSectionController extends Controller
                         'rating' => $item->rating,
                         'poster' => $item->poster_path,
                         'backdrop' => $item->backdrop_path,
+                        'top_rank' => $ranking['rank'] ?? null,
+                        'top_label' => $ranking['label'] ?? null,
+                        'top_is_general' => $ranking['is_general'] ?? false,
                     ];
                 }
 

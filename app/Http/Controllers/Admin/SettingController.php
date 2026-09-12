@@ -13,7 +13,10 @@ class SettingController extends Controller
     {
         $config = AppConfig::getSettings();
         $avatars = \App\Models\Avatar::orderBy('id', 'desc')->get();
-        return view('admin.settings.edit', compact('config', 'avatars'));
+        $searchGenres = \App\Models\Genre::orderBy('name')->get(['id', 'name', 'slug']);
+        $searchCollections = \App\Models\HomeSection::where('is_active', true)
+            ->orderBy('title')->get(['id', 'title', 'slug']);
+        return view('admin.settings.edit', compact('config', 'avatars', 'searchGenres', 'searchCollections'));
     }
 
     public function update(Request $request)
@@ -123,6 +126,10 @@ class SettingController extends Controller
             'android_theme_card' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'android_theme_primary' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'android_theme_accent' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'search_genre_ids' => ['nullable', 'array', 'max:12'],
+            'search_genre_ids.*' => ['integer', 'exists:genres,id'],
+            'search_collection_ids' => ['nullable', 'array'],
+            'search_collection_ids.*' => ['integer', 'exists:home_sections,id'],
         ]);
 
         $config = AppConfig::getSettings();
@@ -246,6 +253,8 @@ class SettingController extends Controller
         $config->android_theme_card = $request->android_theme_card ?: '#171E27';
         $config->android_theme_primary = $request->android_theme_primary ?: '#8B2FFF';
         $config->android_theme_accent = $request->android_theme_accent ?: '#00D4FF';
+        $config->search_genre_ids = array_values($request->input('search_genre_ids', []));
+        $config->search_collection_ids = array_values($request->input('search_collection_ids', []));
 
         $config->save();
 

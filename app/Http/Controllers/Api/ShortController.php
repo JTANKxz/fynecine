@@ -43,7 +43,21 @@ class ShortController extends Controller
         }
         $shorts = Short::query()->where('is_active', true)->where('availability', '!=', 'invalid')
             ->whereNotIn('id', $excluded)->whereNotIn('id', $recent)
-            ->orderByDesc('published_at')->inRandomOrder()->limit($limit)->get();
+            ->orderByDesc('published_at')->limit(100)->get();
+        if ($profile && $shorts->isNotEmpty()) {
+            $liked = Short::query()->whereHas('interactions', fn ($q) => $q
+                ->where('profile_id', $profile->id)->where('type', 'like'))->get();
+            $categories = $liked->pluck('category')->filter()->countBy();
+            $relatedIds = $liked->pluck('related_id')->filter()->countBy();
+            $shorts = $shorts->map(function (Short $short) use ($categories, $relatedIds) {
+                $score = random_int(0, 9);
+                $score += ($categories[$short->category] ?? 0) * 30;
+                $score += ($relatedIds[$short->related_id] ?? 0) * 45;
+                return compact('short', 'score');
+            })->sortByDesc('score')->pluck('short')->take($limit)->values();
+        } else {
+            $shorts = $shorts->shuffle()->take($limit)->values();
+        }
         if ($shorts->count() < $limit) {
             $shorts = Short::query()->where('is_active', true)->where('availability', '!=', 'invalid')
                 ->whereNotIn('id', $excluded)->inRandomOrder()->limit($limit)->get();
@@ -71,6 +85,16 @@ class ShortController extends Controller
         }
         ShortInteraction::updateOrCreate($key, ['watch_seconds' => $data['watch_seconds'] ?? null]);
         return response()->json(['active' => true, 'message' => 'Interação registrada.']);
+    }
+
+    public function liked(Request $request): JsonResponse
+    {
+        $profile = $this->profile($request);
+        abort_unless($profile, 400, 'Header Profile-Id é obrigatório.');
+        $shorts = Short::query()->whereHas('interactions', fn ($q) => $q
+            ->where('profile_id', $profile->id)->where('type', 'like'))
+            ->latest()->get();
+        return response()->json(['data' => $shorts->map(fn (Short $short) => $this->payload($short, $profile))]);
     }
 
     private function payload(Short $short, ?Profile $profile): array

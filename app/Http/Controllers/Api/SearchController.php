@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Movie;
 use App\Models\Serie;
+use App\Models\AppConfig;
+use App\Models\Genre;
+use App\Models\HomeSection;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
@@ -22,8 +25,14 @@ class SearchController extends Controller
 
         $genre = null;
         if ($genreSlug) {
-            $genre = \App\Models\Genre::where('slug', $genreSlug)->first();
+            $genre = Genre::where('slug', $genreSlug)->first();
+        } elseif ($query) {
+            $genre = Genre::where('name', 'like', $query)->orWhere('slug', 'like', $query)->first();
         }
+        $isGenreSearch = $genre && !$genreSlug && (
+            strcasecmp(trim((string) $query), $genre->name) === 0 ||
+            strcasecmp(trim((string) $query), $genre->slug) === 0
+        );
 
         /*
         =========================
@@ -32,8 +41,11 @@ class SearchController extends Controller
         */
 
         $movieQuery = Movie::query();
-        if ($query) {
-            $movieQuery->where('title', 'like', "%{$query}%");
+        if ($query && !$isGenreSearch) {
+            $movieQuery->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                    ->orWhereHas('cast', fn ($cast) => $cast->where('name', 'like', "%{$query}%"));
+            });
         }
         if ($genre) {
             $movieQuery->whereHas('genres', function ($q) use ($genre) {
@@ -51,6 +63,7 @@ class SearchController extends Controller
                     'type' => 'movie',
                     'year' => $movie->release_year,
                     'rating' => $movie->rating,
+                    'runtime' => $movie->runtime,
                     'poster' => $movie->poster_path,
                     'backdrop' => $movie->backdrop_path,
                     'tag_text' => $movie->api_tag_text,
@@ -64,8 +77,11 @@ class SearchController extends Controller
         */
 
         $serieQuery = Serie::query();
-        if ($query) {
-            $serieQuery->where('name', 'like', "%{$query}%");
+        if ($query && !$isGenreSearch) {
+            $serieQuery->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhereHas('cast', fn ($cast) => $cast->where('name', 'like', "%{$query}%"));
+            });
         }
         if ($genre) {
             $serieQuery->whereHas('genres', function ($q) use ($genre) {
@@ -83,6 +99,7 @@ class SearchController extends Controller
                     'type' => 'series',
                     'year' => $serie->first_air_year,
                     'rating' => $serie->rating,
+                    'seasons' => $serie->number_of_seasons,
                     'poster' => $serie->poster_path,
                     'backdrop' => $serie->backdrop_path,
                     'tag_text' => $serie->api_tag_text,
@@ -103,6 +120,35 @@ class SearchController extends Controller
         return response()->json([
             'query' => $query,
             'data' => $results
+        ]);
+    }
+
+    public function discover()
+    {
+        $config = AppConfig::getSettings();
+        $genreIds = array_values(array_filter($config->search_genre_ids ?? []));
+        $genres = Genre::query()
+            ->when($genreIds, fn ($q) => $q->whereIn('id', $genreIds))
+            ->orderByRaw($genreIds ? 'FIELD(id, '.implode(',', array_map('intval', $genreIds)).')' : 'name')
+            ->limit(12)
+            ->get(['id', 'name', 'slug']);
+
+        $collectionIds = array_values(array_filter($config->search_collection_ids ?? []));
+        $collections = $collectionIds
+            ? HomeSection::query()->where('is_active', true)
+                ->whereIn('id', $collectionIds)
+                ->orderByRaw('FIELD(id, '.implode(',', array_map('intval', $collectionIds)).')')
+                ->get(['id', 'title', 'slug'])
+            : collect();
+
+        return response()->json([
+            'genres' => $genres,
+            'collections' => $collections->map(fn ($section) => [
+                'id' => $section->id,
+                'title' => $section->title,
+                'slug' => $section->slug,
+                'type' => 'section',
+            ])->values(),
         ]);
     }
     public function suggestions(Request $request)

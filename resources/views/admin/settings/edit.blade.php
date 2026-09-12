@@ -629,6 +629,16 @@
             </div>
         </div>
 
+        <!-- DESTAQUES DA BUSCA -->
+        <section class="rounded-xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6">
+            <div class="mb-5 flex items-start gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 text-cyan-400"><i class="fa-solid fa-magnifying-glass"></i></div><div><h3 class="font-bold text-white">Descoberta na busca</h3><p class="mt-1 text-xs text-neutral-500">Escolha até 12 gêneros e as coleções personalizadas exibidas antes da pesquisa.</p></div></div>
+            @php $selectedSearchGenres = old('search_genre_ids', $config->search_genre_ids ?? []); $selectedSearchCollections = old('search_collection_ids', $config->search_collection_ids ?? []); @endphp
+            <div class="grid gap-6 lg:grid-cols-2">
+                <div><h4 class="mb-3 text-sm font-bold text-white">Gêneros em destaque</h4><div class="grid grid-cols-2 gap-2 sm:grid-cols-3">@foreach($searchGenres as $genre)<label class="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/40 p-2.5 text-xs text-neutral-300"><input type="checkbox" name="search_genre_ids[]" value="{{ $genre->id }}" {{ in_array($genre->id, $selectedSearchGenres) ? 'checked' : '' }} class="accent-cyan-400"> {{ $genre->name }}</label>@endforeach</div></div>
+                <div><h4 class="mb-3 text-sm font-bold text-white">Coleções em destaque</h4><div class="max-h-64 space-y-2 overflow-y-auto pr-1">@forelse($searchCollections as $section)<label class="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-950/40 p-2.5 text-xs text-neutral-300"><input type="checkbox" name="search_collection_ids[]" value="{{ $section->id }}" {{ in_array($section->id, $selectedSearchCollections) ? 'checked' : '' }} class="accent-cyan-400"> {{ $section->title }}</label>@empty <p class="text-xs text-neutral-500">Nenhuma seção personalizada ativa.</p>@endforelse</div></div>
+            </div>
+        </section>
+
         <!-- TEMA DO APLICATIVO ANDROID -->
         <section class="rounded-xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6">
             <div class="mb-5 flex items-start gap-3">

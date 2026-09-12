@@ -88,6 +88,8 @@ class AppConfig extends Model
         'android_theme_card',
         'android_theme_primary',
         'android_theme_accent',
+        'search_genre_ids',
+        'search_collection_ids',
     ];
 
     protected $casts = [
@@ -125,6 +127,8 @@ class AppConfig extends Model
         'default_avatar_p5' => 'integer',
         'default_avatar_p6' => 'integer',
         'default_avatar_kids' => 'integer',
+        'search_genre_ids' => 'array',
+        'search_collection_ids' => 'array',
     ];
 
     /**

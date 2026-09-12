@@ -48,6 +48,7 @@ Route::middleware('api.token')->group(function () {
     Route::get('/genres/{idOrSlug}', [GenreController::class, 'show']);
     Route::get('/cast/{idOrSlug}', [\App\Http\Controllers\Api\CastController::class, 'show']);
     Route::get('/search', [SearchController::class, 'index']);
+    Route::get('/search/discover', [SearchController::class, 'discover']);
     Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
 
     // Feed reduzido para geração do sitemap público do site. Os links de
@@ -173,6 +174,7 @@ Route::middleware('api.token')->group(function () {
         Route::post('/subscription/redeem', [SubscriptionController::class, 'redeem']);
 
         // Shorts: as interações são pessoais e exigem usuário + Perfil ativo.
+        Route::get('/shorts/liked', [ShortController::class, 'liked']);
         Route::post('/shorts/{short}/interaction', [ShortController::class, 'interaction']);
 
         // Comentários

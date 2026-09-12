@@ -79,6 +79,10 @@ Route::middleware('api.token')->group(function () {
     Route::get('/public-sections/category/{categorySlug}/{slug}', [HomeSectionController::class, 'publicCategory']);
     Route::get('/sections/{id}', [HomeSectionController::class, 'show']);
 
+    // Shorts podem ser descobertos por visitantes. A personalização do feed e
+    // as interações continuam vinculadas ao usuário/perfil quando autenticado.
+    Route::get('/shorts/feed', [ShortController::class, 'feed']);
+
     // Gerenciamento de Dispositivos (Apenas Usuário Autenticado)
     Route::middleware('auth:sanctum')->prefix('account/devices')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\DeviceController::class, 'index']);
@@ -168,8 +172,7 @@ Route::middleware('api.token')->group(function () {
         // Assinaturas e Cupons
         Route::post('/subscription/redeem', [SubscriptionController::class, 'redeem']);
 
-        // Shorts: o feed é pessoal e sempre depende do Perfil ativo.
-        Route::get('/shorts/feed', [ShortController::class, 'feed']);
+        // Shorts: as interações são pessoais e exigem usuário + Perfil ativo.
         Route::post('/shorts/{short}/interaction', [ShortController::class, 'interaction']);
 
         // Comentários

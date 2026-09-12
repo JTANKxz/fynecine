@@ -16,6 +16,11 @@ class SearchController extends Controller
     {
         $query = $request->get('q');
         $genreSlug = $request->get('genre');
+        // Trata hífens e pontuação como separadores. Assim "homem aranha"
+        // encontra "Homem-Aranha", sem depender da grafia exata do catálogo.
+        $terms = collect(preg_split('/[\s\p{P}]+/u', (string) $query, -1, PREG_SPLIT_NO_EMPTY))
+            ->filter(fn ($term) => mb_strlen($term) >= 2)
+            ->values();
 
         if (!$query && !$genreSlug) {
             return response()->json([
@@ -42,9 +47,16 @@ class SearchController extends Controller
 
         $movieQuery = Movie::query();
         if ($query && !$isGenreSearch) {
-            $movieQuery->where(function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                    ->orWhereHas('cast', fn ($cast) => $cast->where('name', 'like', "%{$query}%"));
+            $movieQuery->where(function ($q) use ($terms, $query) {
+                $q->where(function ($title) use ($terms, $query) {
+                    foreach ($terms->isNotEmpty() ? $terms : collect([$query]) as $term) {
+                        $title->where('title', 'like', "%{$term}%");
+                    }
+                })->orWhereHas('cast', function ($cast) use ($terms, $query) {
+                    foreach ($terms->isNotEmpty() ? $terms : collect([$query]) as $term) {
+                        $cast->where('name', 'like', "%{$term}%");
+                    }
+                });
             });
         }
         if ($genre) {
@@ -53,7 +65,7 @@ class SearchController extends Controller
             });
         }
 
-        $movies = $movieQuery->limit(20)
+        $movies = $movieQuery->limit(100)
             ->get()
             ->map(function ($movie) {
                 return [
@@ -78,9 +90,16 @@ class SearchController extends Controller
 
         $serieQuery = Serie::query();
         if ($query && !$isGenreSearch) {
-            $serieQuery->where(function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
-                    ->orWhereHas('cast', fn ($cast) => $cast->where('name', 'like', "%{$query}%"));
+            $serieQuery->where(function ($q) use ($terms, $query) {
+                $q->where(function ($name) use ($terms, $query) {
+                    foreach ($terms->isNotEmpty() ? $terms : collect([$query]) as $term) {
+                        $name->where('name', 'like', "%{$term}%");
+                    }
+                })->orWhereHas('cast', function ($cast) use ($terms, $query) {
+                    foreach ($terms->isNotEmpty() ? $terms : collect([$query]) as $term) {
+                        $cast->where('name', 'like', "%{$term}%");
+                    }
+                });
             });
         }
         if ($genre) {
@@ -89,7 +108,7 @@ class SearchController extends Controller
             });
         }
 
-        $series = $serieQuery->limit(20)
+        $series = $serieQuery->limit(100)
             ->get()
             ->map(function ($serie) {
                 return [
@@ -117,9 +136,18 @@ class SearchController extends Controller
             ->sortByDesc('rating')
             ->values();
 
+        $perPage = 20;
+        $page = max(1, (int) $request->integer('page', 1));
+        $total = $results->count();
+        $lastPage = max(1, (int) ceil($total / $perPage));
+
         return response()->json([
             'query' => $query,
-            'data' => $results
+            'data' => $results->slice(($page - 1) * $perPage, $perPage)->values(),
+            'current_page' => $page,
+            'last_page' => $lastPage,
+            'per_page' => $perPage,
+            'total' => $total,
         ]);
     }
 

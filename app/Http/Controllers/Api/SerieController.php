@@ -67,6 +67,10 @@ class SerieController extends Controller
 
         if ($request->filled('sort')) {
             switch ($request->sort) {
+                case 'latest':
+                case 'recent':
+                    $query->orderBy('first_air_year', $order);
+                    break;
                 case 'rating':
                     $query->orderBy('rating', $order);
                     break;
@@ -80,8 +84,9 @@ class SerieController extends Controller
                     $query->orderBy('id', $order);
             }
         } else {
-            $query->orderBy('id', $order);
+            $query->orderBy('first_air_year', $order);
         }
+        $query->orderBy('id', $order);
 
         /*
         =========================

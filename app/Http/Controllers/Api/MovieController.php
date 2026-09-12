@@ -70,6 +70,10 @@ class MovieController extends Controller
 
         if ($request->filled('sort')) {
             switch ($request->sort) {
+                case 'latest':
+                case 'recent':
+                    $query->orderBy('release_year', $order);
+                    break;
                 case 'rating':
                     $query->orderBy('rating', $order);
                     break;
@@ -83,8 +87,9 @@ class MovieController extends Controller
                     $query->orderBy('id', $order);
             }
         } else {
-            $query->orderBy('id', $order);
+            $query->orderBy('release_year', $order);
         }
+        $query->orderBy('id', $order);
 
         /*
         =========================

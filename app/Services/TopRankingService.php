@@ -29,6 +29,10 @@ class TopRankingService
                 return $item;
             }
 
+            // As seções da home serializam o model diretamente. Sempre exponha
+            // a tag calculada para que tags com prazo vencido não cheguem ao app.
+            $item->setAttribute('tag_text', $item->api_tag_text);
+
             $ranking = $this->for($type, $item->id);
             if ($ranking) {
                 $item->setAttribute('top_rank', $ranking['rank']);

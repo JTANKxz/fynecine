@@ -29,11 +29,14 @@ class FootballTeamController extends Controller
                 $current = $this->fetch('games/current/', ['competitors' => $teamId]);
                 $championships = Championship::query()->where('is_sports_enabled', true)
                     ->where('external_provider', '365scores')->whereNotNull('external_id')->get();
+                // Uma competição indisponível não pode derrubar o perfil inteiro.
                 $standings = $championships->map(function (Championship $championship) {
-                    return ['championship' => $championship, 'source' => $this->fetch('standings/', [
-                        'competitions' => $championship->external_id, 'live' => 'false', 'withSeasonsFilter' => 'true',
-                    ])];
-                });
+                    try {
+                        return ['championship' => $championship, 'source' => $this->fetch('standings/', [
+                            'competitions' => $championship->external_id, 'live' => 'false', 'withSeasonsFilter' => 'true',
+                        ])];
+                    } catch (\Throwable) { return null; }
+                })->filter();
 
                 $team = $this->findTeam($teamId, $recent, $current, ...$standings->pluck('source')->all());
                 if ($team === null) {
@@ -111,7 +114,7 @@ class FootballTeamController extends Controller
         $competition = data_get($source, 'competitions.0', []);
         $rows = data_get($source, 'standings.0.rows', []);
         return collect($rows)->filter(fn ($row) => is_array($row) && (int) data_get($row, 'competitor.id', data_get($row, 'team.id')) === $teamId)
-            ->map(function (array $row) use ($competition) {
+            ->map(function (array $row) use ($competition, $fallback) {
                 return [
                     'competition' => ['id' => data_get($competition, 'id', $fallback->id), 'name' => data_get($competition, 'name', $fallback->name)],
                     'position' => $this->integer(data_get($row, 'position', data_get($row, 'rank'))),

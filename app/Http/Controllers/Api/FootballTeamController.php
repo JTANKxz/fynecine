@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Client\Pool;
 
 class FootballTeamController extends Controller
 {
@@ -21,22 +22,41 @@ class FootballTeamController extends Controller
     public function show(int $teamId): JsonResponse
     {
         try {
-            $payload = Cache::remember("football:365scores:team:{$teamId}:v2", now()->addMinutes(10), function () use ($teamId) {
-                $recent = $this->fetch('competitors/recentForm', [
-                    'competitor' => $teamId,
-                    'numOfGames' => 5,
-                ]);
-                $current = $this->fetch('games/current/', ['competitors' => $teamId]);
+            $payload = Cache::remember("football:365scores:team:{$teamId}:v4", now()->addMinutes(10), function () use ($teamId) {
                 $championships = Championship::query()->where('is_sports_enabled', true)
                     ->where('external_provider', '365scores')->whereNotNull('external_id')->get();
-                // Uma competição indisponível não pode derrubar o perfil inteiro.
-                $standings = $championships->map(function (Championship $championship) {
-                    try {
-                        return ['championship' => $championship, 'source' => $this->fetch('standings/', [
-                            'competitions' => $championship->external_id, 'live' => 'false', 'withSeasonsFilter' => 'true',
-                        ])];
-                    } catch (\Throwable) { return null; }
-                })->filter();
+                // O perfil não pode depender de uma chamada lenta por campeonato. A
+                // agenda, o histórico e todas as tabelas são buscados em paralelo;
+                // se uma fonte falhar, as demais informações continuam disponíveis.
+                $responses = Http::pool(function (Pool $pool) use ($teamId, $championships) {
+                    $requests = [
+                        $this->poolRequest($pool, 'recent', 'competitors/recentForm', [
+                            'competitor' => $teamId,
+                            'numOfGames' => 5,
+                        ]),
+                        $this->poolRequest($pool, 'current', 'games/current/', ['competitors' => $teamId]),
+                    ];
+
+                    foreach ($championships as $championship) {
+                        $requests[] = $this->poolRequest($pool, 'standing-'.$championship->id, 'standings/', [
+                            'competitions' => $championship->external_id,
+                            'live' => 'false',
+                            'withSeasonsFilter' => 'true',
+                        ]);
+                    }
+
+                    return $requests;
+                });
+
+                $recent = $this->responseJson($responses['recent'] ?? null);
+                $current = $this->responseJson($responses['current'] ?? null);
+                $standings = $championships->map(function (Championship $championship) use ($responses) {
+                    $source = $this->responseJson($responses['standing-'.$championship->id] ?? null);
+                    if ($source === []) {
+                        return null;
+                    }
+                    return ['championship' => $championship, 'source' => $source];
+                })->filter()->values();
 
                 $team = $this->findTeam($teamId, $recent, $current, ...$standings->pluck('source')->all());
                 if ($team === null) {
@@ -90,6 +110,24 @@ class FootballTeamController extends Controller
         }
 
         return $response->json();
+    }
+
+    private function poolRequest(Pool $pool, string $key, string $path, array $query = []): mixed
+    {
+        return $pool->as($key)->acceptJson()->withHeaders([
+            'User-Agent' => 'Mozilla/5.0 (compatible; FynecineSports/1.0)',
+            'Accept-Language' => 'pt-BR,pt;q=0.9',
+            'Referer' => 'https://www.365scores.com/',
+        ])->connectTimeout(5)->timeout(10)->get(self::BASE_URL.$path, array_merge([
+            'appTypeId' => 5, 'langId' => 31, 'timezoneName' => 'America/Sao_Paulo', 'userCountryId' => 21,
+        ], $query));
+    }
+
+    private function responseJson(mixed $response): array
+    {
+        return $response && method_exists($response, 'successful') && $response->successful() && is_array($response->json())
+            ? $response->json()
+            : [];
     }
 
     /** @return array<string, mixed>|null */

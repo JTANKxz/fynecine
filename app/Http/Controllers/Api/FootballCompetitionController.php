@@ -28,7 +28,8 @@ class FootballCompetitionController extends Controller
         abort_unless($championship->is_sports_enabled && $championship->external_provider === '365scores' && $championship->external_id, 404);
 
         try {
-            $standing = $championship->has_current_stage_standings === false ? null : $sports->standings($championship);
+            // Não bloqueia a tabela por metadados antigos salvos no painel.
+            $standing = $sports->standings($championship);
             return response()->json([
                 'provider' => '365scores',
                 'competition' => $this->competition($championship),

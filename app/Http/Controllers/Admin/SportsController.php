@@ -28,9 +28,9 @@ class SportsController extends Controller
 
         if ($selected?->is_sports_enabled && $selected->external_provider === '365scores' && $selected->external_id) {
             try {
-                if ($selected->has_current_stage_standings !== false) {
-                    $standings = $sports->standings($selected);
-                }
+                // O campo local serve como metadado, mas pode ficar desatualizado
+                // após uma importação. A fonte é a autoridade para saber se há tabela.
+                $standings = $sports->standings($selected);
                 $games = $sports->upcomingGames($selected);
             } catch (\Throwable $exception) {
                 report($exception);

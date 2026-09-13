@@ -91,9 +91,16 @@ class SportsController extends Controller
             'sport_id' => ['nullable', 'integer', 'min:1'],
             'country_id' => ['nullable', 'integer', 'min:1'],
             'display_order' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'image_url' => ['nullable', 'string', 'max:500'],
+            'image_upload' => ['nullable', 'image', 'max:4096'],
+            'remove_image' => ['nullable', 'boolean'],
         ]);
 
         $enabled = $request->boolean('is_sports_enabled');
+        $imageUrl = $request->boolean('remove_image') ? null : ($data['image_url'] ?? $championship->image_url);
+        if ($request->hasFile('image_upload')) {
+            $imageUrl = '/storage/'.$request->file('image_upload')->store('championships', 'public');
+        }
         $championship->update([
             'external_provider' => $enabled ? '365scores' : null,
             'external_id' => $enabled ? ($data['external_id'] ?? null) : null,
@@ -102,6 +109,7 @@ class SportsController extends Controller
             'is_sports_enabled' => $enabled,
             'auto_sync' => $enabled && $request->boolean('auto_sync'),
             'display_order' => $data['display_order'] ?? 0,
+            'image_url' => $imageUrl,
         ]);
 
         return back()->with('success', 'Configuração esportiva atualizada.');
@@ -167,7 +175,8 @@ class SportsController extends Controller
                     'has_brackets' => $item['has_brackets'],
                     'has_stats' => $item['has_stats'],
                     'provider_color' => $item['color'],
-                    'image_url' => $item['logo_url'],
+                    // Nunca substitui uma capa escolhida manualmente no painel.
+                    'image_url' => $championship->image_url ?: $item['logo_url'],
                     'is_sports_enabled' => true,
                     'auto_sync' => true,
                     'display_order' => $championship->display_order ?: 100 + $count,

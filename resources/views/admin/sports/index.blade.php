@@ -106,7 +106,7 @@
                             </div>
                             <details class="mt-3 rounded-xl border border-neutral-800 bg-black/20">
                                 <summary class="cursor-pointer px-3 py-2 text-xs font-bold text-neutral-300">Configurar integração</summary>
-                                <form method="POST" action="{{ route('admin.sports.configure', $championship) }}" class="grid gap-3 border-t border-neutral-800 p-3 sm:grid-cols-2">
+                                <form method="POST" action="{{ route('admin.sports.configure', $championship) }}" enctype="multipart/form-data" class="grid gap-3 border-t border-neutral-800 p-3 sm:grid-cols-2">
                                     @csrf @method('PUT')
                                     <label class="text-xs text-neutral-400 sm:col-span-2 flex items-center gap-2">
                                         <input type="checkbox" name="is_sports_enabled" value="1" @checked($championship->is_sports_enabled) class="accent-netflix"> Ativar no módulo esportivo
@@ -123,6 +123,27 @@
                                     <label class="text-xs text-neutral-400">ID do país (opcional)
                                         <input name="country_id" value="{{ $championship->country_id }}" type="number" min="1" list="sportsCountries" class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
                                     </label>
+                                    <div class="sm:col-span-2 rounded-xl border border-neutral-800 bg-neutral-950/50 p-3">
+                                        <div class="mb-3 flex items-center gap-3">
+                                            @if($championship->image_url)
+                                                <img src="{{ $championship->image_url }}" alt="Capa atual" class="h-14 w-14 rounded-lg object-contain bg-neutral-900 p-1">
+                                            @else
+                                                <div class="flex h-14 w-14 items-center justify-center rounded-lg bg-neutral-900 text-neutral-600"><i class="fa-solid fa-trophy"></i></div>
+                                            @endif
+                                            <div><p class="text-xs font-bold text-white">Capa do campeonato</p><p class="mt-1 text-[11px] text-neutral-500">A imagem manual tem prioridade sobre a capa da fonte.</p></div>
+                                        </div>
+                                        <div class="grid gap-3 sm:grid-cols-2">
+                                            <label class="text-xs text-neutral-400">URL da imagem
+                                                <input name="image_url" value="{{ $championship->image_url }}" type="url" placeholder="https://..." class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
+                                            </label>
+                                            <label class="text-xs text-neutral-400">Enviar imagem (até 4 MB)
+                                                <input name="image_upload" type="file" accept="image/*" class="mt-1 block w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-xs text-neutral-300 file:mr-3 file:border-0 file:bg-neutral-800 file:px-2 file:py-1 file:text-xs file:font-bold file:text-white">
+                                            </label>
+                                        </div>
+                                        @if($championship->image_url)
+                                            <label class="mt-3 flex items-center gap-2 text-xs text-red-300"><input type="checkbox" name="remove_image" value="1" class="accent-red-500"> Remover capa personalizada</label>
+                                        @endif
+                                    </div>
                                     <label class="text-xs text-neutral-400 sm:col-span-2 flex items-center gap-2">
                                         <input type="checkbox" name="auto_sync" value="1" @checked($championship->auto_sync) class="accent-netflix"> Sincronizar próximos jogos automaticamente a cada 30 minutos
                                     </label>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\BrasileiraoScheduleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -74,6 +75,22 @@ class FootballStandingsController extends Controller
                 'provider' => '365scores',
             ], 503);
         }
+    }
+
+    /**
+     * Próximos jogos oficiais para o app. Não inclui odds, publicidade ou
+     * links de casas de aposta do fornecedor.
+     */
+    public function upcoming(BrasileiraoScheduleService $schedule): JsonResponse
+    {
+        $games = $schedule->upcomingGames();
+
+        return response()->json([
+            'provider' => '365scores',
+            'updated_at' => now()->toIso8601String(),
+            'competition' => 'Brasileirão Série A',
+            'games' => $games->values(),
+        ])->header('Cache-Control', 'public, max-age=300');
     }
 
     /** @param array<string, mixed> $source */
@@ -173,12 +190,15 @@ class FootballStandingsController extends Controller
             : (is_array($row['competitor'] ?? null) ? $row['competitor'] : []);
         $stats = is_array($row['stats'] ?? null) ? $row['stats'] : [];
 
-        $played = $this->number($row, $stats, ['played', 'games', 'matches', 'gamesPlayed']);
-        $wins = $this->number($row, $stats, ['wins', 'won']);
-        $draws = $this->number($row, $stats, ['draws', 'ties']);
-        $losses = $this->number($row, $stats, ['losses', 'lost']);
-        $goalsFor = $this->number($row, $stats, ['goalsFor', 'goals_for', 'scored']);
-        $goalsAgainst = $this->number($row, $stats, ['goalsAgainst', 'goals_against', 'conceded']);
+        // O 365Scores chama estes mesmos dados de gamePlayed/gamesWon/etc.
+        // Mantemos também os aliases mais comuns para não acoplar o contrato
+        // público da nossa API ao nome interno do fornecedor.
+        $played = $this->number($row, $stats, ['played', 'games', 'matches', 'gamesPlayed', 'gamePlayed']);
+        $wins = $this->number($row, $stats, ['wins', 'won', 'gamesWon']);
+        $draws = $this->number($row, $stats, ['draws', 'ties', 'gamesEven']);
+        $losses = $this->number($row, $stats, ['losses', 'lost', 'gamesLost']);
+        $goalsFor = $this->number($row, $stats, ['goalsFor', 'goals_for', 'scored', 'for']);
+        $goalsAgainst = $this->number($row, $stats, ['goalsAgainst', 'goals_against', 'conceded', 'against']);
         $goalDifference = $this->number($row, $stats, ['goalDifference', 'goal_diff', 'difference']);
 
         return [

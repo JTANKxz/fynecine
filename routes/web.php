@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\ShortController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ChampionshipController;
+use App\Http\Controllers\Admin\SportsController;
 use App\Http\Controllers\Admin\TMDBController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Public\PublicHomeController;
@@ -335,6 +336,10 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
     Route::get('teams-search', [\App\Http\Controllers\Admin\TeamController::class, 'search'])->name('teams.search');
 
     // ========== CAMPEONATOS ==========
+    Route::get('sports', [SportsController::class, 'index'])->name('sports.index');
+    Route::put('sports/{championship}', [SportsController::class, 'configure'])->name('sports.configure');
+    Route::post('sports/{championship}/sync', [SportsController::class, 'sync'])->name('sports.sync');
+    Route::post('sports/import-featured', [SportsController::class, 'importFeatured'])->name('sports.import-featured');
     Route::resource('championships', ChampionshipController::class)->except(['show', 'create', 'edit']);
 
     // ========== ANOTAÇÕES ==========

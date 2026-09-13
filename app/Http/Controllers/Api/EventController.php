@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Services\BrasileiraoScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,8 +13,14 @@ class EventController extends Controller
     /**
      * Lista eventos que estão "Ao Vivo" ou "Em Breve" (próximos 30min)
      */
-    public function index()
+    public function index(BrasileiraoScheduleService $schedule)
     {
+        try {
+            $schedule->syncUpcomingGames();
+        } catch (\Throwable $exception) {
+            \Log::warning('Falha ao sincronizar agenda automática na API de eventos.', ['message' => $exception->getMessage()]);
+        }
+
         $now = now()->setTimezone('America/Sao_Paulo')->format('Y-m-d H:i:s');
 
         $events = Event::with(['homeTeam', 'awayTeam'])

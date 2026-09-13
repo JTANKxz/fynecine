@@ -103,6 +103,15 @@ class HomeSection extends Model
 
     private function resolveEvents($limit)
     {
+        // A agenda do Brasileirão é trazida automaticamente para a mesma
+        // seção de eventos já usada pelo app. Se o fornecedor estiver fora,
+        // os eventos cadastrados manualmente continuam sendo exibidos.
+        try {
+            app(\App\Services\BrasileiraoScheduleService::class)->syncUpcomingGames();
+        } catch (\Throwable $exception) {
+            \Log::warning('Falha ao sincronizar agenda automática na Home.', ['message' => $exception->getMessage()]);
+        }
+
         $now = now()->setTimezone('America/Sao_Paulo')->format('Y-m-d H:i:s');
 
         return Event::with(['homeTeam', 'awayTeam'])

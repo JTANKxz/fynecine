@@ -18,7 +18,11 @@ class Event extends Model
         'end_time',
         'is_active',
         'championship_id',
+        'external_provider',
+        'external_id',
     ];
+
+    protected $hidden = ['external_provider', 'external_id'];
 
     public function championship()
     {

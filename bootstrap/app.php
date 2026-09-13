@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('notifications:cleanup')->dailyAt('03:00');
         $schedule->command('epg:sync')->everySixHours()->withoutOverlapping();
         $schedule->command('plans:expire')->everyMinute()->withoutOverlapping();
+        $schedule->command('football:sync-brasileirao')->everyThirtyMinutes()->withoutOverlapping();
+        $schedule->command('sports:sync')->everyThirtyMinutes()->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([

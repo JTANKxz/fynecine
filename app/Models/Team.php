@@ -9,6 +9,8 @@ class Team extends Model
     protected $fillable = [
         'name',
         'image_url',
+        'external_provider',
+        'external_id',
     ];
 
     public function homeEvents()

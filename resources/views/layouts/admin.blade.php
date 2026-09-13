@@ -194,6 +194,10 @@
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.championships.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-trophy w-4 mr-1"></i> Campeonatos
                     </a>
+                    <a href="{{ route('admin.sports.index') }}"
+                       class="block p-2 rounded text-sm {{ request()->routeIs('admin.sports.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
+                        <i class="fa-solid fa-futbol w-4 mr-1"></i> Central de Esportes
+                    </a>
                     <a href="{{ route('admin.teams.index') }}"
                        class="block p-2 rounded text-sm {{ request()->routeIs('admin.teams.*') ? 'bg-neutral-700 text-white' : 'hover:bg-neutral-800' }}">
                         <i class="fa-solid fa-shield-halved w-4 mr-1"></i> Times / Equipes

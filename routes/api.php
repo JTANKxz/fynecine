@@ -71,6 +71,7 @@ Route::middleware('api.token')->group(function () {
 
     // Futebol: tabela normalizada pelo backend, sem expor o formato instável do provedor.
     Route::get('/football/brasileirao/standings', [FootballStandingsController::class, 'brasileirao']);
+    Route::get('/football/brasileirao/games', [FootballStandingsController::class, 'upcoming']);
 
     // Planos de Assinatura (Para página de Pricing/Vendas)
     Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'plans']);

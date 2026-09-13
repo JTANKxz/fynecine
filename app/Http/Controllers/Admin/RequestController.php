@@ -89,8 +89,12 @@ class RequestController extends Controller
         return back()->with('success', 'Pedido respondido e usuário notificado!');
     }
  
-    public function autoImport(ContentRequest $request)
+    public function autoImport(Request $requestData, ContentRequest $request)
     {
+        $requestData->validate([
+            'notify_user' => ['nullable', 'boolean'],
+        ]);
+
         $tmdbController = app(\App\Http\Controllers\Admin\TMDBController::class);
         
         try {
@@ -104,13 +108,59 @@ class RequestController extends Controller
             // Se o import foi com sucesso ou já existia
             if ($response && $response->getStatusCode() === 200) {
                 $request->update(['status' => 'approved']);
-                return back()->with('success', "O título '{$request->title}' foi importado automaticamente para o catálogo!");
+
+                if ($requestData->boolean('notify_user')) {
+                    $this->notifyAutoImport($request);
+                }
+
+                $message = "O título '{$request->title}' foi importado automaticamente para o catálogo!";
+                if ($requestData->boolean('notify_user')) {
+                    $message .= ' O usuário foi notificado.';
+                }
+
+                return back()->with('success', $message);
             }
 
             return back()->with('error', "Falha ao importar o título do TMDB.");
             
         } catch (\Exception $e) {
             return back()->with('error', "Erro fatal no conversor do TMDB: " . $e->getMessage());
+        }
+    }
+
+    private function notifyAutoImport(ContentRequest $request): void
+    {
+        $user = $request->user;
+        if (! $user) {
+            return;
+        }
+
+        $title = 'Seu pedido está disponível!';
+        $content = "{$request->title} foi adicionado ao catálogo.";
+
+        Notification::create([
+            'title' => $title,
+            'content' => $content,
+            'action_type' => 'none',
+            'action_value' => null,
+            'user_id' => $user->id,
+            'segment' => 'individual',
+            'is_in_app' => true,
+            'push_status' => 'pending',
+        ]);
+
+        try {
+            $tokens = FcmDevice::where('user_id', $user->id)->pluck('device_token')->all();
+            if ($tokens) {
+                $this->fcmService->sendPush($tokens, [
+                    'title' => $title,
+                    'body' => $content,
+                    'action_type' => 'none',
+                    'action_value' => null,
+                ]);
+            }
+        } catch (\Throwable $exception) {
+            report($exception);
         }
     }
 }

@@ -28,7 +28,9 @@ class GenreController extends Controller
         $order = $request->get('order', 'desc');
         if (!in_array($order, ['asc', 'desc'])) { $order = 'desc'; }
         
-        $sort = $request->get('sort', 'rating');
+        // Mantém o comportamento da listagem geral: o padrão é o conteúdo
+        // adicionado mais recentemente, não a maior avaliação do TMDB.
+        $sort = $request->get('sort', 'recent');
         $year = $request->get('year');
 
         /*
@@ -105,6 +107,10 @@ class GenreController extends Controller
         $content = $movies->concat($series);
         
         switch ($sort) {
+            case 'latest':
+            case 'recent':
+                $content = ($order === 'asc') ? $content->sortBy('created_at') : $content->sortByDesc('created_at');
+                break;
             case 'year':
                 $content = ($order === 'asc') ? $content->sortBy('year') : $content->sortByDesc('year');
                 break;

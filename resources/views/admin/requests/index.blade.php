@@ -86,8 +86,9 @@
                                         </button>
 
                                         {{-- Botão mágico Importar --}}
-                                        <form action="{{ route('admin.requests.autoimport', $req) }}" method="POST" class="inline" onsubmit="return confirm('Isso fará o download de todos os episódios/links originais do TMDB. Continuar?')">
+                                        <form action="{{ route('admin.requests.autoimport', $req) }}" method="POST" class="inline" onsubmit="return confirmAutoImport(this, @js($req->title))">
                                             @csrf
+                                            <input type="hidden" name="notify_user" value="0">
                                             <button type="submit" class="bg-netflix hover:bg-red-700 text-white px-3 py-1.5 rounded mr-2 text-xs font-bold transition">
                                                 <i class="fa-solid fa-download mr-1"></i> Auto-Importar
                                             </button>
@@ -210,6 +211,15 @@
 
 @push('scripts')
 <script>
+    function confirmAutoImport(form, title) {
+        if (!confirm(`Importar "${title}" para o catálogo?`)) {
+            return false;
+        }
+
+        form.querySelector('[name="notify_user"]').value = confirm('Deseja notificar o usuário de que o pedido foi atendido?') ? '1' : '0';
+        return true;
+    }
+
     function openResponseModal(action, userName, requestTitle) {
         document.getElementById('responseForm').action = action;
         document.getElementById('modalTargetName').innerText = userName + ' (' + requestTitle + ')';

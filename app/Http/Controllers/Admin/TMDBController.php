@@ -432,6 +432,26 @@ class TMDBController extends Controller
         return response()->json($result);
     }
 
+    public function importSeries($tmdbId, bool $fullImport = true, $categoryId = null, $importCast = true, ?int $castLimit = null)
+    {
+        $existingSeries = Serie::where('tmdb_id', $tmdbId)->first();
+        if ($existingSeries) {
+            return response()->json([
+                'success' => true,
+                'series' => $existingSeries,
+                'already_imported' => true,
+            ]);
+        }
+
+        $result = $this->performSeriesImport($tmdbId, $fullImport, $categoryId, $importCast, $castLimit);
+
+        if (! $result['success']) {
+            return response()->json(['error' => $result['error']], 404);
+        }
+
+        return response()->json($result);
+    }
+
     public function fetchSeasonsForSync($tmdbId)
     {
         try {

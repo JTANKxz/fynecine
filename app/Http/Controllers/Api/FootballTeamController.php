@@ -142,6 +142,10 @@ class FootballTeamController extends Controller
                     if (is_array($team) && (int) data_get($team, 'id') === $teamId) return $this->normalizeTeam($team);
                 }
             }
+            foreach (data_get($source, 'standings.0.rows', []) as $row) {
+                $team = data_get($row, 'competitor', data_get($row, 'team', []));
+                if (is_array($team) && (int) data_get($team, 'id') === $teamId) return $this->normalizeTeam($team);
+            }
         }
         return null;
     }
@@ -150,7 +154,7 @@ class FootballTeamController extends Controller
     private function teamStandings(array $source, int $teamId, Championship $fallback): array
     {
         $competition = data_get($source, 'competitions.0', []);
-        $rows = data_get($source, 'standings.0.rows', []);
+        $rows = $this->standingRows($source);
         return collect($rows)->filter(fn ($row) => is_array($row) && (int) data_get($row, 'competitor.id', data_get($row, 'team.id')) === $teamId)
             ->map(function (array $row) use ($competition, $fallback) {
                 return [
@@ -163,6 +167,15 @@ class FootballTeamController extends Controller
                     'losses' => $this->integer(data_get($row, 'gamesLost', data_get($row, 'losses'))),
                 ];
             })->values()->all();
+    }
+
+    private function standingRows(array $source): array
+    {
+        foreach (['standings.0.rows', 'standings.0.table.rows', 'standings.0.table', 'standings.rows', 'table.rows'] as $path) {
+            $rows = data_get($source, $path);
+            if (is_array($rows) && array_is_list($rows)) return $rows;
+        }
+        return [];
     }
 
     /** @return array<string, mixed> */

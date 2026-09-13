@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FootballStandingsController;
 use App\Http\Controllers\Api\FootballTeamController;
+use App\Http\Controllers\Api\FootballCompetitionController;
 use App\Http\Controllers\Api\NetworkController;
 use App\Http\Controllers\Api\HomeSectionController;
 use App\Http\Controllers\Api\ShortController;
@@ -74,6 +75,8 @@ Route::middleware('api.token')->group(function () {
     Route::get('/football/brasileirao/standings', [FootballStandingsController::class, 'brasileirao']);
     Route::get('/football/brasileirao/games', [FootballStandingsController::class, 'upcoming']);
     Route::get('/football/teams/{teamId}', [FootballTeamController::class, 'show'])->whereNumber('teamId');
+    Route::get('/football/competitions', [FootballCompetitionController::class, 'index']);
+    Route::get('/football/competitions/{championship}', [FootballCompetitionController::class, 'show'])->whereNumber('championship');
 
     // Planos de Assinatura (Para página de Pricing/Vendas)
     Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'plans']);

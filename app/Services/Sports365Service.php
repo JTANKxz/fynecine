@@ -149,6 +149,24 @@ class Sports365Service
     }
 
     /** @return Collection<int, array<string, mixed>> */
+    public function recentGames(Championship $championship, int $limit = 4): Collection
+    {
+        $competitionId = $this->competitionId($championship);
+        $source = $this->fetch('games/current/', ['competitions' => $competitionId], "sports:365:games:{$competitionId}", 30);
+
+        return collect(data_get($source, 'games', []))
+            ->filter(fn ($game) => is_array($game)
+                && (int) ($game['competitionId'] ?? 0) === $competitionId
+                && (int) ($game['statusGroup'] ?? 0) === 4)
+            ->map(fn (array $game) => $this->normalizeGame($game) + [
+                'status' => data_get($game, 'statusText'),
+                'home_score' => $this->integer(data_get($game, 'homeCompetitor.score')),
+                'away_score' => $this->integer(data_get($game, 'awayCompetitor.score')),
+            ])
+            ->sortByDesc('starts_at')->take(max(1, $limit))->values();
+    }
+
+    /** @return Collection<int, array<string, mixed>> */
     public function teamRecentForm(Team $team, int $games = 5): Collection
     {
         if (! $team->external_id || $team->external_provider !== self::PROVIDER) {

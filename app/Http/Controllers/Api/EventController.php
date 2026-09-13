@@ -23,7 +23,7 @@ class EventController extends Controller
 
         $now = now()->setTimezone('America/Sao_Paulo')->format('Y-m-d H:i:s');
 
-        $events = Event::with(['homeTeam', 'awayTeam'])
+        $events = Event::with(['homeTeam', 'awayTeam', 'championship'])
             ->visible()
             ->orderByRaw("CASE WHEN ? >= start_time AND ? <= end_time THEN 0 ELSE 1 END ASC", [$now, $now])
             ->orderBy('start_time')
@@ -32,8 +32,10 @@ class EventController extends Controller
                 $user = auth('sanctum')->user();
                 $event->home_team_image = $event->homeTeam?->image_url;
                 $event->away_team_image = $event->awayTeam?->image_url;
+                // Eventos manuais sem campeonato continuam aparecendo em seu próprio filtro.
+                $event->competition = $event->championship?->name ?: $event->title;
                 $event->is_locked = !($user && $user->canWatchEvents());
-                unset($event->homeTeam, $event->awayTeam);
+                unset($event->homeTeam, $event->awayTeam, $event->championship);
                 return $event;
             });
 

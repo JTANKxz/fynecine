@@ -30,6 +30,27 @@
         <div class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{{ session('error') ?: $sourceError }}</div>
     @endif
 
+    <section class="rounded-2xl border border-violet-500/25 bg-neutral-900 p-5">
+        <div class="mb-4"><h2 class="font-bold text-white">Banner FYNE GAMES</h2><p class="mt-1 text-xs text-neutral-400">Banner opcional na tela de Esportes. O toque abre o site dentro do aplicativo.</p></div>
+        <form method="POST" action="{{ route('admin.sports.games-banner') }}" enctype="multipart/form-data" class="grid gap-4 md:grid-cols-2">
+            @csrf @method('PUT')
+            <label class="flex items-center gap-3 rounded-xl border border-neutral-800 bg-black/20 p-3 text-sm text-white md:col-span-2"><input type="checkbox" name="sports_games_banner_enabled" value="1" @checked($gamesConfig->sports_games_banner_enabled) class="accent-violet-500"> Exibir FYNE GAMES no app</label>
+            <label class="text-xs text-neutral-400">URL da imagem
+                <input name="sports_games_banner_image" type="url" value="{{ $gamesConfig->sports_games_banner_image }}" placeholder="https://..." class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
+            </label>
+            <label class="text-xs text-neutral-400">Enviar banner (até 4 MB)
+                <input name="sports_games_banner_upload" type="file" accept="image/*" class="mt-1 block w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-xs text-neutral-300 file:mr-3 file:border-0 file:bg-neutral-800 file:px-2 file:py-1 file:text-xs file:font-bold file:text-white">
+            </label>
+            <label class="text-xs text-neutral-400 md:col-span-2">Site aberto ao tocar no banner
+                <input name="sports_games_banner_url" type="url" value="{{ $gamesConfig->sports_games_banner_url }}" placeholder="https://seu-site.com" class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
+            </label>
+            @if($gamesConfig->sports_games_banner_image)
+                <img src="{{ filter_var($gamesConfig->sports_games_banner_image, FILTER_VALIDATE_URL) ? $gamesConfig->sports_games_banner_image : asset('storage/'.$gamesConfig->sports_games_banner_image) }}" alt="Prévia FYNE GAMES" class="h-24 w-full rounded-xl border border-neutral-800 bg-black/30 object-cover md:col-span-2">
+            @endif
+            <button class="justify-self-start rounded-lg bg-violet-600 px-4 py-2.5 text-xs font-black text-white hover:bg-violet-500 md:col-span-2">SALVAR BANNER FYNE GAMES</button>
+        </form>
+    </section>
+
     @if($catalog->isNotEmpty())
         <form method="POST" action="{{ route('admin.sports.import-featured') }}" class="rounded-2xl border border-netflix/30 bg-neutral-900 p-5">
             @csrf

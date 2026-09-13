@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Championship;
+use App\Models\AppConfig;
 use App\Services\Sports365Service;
 use Illuminate\Http\JsonResponse;
 
@@ -17,10 +18,18 @@ class FootballCompetitionController extends Controller
             ->whereNotNull('external_id')
             ->orderByDesc('is_featured')->orderBy('display_order')->orderBy('name')->get();
 
+        $config = AppConfig::getSettings();
+        $bannerImage = $config->sports_games_banner_image;
         return response()->json([
             'provider' => '365scores',
             'competitions' => $competitions->map(fn (Championship $item) => $this->competition($item))->values(),
             'featured_ids' => $competitions->where('is_featured', true)->pluck('id')->values(),
+            'games_banner' => [
+                'enabled' => (bool) $config->sports_games_banner_enabled,
+                'title' => 'FYNE GAMES',
+                'image_url' => $bannerImage ? (filter_var($bannerImage, FILTER_VALIDATE_URL) ? $bannerImage : asset('storage/'.$bannerImage)) : null,
+                'url' => $config->sports_games_banner_url,
+            ],
         ])->header('Cache-Control', 'public, max-age=300');
     }
 

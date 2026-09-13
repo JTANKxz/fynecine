@@ -337,6 +337,7 @@ Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(f
 
     // ========== CAMPEONATOS ==========
     Route::get('sports', [SportsController::class, 'index'])->name('sports.index');
+    Route::put('sports/games-banner', [SportsController::class, 'updateGamesSettings'])->name('sports.games-banner');
     Route::put('sports/{championship}', [SportsController::class, 'configure'])->name('sports.configure');
     Route::post('sports/{championship}/sync', [SportsController::class, 'sync'])->name('sports.sync');
     Route::post('sports/import-featured', [SportsController::class, 'importFeatured'])->name('sports.import-featured');

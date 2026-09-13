@@ -23,4 +23,9 @@ class Short extends Model
     {
         return $this->hasMany(ShortInteraction::class);
     }
+
+    public function metrics(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ShortMetric::class);
+    }
 }

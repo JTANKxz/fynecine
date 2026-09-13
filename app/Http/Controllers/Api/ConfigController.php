@@ -50,6 +50,7 @@ class ConfigController extends Controller
             // Retorna o security_mode para que o front também possa omitir itens se quiser
             'security_mode' => (bool) $config->security_mode,
             'is_channels_active' => (bool) $config->is_channels_active,
+            'shorts_enabled' => (bool) $config->shorts_enabled,
             'rewards_status' => (bool) $config->rewards_status,
             
             // Redes Sociais

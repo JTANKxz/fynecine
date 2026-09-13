@@ -9,11 +9,19 @@ use App\Models\Season;
 use App\Models\Serie;
 use App\Models\Short;
 use App\Models\ShortInteraction;
+use App\Models\AppConfig;
+use App\Services\Shorts\ShortFeedService;
+use App\Services\Shorts\ShortInteractionRecorder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ShortController extends Controller
 {
+    private function ensureEnabled(): void
+    {
+        abort_unless(AppConfig::getSettings()->shorts_enabled, 404);
+    }
+
     private function profile(Request $request): ?Profile
     {
         $user = $request->user('sanctum');
@@ -29,72 +37,47 @@ class ShortController extends Controller
         return $user->profiles()->findOrFail($id);
     }
 
-    public function feed(Request $request): JsonResponse
+    public function feed(Request $request, ShortFeedService $feed): JsonResponse
     {
+        $this->ensureEnabled();
         $profile = $this->profile($request);
         $limit = min(max($request->integer('limit', 12), 1), 30);
-        $excluded = collect();
-        $recent = collect();
-        if ($profile) {
-            $excluded = ShortInteraction::query()->where('profile_id', $profile->id)
-                ->whereIn('type', ['like', 'hide', 'report'])->pluck('short_id');
-            $recent = ShortInteraction::query()->where('profile_id', $profile->id)->where('type', 'impression')
-                ->where('created_at', '>', now()->subDays(2))->latest()->limit(50)->pluck('short_id');
-        }
-        $shorts = Short::query()->where('is_active', true)->where('availability', '!=', 'invalid')
-            ->whereNotIn('id', $excluded)->whereNotIn('id', $recent)
-            ->orderByDesc('published_at')->limit(100)->get();
-        if ($profile && $shorts->isNotEmpty()) {
-            $liked = Short::query()->whereHas('interactions', fn ($q) => $q
-                ->where('profile_id', $profile->id)->where('type', 'like'))->get();
-            $categories = $liked->pluck('category')->filter()->countBy();
-            $relatedIds = $liked->pluck('related_id')->filter()->countBy();
-            $shorts = $shorts->map(function (Short $short) use ($categories, $relatedIds) {
-                $score = random_int(0, 9);
-                $score += ($categories[$short->category] ?? 0) * 30;
-                $score += ($relatedIds[$short->related_id] ?? 0) * 45;
-                return compact('short', 'score');
-            })->sortByDesc('score')->pluck('short')->take($limit)->values();
-        } else {
-            $shorts = $shorts->shuffle()->take($limit)->values();
-        }
-        if ($shorts->count() < $limit) {
-            $shorts = Short::query()->where('is_active', true)->where('availability', '!=', 'invalid')
-                ->whereNotIn('id', $excluded)->inRandomOrder()->limit($limit)->get();
-        }
-        if ($profile) {
-            foreach ($shorts as $short) {
-                ShortInteraction::updateOrCreate(
-                    ['short_id' => $short->id, 'user_id' => $profile->user_id, 'profile_id' => $profile->id, 'type' => 'impression'],
-                    ['metadata' => ['source' => 'feed']]
-                );
-            }
-        }
-        return response()->json(['data' => $shorts->map(fn (Short $short) => $this->payload($short, $profile)), 'next_cursor' => null]);
+        $shorts = $feed->generate($profile, $limit);
+        return response()->json([
+            'data' => $shorts->map(fn (Short $short) => $this->payload($short, $profile)),
+            'next_cursor' => null,
+            'ranking' => 'dynamic',
+        ]);
     }
 
-    public function interaction(Request $request, Short $short): JsonResponse
+    public function interaction(Request $request, Short $short, ShortInteractionRecorder $recorder): JsonResponse
     {
+        $this->ensureEnabled();
         $profile = $this->profile($request);
-        $data = $request->validate(['type' => 'required|in:like,hide,save,report,completion', 'watch_seconds' => 'nullable|integer|min:0']);
-        $key = ['short_id' => $short->id, 'user_id' => $request->user()->id, 'profile_id' => $profile->id, 'type' => $data['type']];
-        $existing = ShortInteraction::where($key)->first();
-        if ($data['type'] === 'like' && $existing) {
-            $existing->delete();
-            return response()->json(['active' => false, 'message' => 'Curtida removida.']);
+        abort_unless($profile, 400, 'Header Profile-Id é obrigatório.');
+        $data = $request->validate([
+            'type' => 'required|in:like,hide,save,report,delivery,view,progress,completion,skip,replay',
+            'watch_seconds' => 'nullable|integer|min:0', 'watch_percentage' => 'nullable|integer|min:0|max:100',
+            'session_id' => 'nullable|uuid',
+        ]);
+        if ($data['type'] === 'like') {
+            $active = $recorder->toggleLike($profile, $short, $data);
+            return response()->json(['active' => $active, 'message' => $active ? 'Curtida registrada.' : 'Curtida removida.']);
         }
-        ShortInteraction::updateOrCreate($key, ['watch_seconds' => $data['watch_seconds'] ?? null]);
+        $recorder->record($profile, $short, $data['type'], $data);
         return response()->json(['active' => true, 'message' => 'Interação registrada.']);
     }
 
     public function show(Request $request, Short $short): JsonResponse
     {
+        $this->ensureEnabled();
         abort_unless($short->is_active && $short->availability !== 'invalid', 404);
         return response()->json(['data' => $this->payload($short, $this->profile($request))]);
     }
 
     public function liked(Request $request): JsonResponse
     {
+        $this->ensureEnabled();
         $profile = $this->profile($request);
         abort_unless($profile, 400, 'Header Profile-Id é obrigatório.');
         $shorts = Short::query()->whereHas('interactions', fn ($q) => $q

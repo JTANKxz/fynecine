@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Championship;
+use App\Models\AppConfig;
 use App\Models\Team;
 use App\Services\Sports365Service;
 use Illuminate\Http\RedirectResponse;
@@ -77,11 +78,34 @@ class SportsController extends Controller
             report($exception);
         }
 
+        $gamesConfig = AppConfig::getSettings();
         return view('admin.sports.index', compact(
             'championships', 'selected', 'standings', 'games', 'sourceError',
             'teams', 'selectedTeam', 'teamForm', 'teamGames', 'catalog',
-            'catalogCountries', 'catalogCountryId', 'countries'
+            'catalogCountries', 'catalogCountryId', 'countries', 'gamesConfig'
         ));
+    }
+
+    public function updateGamesSettings(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'sports_games_banner_image' => ['nullable', 'string', 'max:1000'],
+            'sports_games_banner_upload' => ['nullable', 'image', 'max:4096'],
+            'sports_games_banner_url' => ['nullable', 'url', 'max:1000'],
+        ]);
+
+        $config = AppConfig::getSettings();
+        $image = $data['sports_games_banner_image'] ?? $config->sports_games_banner_image;
+        if ($request->hasFile('sports_games_banner_upload')) {
+            $image = $request->file('sports_games_banner_upload')->store('sports-banners', 'public');
+        }
+        $config->update([
+            'sports_games_banner_enabled' => $request->boolean('sports_games_banner_enabled'),
+            'sports_games_banner_image' => $image,
+            'sports_games_banner_url' => $data['sports_games_banner_url'] ?? null,
+        ]);
+
+        return back()->with('success', 'Banner FYNE GAMES atualizado.');
     }
 
     public function configure(Request $request, Championship $championship): RedirectResponse

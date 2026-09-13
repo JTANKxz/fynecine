@@ -38,6 +38,7 @@ class SettingController extends Controller
             'maintenance_title' => ['nullable', 'string', 'max:255'],
             'maintenance_description' => ['nullable', 'string'],
             'is_channels_active' => ['nullable', 'boolean'],
+            'shorts_enabled' => ['nullable', 'boolean'],
             'app_version' => ['nullable', 'string', 'max:50'],
             'contact_email' => ['nullable', 'email', 'max:100'],
             
@@ -140,6 +141,7 @@ class SettingController extends Controller
         $config->security_mode = $request->has('security_mode');
         $config->maintenance_mode = $request->has('maintenance_mode');
         $config->is_channels_active = $request->has('is_channels_active');
+        $config->shorts_enabled = $request->has('shorts_enabled');
         $config->custom_message_status = $request->has('custom_message_status');
         $config->update_skippable = $request->has('update_skippable');
         $config->update_status = $request->has('update_status');

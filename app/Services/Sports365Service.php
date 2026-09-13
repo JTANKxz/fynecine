@@ -23,10 +23,9 @@ class Sports365Service
             'competitions' => $competitionId,
             'live' => 'false',
             'withSeasonsFilter' => 'true',
-        ], "sports:365:standings:{$competitionId}", 20);
+        ], "sports:365:standings:{$competitionId}:v2", 20);
 
-        $standing = data_get($source, 'standings.0', []);
-        $rows = collect(data_get($standing, 'rows', []))
+        $rows = collect($this->extractStandingRows($source))
             ->map(fn (array $row) => $this->normalizeStandingRow($row))
             ->filter(fn (array $row) => filled($row['team']['name']))
             ->sortBy('position')
@@ -296,22 +295,39 @@ class Sports365Service
     /** @param array<string, mixed> $row @return array<string, mixed> */
     private function normalizeStandingRow(array $row): array
     {
-        $team = $this->normalizeTeam(is_array($row['competitor'] ?? null) ? $row['competitor'] : []);
-        $for = $this->integer($row['for'] ?? null);
-        $against = $this->integer($row['against'] ?? null);
+        $sourceTeam = is_array($row['competitor'] ?? null) ? $row['competitor'] : (is_array($row['team'] ?? null) ? $row['team'] : []);
+        $team = $this->normalizeTeam($sourceTeam);
+        $stats = is_array($row['stats'] ?? null) ? $row['stats'] : [];
+        $for = $this->firstInteger([$row['for'] ?? null, $row['goalsFor'] ?? null, $stats['for'] ?? null, $stats['goalsFor'] ?? null]);
+        $against = $this->firstInteger([$row['against'] ?? null, $row['goalsAgainst'] ?? null, $stats['against'] ?? null, $stats['goalsAgainst'] ?? null]);
 
         return [
-            'position' => $this->integer($row['position'] ?? null),
+            'position' => $this->firstInteger([$row['position'] ?? null, $row['rank'] ?? null, $row['number'] ?? null]),
             'team' => $team,
-            'played' => $this->integer($row['gamePlayed'] ?? null),
-            'wins' => $this->integer($row['gamesWon'] ?? null),
-            'draws' => $this->integer($row['gamesEven'] ?? null),
-            'losses' => $this->integer($row['gamesLost'] ?? null),
-            'goals_for' => $for,
-            'goals_against' => $against,
-            'goal_difference' => $this->integer($row['ratio'] ?? null) ?? (($for !== null && $against !== null) ? $for - $against : null),
-            'points' => $this->integer($row['points'] ?? null),
+            'played' => $this->firstInteger([$row['gamePlayed'] ?? null, $row['played'] ?? null, $row['gamesPlayed'] ?? null, $stats['played'] ?? null]),
+            'wins' => $this->firstInteger([$row['gamesWon'] ?? null, $row['wins'] ?? null, $stats['wins'] ?? null]),
+            'draws' => $this->firstInteger([$row['gamesEven'] ?? null, $row['draws'] ?? null, $stats['draws'] ?? null]),
+            'losses' => $this->firstInteger([$row['gamesLost'] ?? null, $row['losses'] ?? null, $stats['losses'] ?? null]),
+            'goals_for' => $for, 'goals_against' => $against,
+            'goal_difference' => $this->firstInteger([$row['ratio'] ?? null, $row['goalDifference'] ?? null, $stats['goalDifference'] ?? null]) ?? (($for !== null && $against !== null) ? $for - $against : null),
+            'points' => $this->firstInteger([$row['points'] ?? null, $row['pts'] ?? null, $stats['points'] ?? null]),
         ];
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function extractStandingRows(array $source): array
+    {
+        foreach (['standings.0.rows', 'standings.0.table.rows', 'standings.0.table', 'standings.rows', 'table.rows'] as $path) {
+            $rows = data_get($source, $path);
+            if (is_array($rows) && array_is_list($rows) && $rows !== []) return $rows;
+        }
+        return [];
+    }
+
+    private function firstInteger(array $values): ?int
+    {
+        foreach ($values as $value) if (is_numeric($value)) return (int) $value;
+        return null;
     }
 
     /** @param array<string, mixed> $team */

@@ -101,8 +101,8 @@ class BrasileiraoScheduleService
             ]);
 
             $event->fill([
-                'title' => $game['home_team']['name'].' x '.$game['away_team']['name'],
-                'description' => trim($game['competition'].($game['round'] ? ' · Rodada '.$game['round'] : '')),
+                'title' => $championship->name,
+                'description' => $game['round'] ? 'Rodada '.$game['round'] : null,
                 'home_team' => $game['home_team']['name'],
                 'away_team' => $game['away_team']['name'],
                 'home_team_id' => $homeTeam?->id,

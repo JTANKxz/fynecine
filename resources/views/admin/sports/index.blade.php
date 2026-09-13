@@ -37,14 +37,26 @@
                 <div><h2 class="font-bold text-white">Campeonatos em destaque</h2><p class="mt-1 text-xs text-neutral-400">Fonte: 365Scores. Selecione os campeonatos que deseja ativar e sincronizar.</p></div>
                 <button class="rounded-xl bg-netflix px-4 py-2.5 text-xs font-black text-white">IMPORTAR SELECIONADOS</button>
             </div>
+            <div class="mt-4 flex flex-wrap gap-2 border-y border-neutral-800 py-3">
+                <a href="{{ route('admin.sports.index', ['catalog' => 1]) }}" class="rounded-full px-3 py-1 text-xs font-bold {{ !$catalogCountryId ? 'bg-netflix text-white' : 'bg-neutral-800 text-neutral-400 hover:text-white' }}">Todos</a>
+                @foreach($catalogCountries as $country)
+                    <a href="{{ route('admin.sports.index', ['catalog' => 1, 'catalog_country' => $country['id']]) }}" class="rounded-full px-3 py-1 text-xs font-bold {{ $catalogCountryId === $country['id'] ? 'bg-netflix text-white' : 'bg-neutral-800 text-neutral-400 hover:text-white' }}">{{ $country['name'] }}</a>
+                @endforeach
+            </div>
             <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 @foreach($catalog as $item)
                     @php $configured = $championships->first(fn ($championship) => $championship->external_provider === '365scores' && (string) $championship->external_id === (string) $item['source_id']); @endphp
                     <label class="flex cursor-pointer gap-3 rounded-xl border border-neutral-800 bg-black/30 p-3 hover:border-neutral-600 transition">
                         <input class="mt-1 accent-netflix" type="checkbox" name="competitions[]" value="{{ $item['source_id'] }}" @checked($configured)>
+                        @if($item['logo_url'])
+                            <img src="{{ $item['logo_url'] }}" alt="" class="mt-0.5 h-11 w-11 shrink-0 object-contain" loading="lazy">
+                        @endif
                         <span class="min-w-0 flex-1">
                             <span class="block truncate font-bold text-white">{{ $item['name'] }}</span>
                             <span class="mt-1 block text-xs text-neutral-500">{{ $item['country_name'] ?: 'Internacional' }} · ID {{ $item['source_id'] }}</span>
+                            @if($item['current_season_name'] || $item['current_stage_name'])
+                                <span class="mt-1 block text-[10px] text-neutral-500">{{ $item['current_season_name'] }} · {{ $item['current_stage_name'] ?: 'Fase atual' }}</span>
+                            @endif
                             <span class="mt-2 inline-flex rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] font-bold {{ $item['has_live_standings'] ? 'text-emerald-400' : 'text-neutral-400' }}">{{ $item['has_live_standings'] ? 'TABELA AO VIVO' : 'CLASSIFICAÇÃO' }}</span>
                         </span>
                     </label>
@@ -67,8 +79,12 @@
                     @forelse($championships as $championship)
                         <div class="p-4 {{ $selected?->id === $championship->id ? 'bg-neutral-800/40' : '' }}">
                             <div class="flex flex-wrap items-center justify-between gap-3">
-                                <a href="{{ route('admin.sports.index', ['championship' => $championship->id]) }}" class="min-w-0">
-                                    <div class="font-bold text-white">{{ $championship->name }}</div>
+                                <a href="{{ route('admin.sports.index', ['championship' => $championship->id]) }}" class="flex min-w-0 items-center gap-3">
+                                    @if($championship->image_url)
+                                        <img src="{{ $championship->image_url }}" alt="" class="h-9 w-9 shrink-0 object-contain" loading="lazy">
+                                    @endif
+                                    <div class="min-w-0">
+                                    <div class="truncate font-bold text-white">{{ $championship->name }}</div>
                                     <div class="mt-1 text-xs text-neutral-500">
                                         @if($championship->is_sports_enabled)
                                             365Scores #{{ $championship->external_id ?: 'sem ID' }}
@@ -76,6 +92,7 @@
                                         @else
                                             Não integrado
                                         @endif
+                                    </div>
                                     </div>
                                 </a>
                                 <div class="flex items-center gap-2 text-[10px] font-black uppercase">
@@ -104,7 +121,7 @@
                                         <input name="sport_id" value="{{ $championship->sport_id ?: 1 }}" type="number" min="1" class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
                                     </label>
                                     <label class="text-xs text-neutral-400">ID do país (opcional)
-                                        <input name="country_id" value="{{ $championship->country_id }}" type="number" min="1" class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
+                                        <input name="country_id" value="{{ $championship->country_id }}" type="number" min="1" list="sportsCountries" class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
                                     </label>
                                     <label class="text-xs text-neutral-400 sm:col-span-2 flex items-center gap-2">
                                         <input type="checkbox" name="auto_sync" value="1" @checked($championship->auto_sync) class="accent-netflix"> Sincronizar próximos jogos automaticamente a cada 30 minutos
@@ -193,4 +210,9 @@
         </aside>
     </div>
 </section>
+<datalist id="sportsCountries">
+    @foreach($countries as $country)
+        <option value="{{ $country['id'] }}">{{ $country['name'] }}</option>
+    @endforeach
+</datalist>
 @endsection

@@ -28,7 +28,9 @@ class SportsController extends Controller
 
         if ($selected?->is_sports_enabled && $selected->external_provider === '365scores' && $selected->external_id) {
             try {
-                $standings = $sports->standings($selected);
+                if ($selected->has_current_stage_standings !== false) {
+                    $standings = $sports->standings($selected);
+                }
                 $games = $sports->upcomingGames($selected);
             } catch (\Throwable $exception) {
                 report($exception);
@@ -45,6 +47,9 @@ class SportsController extends Controller
         $teamForm = collect();
         $teamGames = collect();
         $catalog = collect();
+        $catalogCountries = collect();
+        $countries = collect();
+        $catalogCountryId = $request->integer('catalog_country') ?: null;
 
         if ($selectedTeam) {
             try {
@@ -58,16 +63,24 @@ class SportsController extends Controller
 
         if ($request->boolean('catalog')) {
             try {
-                $catalog = $sports->featuredCompetitions();
+                $catalogCountries = $sports->featuredCountries();
+                $catalog = $sports->featuredCompetitions($catalogCountryId);
             } catch (\Throwable $exception) {
                 report($exception);
                 $sourceError ??= 'Não foi possível buscar os campeonatos em destaque agora.';
             }
         }
 
+        try {
+            $countries = $sports->countries();
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
         return view('admin.sports.index', compact(
             'championships', 'selected', 'standings', 'games', 'sourceError',
-            'teams', 'selectedTeam', 'teamForm', 'teamGames', 'catalog'
+            'teams', 'selectedTeam', 'teamForm', 'teamGames', 'catalog',
+            'catalogCountries', 'catalogCountryId', 'countries'
         ));
     }
 
@@ -143,6 +156,18 @@ class SportsController extends Controller
                     'external_id' => (string) $item['source_id'],
                     'sport_id' => $item['sport_id'],
                     'country_id' => $item['country_id'],
+                    'current_season_num' => $item['current_season_num'],
+                    'current_season_name' => $item['current_season_name'],
+                    'current_stage_num' => $item['current_stage_num'],
+                    'current_stage_name' => $item['current_stage_name'],
+                    'stage_type' => $item['stage_type'],
+                    'has_standings' => true,
+                    'has_live_standings' => $item['has_live_standings'],
+                    'has_current_stage_standings' => $item['has_current_stage_standings'],
+                    'has_brackets' => $item['has_brackets'],
+                    'has_stats' => $item['has_stats'],
+                    'provider_color' => $item['color'],
+                    'image_url' => $item['logo_url'],
                     'is_sports_enabled' => true,
                     'auto_sync' => true,
                     'display_order' => $championship->display_order ?: 100 + $count,

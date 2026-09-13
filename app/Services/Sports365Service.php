@@ -40,12 +40,13 @@ class Sports365Service
     }
 
     /** @return Collection<int, array<string, mixed>> */
-    public function featuredCompetitions(): Collection
+    public function featuredCompetitions(?int $countryId = null): Collection
     {
         $source = $this->fetch('competitions/featured/', [
             'sports' => 1,
-            'type' => 'standings',
-        ], 'sports:365:featured-competitions:v1', 360);
+            'withSeasons' => 'true',
+            'type' => 'stats',
+        ], 'sports:365:featured-competitions:stats:v1', 360);
         $countries = collect(data_get($source, 'countries', []))->keyBy('id');
 
         return collect(data_get($source, 'competitions', []))
@@ -55,6 +56,10 @@ class Sports365Service
                 && (bool) ($competition['isActive'] ?? true))
             ->map(function (array $competition) use ($countries) {
                 $country = $countries->get($competition['countryId'] ?? null, []);
+                $season = collect($competition['seasons'] ?? [])
+                    ->firstWhere('num', $competition['currentSeasonNum'] ?? null) ?? [];
+                $stage = collect($season['stages'] ?? [])
+                    ->firstWhere('num', $competition['currentStageNum'] ?? null) ?? [];
 
                 return [
                     'source_id' => (int) $competition['id'],
@@ -65,10 +70,54 @@ class Sports365Service
                     'color' => $competition['color'] ?? null,
                     'has_live_standings' => (bool) ($competition['hasLiveStandings'] ?? false),
                     'has_stats' => (bool) ($competition['hasStats'] ?? false),
+                    'has_brackets' => (bool) ($competition['hasBrackets'] ?? false),
+                    'has_current_stage_standings' => (bool) ($competition['hasCurrentStageStandings'] ?? false),
+                    'standings_name' => $competition['tableName'] ?? 'Classificação',
+                    'brackets_name' => $competition['bracketsName'] ?? 'Mata-Mata',
+                    'current_season_num' => isset($competition['currentSeasonNum']) ? (int) $competition['currentSeasonNum'] : null,
+                    'current_season_name' => $season['name'] ?? null,
+                    'current_stage_num' => isset($competition['currentStageNum']) ? (int) $competition['currentStageNum'] : null,
+                    'current_stage_name' => $stage['name'] ?? null,
+                    'stage_type' => isset($stage['stageType']) ? (int) $stage['stageType'] : null,
                     'image_version' => $competition['imageVersion'] ?? null,
+                    'logo_url' => $this->competitionLogoUrl(
+                        (int) $competition['id'],
+                        isset($competition['countryId']) ? (int) $competition['countryId'] : null,
+                        isset($competition['imageVersion']) ? (int) $competition['imageVersion'] : null,
+                    ),
                 ];
             })
+            ->when($countryId, fn (Collection $items) => $items->where('country_id', $countryId))
             ->sortByDesc('has_live_standings')
+            ->values();
+    }
+
+    /** @return Collection<int, array{id:int,name:string}> */
+    public function featuredCountries(): Collection
+    {
+        $source = $this->fetch('competitions/featured/', [
+            'sports' => 1,
+            'withSeasons' => 'true',
+            'type' => 'stats',
+        ], 'sports:365:featured-competitions:stats:v1', 360);
+
+        return collect(data_get($source, 'countries', []))
+            ->filter(fn ($country) => isset($country['id'], $country['name']))
+            ->map(fn (array $country) => ['id' => (int) $country['id'], 'name' => $country['name']])
+            ->values();
+    }
+
+    /** @return Collection<int, array{id:int,name:string}> */
+    public function countries(): Collection
+    {
+        $source = $this->fetch('countries/', [
+            'sports' => 1,
+        ], 'sports:365:countries:football:v1', 1440);
+
+        return collect(data_get($source, 'countries', []))
+            ->filter(fn ($country) => is_array($country) && isset($country['id'], $country['name']))
+            ->map(fn (array $country) => ['id' => (int) $country['id'], 'name' => $country['name']])
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
     }
 
@@ -171,8 +220,8 @@ class Sports365Service
             ]);
 
             $event->fill([
-                'title' => $game['home_team']['name'].' x '.$game['away_team']['name'],
-                'description' => $game['competition'].($game['round'] ? ' · Rodada '.$game['round'] : ''),
+                'title' => $championship->name,
+                'description' => $game['round'] ? 'Rodada '.$game['round'] : null,
                 'home_team' => $game['home_team']['name'],
                 'away_team' => $game['away_team']['name'],
                 'home_team_id' => $homeTeam?->id,
@@ -310,6 +359,15 @@ class Sports365Service
         }
 
         return (int) $championship->external_id;
+    }
+
+    private function competitionLogoUrl(int $competitionId, ?int $countryId, ?int $imageVersion): ?string
+    {
+        if ($competitionId < 1 || ! $countryId || ! $imageVersion) {
+            return null;
+        }
+
+        return "https://imagecache.365scores.com/image/upload/f_png,w_64,h_64,c_limit,q_auto:eco,dpr_2,d_Countries:Round:{$countryId}.png/v{$imageVersion}/Competitions/{$competitionId}";
     }
 
     private function integer(mixed $value): ?int

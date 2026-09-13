@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 class FootballStandingsController extends Controller
 {
     private const PROVIDER_URL = 'https://webws.365scores.com/web/standings/';
-    private const CACHE_KEY = 'football:standings:365scores:brasileirao-serie-a:v1';
+    private const CACHE_KEY = 'football:standings:365scores:brasileirao-serie-a:v2';
 
     /**
      * Tabela do Brasileirão Série A, normalizada para os clientes do Fynecine.
@@ -201,14 +201,17 @@ class FootballStandingsController extends Controller
         $goalsAgainst = $this->number($row, $stats, ['goalsAgainst', 'goals_against', 'conceded', 'against']);
         $goalDifference = $this->number($row, $stats, ['goalDifference', 'goal_diff', 'difference']);
 
+        $teamId = data_get($team, 'id') ?? data_get($row, 'teamId');
+
         return [
             'position' => $this->number($row, [], ['position', 'rank', 'place', 'number']),
             'team' => [
-                'id' => data_get($team, 'id') ?? data_get($row, 'teamId'),
+                'id' => $teamId,
                 'name' => data_get($team, 'name') ?? data_get($team, 'displayName')
                     ?? data_get($row, 'teamName') ?? data_get($row, 'name'),
                 'logo' => data_get($team, 'logo') ?? data_get($team, 'image') ?? data_get($team, 'imageUrl')
-                    ?? data_get($row, 'teamLogo') ?? data_get($row, 'logo'),
+                    ?? data_get($row, 'teamLogo') ?? data_get($row, 'logo')
+                    ?? $this->teamLogoUrl($teamId, data_get($team, 'imageVersion')),
             ],
             'played' => $played,
             'wins' => $wins,
@@ -233,6 +236,16 @@ class FootballStandingsController extends Controller
         }
 
         return null;
+    }
+
+    private function teamLogoUrl(mixed $teamId, mixed $imageVersion): ?string
+    {
+        if (! is_numeric($teamId)) {
+            return null;
+        }
+
+        $version = is_numeric($imageVersion) ? (int) $imageVersion : 1;
+        return "https://imagecache.365scores.com/image/upload/f_png,w_82,h_82,c_limit,q_auto:eco,dpr_2,d_Competitors:default1.png/v{$version}/Competitors/{$teamId}";
     }
 
     /** @param array<string, mixed> $source @param array<int, string> $paths @return array<string, mixed> */

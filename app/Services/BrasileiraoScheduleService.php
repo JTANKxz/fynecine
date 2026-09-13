@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 class BrasileiraoScheduleService
 {
     private const PROVIDER_URL = 'https://webws.365scores.com/web/games/current/';
-    private const CACHE_KEY = 'football:365scores:brasileirao:upcoming-games:v1';
+    private const CACHE_KEY = 'football:365scores:brasileirao:upcoming-games:v2';
     private const PROVIDER = '365scores';
     private const COMPETITION_ID = 113;
 
@@ -138,10 +138,12 @@ class BrasileiraoScheduleService
             'home_team' => [
                 'source_id' => $home['id'] ?? null,
                 'name' => $home['name'] ?? 'Mandante',
+                'logo' => $this->teamLogoUrl($home['id'] ?? null, $home['imageVersion'] ?? null),
             ],
             'away_team' => [
                 'source_id' => $away['id'] ?? null,
                 'name' => $away['name'] ?? 'Visitante',
+                'logo' => $this->teamLogoUrl($away['id'] ?? null, $away['imageVersion'] ?? null),
             ],
             'venue' => data_get($game, 'venue.name'),
         ];
@@ -154,5 +156,15 @@ class BrasileiraoScheduleService
         }
 
         return Team::firstOrCreate(['name' => trim($name)]);
+    }
+
+    private function teamLogoUrl(mixed $teamId, mixed $imageVersion): ?string
+    {
+        if (! is_numeric($teamId)) {
+            return null;
+        }
+
+        $version = is_numeric($imageVersion) ? (int) $imageVersion : 1;
+        return "https://imagecache.365scores.com/image/upload/f_png,w_82,h_82,c_limit,q_auto:eco,dpr_2,d_Competitors:default1.png/v{$version}/Competitors/{$teamId}";
     }
 }

@@ -86,13 +86,9 @@
                                         </button>
 
                                         {{-- Botão mágico Importar --}}
-                                        <form action="{{ route('admin.requests.autoimport', $req) }}" method="POST" class="inline" onsubmit="return confirmAutoImport(this, @js($req->title))">
-                                            @csrf
-                                            <input type="hidden" name="notify_user" value="0">
-                                            <button type="submit" class="bg-netflix hover:bg-red-700 text-white px-3 py-1.5 rounded mr-2 text-xs font-bold transition">
-                                                <i class="fa-solid fa-download mr-1"></i> Auto-Importar
-                                            </button>
-                                        </form>
+                                        <button type="button" onclick="openAutoImportModal('{{ route('admin.requests.autoimport', $req) }}', @js($req->title))" class="bg-netflix hover:bg-red-700 text-white px-3 py-1.5 rounded mr-2 text-xs font-bold transition">
+                                            <i class="fa-solid fa-download mr-1"></i> Auto-Importar
+                                        </button>
 
                                         <form action="{{ route('admin.requests.update', $req) }}" method="POST" class="inline">
                                             @csrf @method('PUT')
@@ -125,6 +121,52 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- MODAL DE AUTO-IMPORTAÇÃO -->
+<div id="autoImportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4">
+    <div class="w-full max-w-lg overflow-hidden rounded-2xl border border-neutral-700 bg-neutral-900 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-neutral-800 bg-neutral-800/50 p-5">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-netflix">Pedido aprovado</p>
+                <h3 class="mt-1 text-lg font-bold text-white">Importar para o catálogo</h3>
+            </div>
+            <button type="button" onclick="closeAutoImportModal()" class="text-xl text-neutral-400 hover:text-white">&times;</button>
+        </div>
+        <form id="autoImportForm" method="POST" class="space-y-5 p-5">
+            @csrf
+            <div class="rounded-xl border border-neutral-800 bg-black/20 p-3">
+                <div class="text-xs text-neutral-500">Conteúdo a importar</div>
+                <div id="autoImportTarget" class="mt-1 truncate font-bold text-white"></div>
+                <p class="mt-2 text-xs leading-relaxed text-neutral-400">Filmes e séries já existentes também serão aprovados sem criar duplicidade.</p>
+            </div>
+
+            <div>
+                <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-neutral-400">Mensagem de aprovação</label>
+                <textarea id="autoImportMessage" name="notification_message" rows="4" class="w-full rounded-xl border border-neutral-700 bg-neutral-950 p-3 text-sm text-white outline-none transition focus:border-netflix" placeholder="Escreva a mensagem que o usuário receberá..."></textarea>
+            </div>
+
+            <div>
+                <label class="mb-2 block text-xs font-bold uppercase tracking-wide text-neutral-400">Notificar usuário</label>
+                <div class="grid gap-2 sm:grid-cols-2">
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-700 bg-black/20 p-3 transition hover:border-neutral-500">
+                        <input type="checkbox" name="send_in_app" value="1" checked class="h-4 w-4 accent-netflix">
+                        <span><span class="block text-sm font-bold text-white">No aplicativo</span><span class="text-xs text-neutral-500">Central de notificações</span></span>
+                    </label>
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-700 bg-black/20 p-3 transition hover:border-neutral-500">
+                        <input type="checkbox" name="send_push" value="1" class="h-4 w-4 accent-netflix">
+                        <span><span class="block text-sm font-bold text-white">Notificação push</span><span class="text-xs text-neutral-500">Aviso no dispositivo</span></span>
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-neutral-500">Você pode marcar os dois ou desmarcar ambos para apenas importar.</p>
+            </div>
+
+            <div class="flex flex-col-reverse gap-2 border-t border-neutral-800 pt-4 sm:flex-row sm:justify-end">
+                <button type="button" onclick="closeAutoImportModal()" class="rounded-xl border border-neutral-700 px-4 py-2.5 text-sm font-bold text-neutral-300 hover:text-white">Cancelar</button>
+                <button type="submit" class="rounded-xl bg-netflix px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700"><i class="fa-solid fa-download mr-2"></i>Importar e aprovar</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -211,13 +253,17 @@
 
 @push('scripts')
 <script>
-    function confirmAutoImport(form, title) {
-        if (!confirm(`Importar "${title}" para o catálogo?`)) {
-            return false;
-        }
+    function openAutoImportModal(action, title) {
+        document.getElementById('autoImportForm').action = action;
+        document.getElementById('autoImportTarget').textContent = title;
+        document.getElementById('autoImportMessage').value = `Seu pedido de "${title}" foi atendido e já está disponível no catálogo.`;
+        document.getElementById('autoImportModal').classList.remove('hidden');
+        document.getElementById('autoImportModal').classList.add('flex');
+    }
 
-        form.querySelector('[name="notify_user"]').value = confirm('Deseja notificar o usuário de que o pedido foi atendido?') ? '1' : '0';
-        return true;
+    function closeAutoImportModal() {
+        document.getElementById('autoImportModal').classList.add('hidden');
+        document.getElementById('autoImportModal').classList.remove('flex');
     }
 
     function openResponseModal(action, userName, requestTitle) {

@@ -92,7 +92,9 @@ class RequestController extends Controller
     public function autoImport(Request $requestData, ContentRequest $request)
     {
         $requestData->validate([
-            'notify_user' => ['nullable', 'boolean'],
+            'notification_message' => ['nullable', 'string', 'max:1000'],
+            'send_in_app' => ['nullable', 'boolean'],
+            'send_push' => ['nullable', 'boolean'],
         ]);
 
         $tmdbController = app(\App\Http\Controllers\Admin\TMDBController::class);
@@ -109,12 +111,20 @@ class RequestController extends Controller
             if ($response && $response->getStatusCode() === 200) {
                 $request->update(['status' => 'approved']);
 
-                if ($requestData->boolean('notify_user')) {
-                    $this->notifyAutoImport($request);
+                $sendInApp = $requestData->boolean('send_in_app');
+                $sendPush = $requestData->boolean('send_push');
+
+                if ($sendInApp || $sendPush) {
+                    $this->notifyAutoImport(
+                        $request,
+                        $requestData->input('notification_message'),
+                        $sendInApp,
+                        $sendPush,
+                    );
                 }
 
                 $message = "O título '{$request->title}' foi importado automaticamente para o catálogo!";
-                if ($requestData->boolean('notify_user')) {
+                if ($sendInApp || $sendPush) {
                     $message .= ' O usuário foi notificado.';
                 }
 
@@ -128,7 +138,7 @@ class RequestController extends Controller
         }
     }
 
-    private function notifyAutoImport(ContentRequest $request): void
+    private function notifyAutoImport(ContentRequest $request, ?string $message, bool $sendInApp, bool $sendPush): void
     {
         $user = $request->user;
         if (! $user) {
@@ -136,20 +146,23 @@ class RequestController extends Controller
         }
 
         $title = 'Seu pedido está disponível!';
-        $content = "{$request->title} foi adicionado ao catálogo.";
+        $content = filled($message) ? trim($message) : "{$request->title} foi adicionado ao catálogo.";
 
-        Notification::create([
-            'title' => $title,
-            'content' => $content,
-            'action_type' => 'none',
-            'action_value' => null,
-            'user_id' => $user->id,
-            'segment' => 'individual',
-            'is_in_app' => true,
-            'push_status' => 'pending',
-        ]);
+        if ($sendInApp) {
+            Notification::create([
+                'title' => $title,
+                'content' => $content,
+                'action_type' => 'none',
+                'action_value' => null,
+                'user_id' => $user->id,
+                'segment' => 'individual',
+                'is_in_app' => true,
+                'push_status' => $sendPush ? 'pending' : 'none',
+            ]);
+        }
 
-        try {
+        if ($sendPush) {
+            try {
             $tokens = FcmDevice::where('user_id', $user->id)->pluck('device_token')->all();
             if ($tokens) {
                 $this->fcmService->sendPush($tokens, [
@@ -159,8 +172,9 @@ class RequestController extends Controller
                     'action_value' => null,
                 ]);
             }
-        } catch (\Throwable $exception) {
-            report($exception);
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
         }
     }
 }

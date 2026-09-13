@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\SerieController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\FootballStandingsController;
 use App\Http\Controllers\Api\NetworkController;
 use App\Http\Controllers\Api\HomeSectionController;
 use App\Http\Controllers\Api\ShortController;
@@ -67,6 +68,9 @@ Route::middleware('api.token')->group(function () {
     // Eventos Ao Vivo
     Route::get('/events', [\App\Http\Controllers\Api\EventController::class, 'index']);
     Route::get('/events/{id}', [\App\Http\Controllers\Api\EventController::class, 'show']);
+
+    // Futebol: tabela normalizada pelo backend, sem expor o formato instável do provedor.
+    Route::get('/football/brasileirao/standings', [FootballStandingsController::class, 'brasileirao']);
 
     // Planos de Assinatura (Para página de Pricing/Vendas)
     Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'plans']);

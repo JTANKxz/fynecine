@@ -93,6 +93,7 @@ Route::middleware('api.token')->group(function () {
     // Shorts podem ser descobertos por visitantes. A personalização do feed e
     // as interações continuam vinculadas ao usuário/perfil quando autenticado.
     Route::get('/shorts/feed', [ShortController::class, 'feed']);
+    Route::get('/shorts/{short}', [ShortController::class, 'show'])->whereNumber('short');
 
     // Gerenciamento de Dispositivos (Apenas Usuário Autenticado)
     Route::middleware('auth:sanctum')->prefix('account/devices')->group(function () {

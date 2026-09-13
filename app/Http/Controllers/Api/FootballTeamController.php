@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Championship;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -12,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 class FootballTeamController extends Controller
 {
     private const BASE_URL = 'https://webws.365scores.com/web/';
-    private const BRASILEIRAO_ID = 113;
 
     /**
      * Perfil esportivo enxuto para o app: agenda, resultados recentes e a
@@ -21,19 +21,21 @@ class FootballTeamController extends Controller
     public function show(int $teamId): JsonResponse
     {
         try {
-            $payload = Cache::remember("football:365scores:team:{$teamId}:v1", now()->addMinutes(10), function () use ($teamId) {
+            $payload = Cache::remember("football:365scores:team:{$teamId}:v2", now()->addMinutes(10), function () use ($teamId) {
                 $recent = $this->fetch('competitors/recentForm', [
                     'competitor' => $teamId,
                     'numOfGames' => 5,
                 ]);
                 $current = $this->fetch('games/current/', ['competitors' => $teamId]);
-                $standings = $this->fetch('standings/', [
-                    'competitions' => self::BRASILEIRAO_ID,
-                    'live' => 'false',
-                    'withSeasonsFilter' => 'true',
-                ]);
+                $championships = Championship::query()->where('is_sports_enabled', true)
+                    ->where('external_provider', '365scores')->whereNotNull('external_id')->get();
+                $standings = $championships->map(function (Championship $championship) {
+                    return ['championship' => $championship, 'source' => $this->fetch('standings/', [
+                        'competitions' => $championship->external_id, 'live' => 'false', 'withSeasonsFilter' => 'true',
+                    ])];
+                });
 
-                $team = $this->findTeam($teamId, $recent, $current, $standings);
+                $team = $this->findTeam($teamId, $recent, $current, ...$standings->pluck('source')->all());
                 if ($team === null) {
                     throw new \RuntimeException('Time não encontrado na fonte esportiva.');
                 }
@@ -58,7 +60,7 @@ class FootballTeamController extends Controller
                     'team' => $team,
                     'upcoming_games' => $upcoming,
                     'recent_games' => $latest,
-                    'standings' => $this->teamStandings($standings, $teamId),
+                    'standings' => $standings->flatMap(fn (array $item) => $this->teamStandings($item['source'], $teamId, $item['championship']))->values(),
                 ];
             });
 
@@ -104,14 +106,14 @@ class FootballTeamController extends Controller
     }
 
     /** @return array<int, array<string, mixed>> */
-    private function teamStandings(array $source, int $teamId): array
+    private function teamStandings(array $source, int $teamId, Championship $fallback): array
     {
         $competition = data_get($source, 'competitions.0', []);
         $rows = data_get($source, 'standings.0.rows', []);
         return collect($rows)->filter(fn ($row) => is_array($row) && (int) data_get($row, 'competitor.id', data_get($row, 'team.id')) === $teamId)
             ->map(function (array $row) use ($competition) {
                 return [
-                    'competition' => ['id' => data_get($competition, 'id', self::BRASILEIRAO_ID), 'name' => data_get($competition, 'name', 'Brasileirão Série A')],
+                    'competition' => ['id' => data_get($competition, 'id', $fallback->id), 'name' => data_get($competition, 'name', $fallback->name)],
                     'position' => $this->integer(data_get($row, 'position', data_get($row, 'rank'))),
                     'points' => $this->integer(data_get($row, 'points')),
                     'played' => $this->integer(data_get($row, 'gamePlayed', data_get($row, 'played'))),

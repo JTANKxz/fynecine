@@ -87,6 +87,12 @@ class ShortController extends Controller
         return response()->json(['active' => true, 'message' => 'Interação registrada.']);
     }
 
+    public function show(Request $request, Short $short): JsonResponse
+    {
+        abort_unless($short->is_active && $short->availability !== 'invalid', 404);
+        return response()->json(['data' => $this->payload($short, $this->profile($request))]);
+    }
+
     public function liked(Request $request): JsonResponse
     {
         $profile = $this->profile($request);

@@ -15,11 +15,12 @@ class FootballCompetitionController extends Controller
             ->where('is_sports_enabled', true)
             ->where('external_provider', '365scores')
             ->whereNotNull('external_id')
-            ->orderBy('display_order')->orderBy('name')->get();
+            ->orderByDesc('is_featured')->orderBy('display_order')->orderBy('name')->get();
 
         return response()->json([
             'provider' => '365scores',
             'competitions' => $competitions->map(fn (Championship $item) => $this->competition($item))->values(),
+            'featured_ids' => $competitions->where('is_featured', true)->pluck('id')->values(),
         ])->header('Cache-Control', 'public, max-age=300');
     }
 
@@ -45,7 +46,7 @@ class FootballCompetitionController extends Controller
 
     private function competition(Championship $item): array
     {
-        return ['id' => $item->id, 'source_id' => (int) $item->external_id, 'name' => $item->name, 'season' => $item->current_season_name, 'logo' => $item->image_url, 'color' => $item->provider_color, 'has_standings' => (bool) $item->has_standings];
+        return ['id' => $item->id, 'source_id' => (int) $item->external_id, 'name' => $item->name, 'season' => $item->current_season_name, 'logo' => $item->image_url, 'color' => $item->provider_color, 'is_featured' => (bool) $item->is_featured, 'has_standings' => (bool) $item->has_standings];
     }
 
     private function mapStanding(array $row): array

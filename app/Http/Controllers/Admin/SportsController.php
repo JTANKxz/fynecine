@@ -91,6 +91,7 @@ class SportsController extends Controller
             'sport_id' => ['nullable', 'integer', 'min:1'],
             'country_id' => ['nullable', 'integer', 'min:1'],
             'display_order' => ['nullable', 'integer', 'min:0', 'max:999'],
+            'is_featured' => ['nullable', 'boolean'],
             'image_url' => ['nullable', 'string', 'max:500'],
             'image_upload' => ['nullable', 'image', 'max:4096'],
             'remove_image' => ['nullable', 'boolean'],
@@ -107,6 +108,7 @@ class SportsController extends Controller
             'sport_id' => $enabled ? ($data['sport_id'] ?? 1) : null,
             'country_id' => $enabled ? ($data['country_id'] ?? null) : null,
             'is_sports_enabled' => $enabled,
+            'is_featured' => $enabled && $request->boolean('is_featured'),
             'auto_sync' => $enabled && $request->boolean('auto_sync'),
             'display_order' => $data['display_order'] ?? 0,
             'image_url' => $imageUrl,
@@ -178,6 +180,7 @@ class SportsController extends Controller
                     // Nunca substitui uma capa escolhida manualmente no painel.
                     'image_url' => $championship->image_url ?: $item['logo_url'],
                     'is_sports_enabled' => true,
+                    'is_featured' => $championship->is_featured ?? ($count < 4),
                     'auto_sync' => true,
                     'display_order' => $championship->display_order ?: 100 + $count,
                 ]);

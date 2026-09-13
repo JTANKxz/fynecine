@@ -148,7 +148,7 @@ class Sports365Service
     }
 
     /** @return Collection<int, array<string, mixed>> */
-    public function recentGames(Championship $championship, int $limit = 4): Collection
+    public function recentGames(Championship $championship, int $limit = 5): Collection
     {
         $competitionId = $this->competitionId($championship);
         $source = $this->fetch('games/current/', ['competitions' => $competitionId], "sports:365:games:{$competitionId}", 30);

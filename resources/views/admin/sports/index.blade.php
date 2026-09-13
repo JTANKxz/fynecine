@@ -111,6 +111,9 @@
                                     <label class="text-xs text-neutral-400 sm:col-span-2 flex items-center gap-2">
                                         <input type="checkbox" name="is_sports_enabled" value="1" @checked($championship->is_sports_enabled) class="accent-netflix"> Ativar no módulo esportivo
                                     </label>
+                                    <label class="text-xs text-neutral-400 sm:col-span-2 flex items-center gap-2">
+                                        <input type="checkbox" name="is_featured" value="1" @checked($championship->is_featured) class="accent-netflix"> Exibir em destaque na tela inicial de Esportes
+                                    </label>
                                     <label class="text-xs text-neutral-400">ID da competição 365Scores
                                         <input name="external_id" value="{{ $championship->external_id }}" inputmode="numeric" placeholder="Ex.: 113" class="mt-1 w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white">
                                     </label>

@@ -625,6 +625,10 @@
             </div>
             
             <div class="modal-body" id="serverList">
+                @php
+                    $autoEmbedUrl = null;
+                @endphp
+
                 @if($settings->autoembed_movies && $movie->tmdb_id && $movie->use_autoembed)
                     @php
                         $sources = is_string($settings->autoembed_movie_sources) ? json_decode($settings->autoembed_movie_sources, true) : $settings->autoembed_movie_sources;

@@ -13,9 +13,9 @@ class RelatedContentService
     public function for(Model $content, int $limit = 12): Collection
     {
         $class = $content instanceof Movie ? Movie::class : Serie::class;
-        $content->loadMissing(['genres', 'keywords', 'cast']);
+        $content->loadMissing(['genres', 'keywords', 'cast', 'contentCategory']);
         $week = now()->format('o-W');
-        $cacheKey = sprintf('related:v3:%s:%s:%s:%d', $content->getTable(), $content->getKey(), $week, $limit);
+        $cacheKey = sprintf('related:v4:%s:%s:%s:%d', $content->getTable(), $content->getKey(), $week, $limit);
 
         $ids = Cache::remember($cacheKey, now()->addHours(12), function () use ($class, $content, $limit, $week) {
             $genreIds = $content->genres->pluck('id');
@@ -23,6 +23,13 @@ class RelatedContentService
             $castIds = $content->cast->take(10)->pluck('id');
 
             $query = $class::query()->whereKeyNot($content->getKey());
+
+            // A tela dedicada de animes não deve sugerir filmes/séries do catálogo geral.
+            // A regra é baseada no slug para não depender de um ID fixo de categoria.
+            if (str_contains(strtolower((string) $content->contentCategory?->slug), 'anime')) {
+                $query->whereHas('contentCategory', fn ($relation) => $relation->where('slug', 'like', '%anime%'));
+            }
+
             if ($genreIds->isNotEmpty() || $keywordIds->isNotEmpty() || $castIds->isNotEmpty()) {
                 $query->where(function ($candidateQuery) use ($genreIds, $keywordIds, $castIds) {
                     if ($genreIds->isNotEmpty()) {

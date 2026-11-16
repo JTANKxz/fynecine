@@ -29,11 +29,22 @@ class SeoCatalogController extends Controller
                         ->orderBy('season_number'),
                 ]),
             ])
-            ->where(is_numeric($idOrSlug) ? 'id' : 'slug', $idOrSlug)
+            ->where(function ($query) use ($idOrSlug) {
+                if (is_numeric($idOrSlug)) {
+                    // O site aceita /filme/{tmdb_id}; mantenha o ID interno como
+                    // alternativa para não quebrar links antigos.
+                    $query->where('tmdb_id', $idOrSlug)
+                        ->orWhere('id', $idOrSlug);
+                } else {
+                    $query->where('slug', $idOrSlug);
+                }
+            })
+            ->when(is_numeric($idOrSlug), fn ($query) => $query->orderByRaw('CASE WHEN tmdb_id = ? THEN 0 ELSE 1 END', [$idOrSlug]))
             ->firstOrFail();
 
         return response()->json([
             'id' => $item->id,
+            'tmdb_id' => $item->tmdb_id,
             'slug' => $item->slug,
             'title' => $isMovie ? $item->title : $item->name,
             'overview' => $item->overview,
@@ -92,7 +103,6 @@ class SeoCatalogController extends Controller
         $perPage = max(1, min((int) $request->input('per_page', 500), 1000));
 
         $items = $model::query()
-            ->whereNull('content_category_id')
             ->select(['id', 'slug', 'poster_path', 'updated_at'])
             ->orderBy('id')
             ->paginate($perPage);

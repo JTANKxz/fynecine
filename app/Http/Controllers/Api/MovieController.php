@@ -125,14 +125,17 @@ class MovieController extends Controller
             }
         ])
             ->where(function ($query) use ($idOrSlug) {
-
                 if (is_numeric($idOrSlug)) {
-                    $query->where('id', $idOrSlug);
+                    // URLs públicas podem usar o ID interno ou o ID do TMDB.
+                    // Damos prioridade ao TMDB para que /filme/{tmdb_id} resolva
+                    // corretamente mesmo se o mesmo número existir como ID local.
+                    $query->where('tmdb_id', $idOrSlug)
+                        ->orWhere('id', $idOrSlug);
                 } else {
                     $query->where('slug', $idOrSlug);
                 }
-
             })
+            ->when(is_numeric($idOrSlug), fn ($query) => $query->orderByRaw('CASE WHEN tmdb_id = ? THEN 0 ELSE 1 END', [$idOrSlug]))
             ->firstOrFail();
 
 

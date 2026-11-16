@@ -140,14 +140,16 @@ class SerieController extends Controller
             }
         ])
             ->where(function ($query) use ($idOrSlug) {
-
                 if (is_numeric($idOrSlug)) {
-                    $query->where('id', $idOrSlug);
+                    // Aceita tanto o ID local quanto o ID do TMDB nas URLs.
+                    // O TMDB tem prioridade para /serie/{tmdb_id}.
+                    $query->where('tmdb_id', $idOrSlug)
+                        ->orWhere('id', $idOrSlug);
                 } else {
                     $query->where('slug', $idOrSlug);
                 }
-
             })
+            ->when(is_numeric($idOrSlug), fn ($query) => $query->orderByRaw('CASE WHEN tmdb_id = ? THEN 0 ELSE 1 END', [$idOrSlug]))
             ->firstOrFail();
 
 

@@ -11,9 +11,10 @@ use Illuminate\Http\Request;
 
 class SeoCatalogController extends Controller
 {
-    public function show(string $type, string $idOrSlug): JsonResponse
+    public function show(Request $request, string $type, string $idOrSlug): JsonResponse
     {
         $isMovie = $type === 'movie';
+        $lookupByTmdb = $request->string('lookup')->lower()->value() === 'tmdb';
         $model = $isMovie ? Movie::class : Serie::class;
         $item = $model::query()
             ->with([
@@ -29,17 +30,13 @@ class SeoCatalogController extends Controller
                         ->orderBy('season_number'),
                 ]),
             ])
-            ->where(function ($query) use ($idOrSlug) {
+            ->where(function ($query) use ($idOrSlug, $lookupByTmdb) {
                 if (is_numeric($idOrSlug)) {
-                    // O site aceita /filme/{tmdb_id}; mantenha o ID interno como
-                    // alternativa para não quebrar links antigos.
-                    $query->where('tmdb_id', $idOrSlug)
-                        ->orWhere('id', $idOrSlug);
+                    $query->where($lookupByTmdb ? 'tmdb_id' : 'id', $idOrSlug);
                 } else {
                     $query->where('slug', $idOrSlug);
                 }
             })
-            ->when(is_numeric($idOrSlug), fn ($query) => $query->orderByRaw('CASE WHEN tmdb_id = ? THEN 0 ELSE 1 END', [$idOrSlug]))
             ->firstOrFail();
 
         return response()->json([

@@ -129,6 +129,7 @@ class SerieController extends Controller
 
     public function show(Request $request, $idOrSlug)
     {
+        $lookupByTmdb = $request->string('lookup')->lower()->value() === 'tmdb';
 
         $serie = Serie::with([
             'genres',
@@ -139,17 +140,19 @@ class SerieController extends Controller
                 $q->orderBy('pivot_order');
             }
         ])
-            ->where(function ($query) use ($idOrSlug) {
+            ->where(function ($query) use ($idOrSlug, $lookupByTmdb) {
                 if (is_numeric($idOrSlug)) {
-                    // Aceita tanto o ID local quanto o ID do TMDB nas URLs.
-                    // O TMDB tem prioridade para /serie/{tmdb_id}.
-                    $query->where('tmdb_id', $idOrSlug)
-                        ->orWhere('id', $idOrSlug);
+                    // O site público envia lookup=tmdb: números na URL são IDs
+                    // do TMDB, nunca IDs internos do banco.
+                    if ($lookupByTmdb) {
+                        $query->where('tmdb_id', $idOrSlug);
+                    } else {
+                        $query->where('id', $idOrSlug);
+                    }
                 } else {
                     $query->where('slug', $idOrSlug);
                 }
             })
-            ->when(is_numeric($idOrSlug), fn ($query) => $query->orderByRaw('CASE WHEN tmdb_id = ? THEN 0 ELSE 1 END', [$idOrSlug]))
             ->firstOrFail();
 
 

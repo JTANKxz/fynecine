@@ -114,6 +114,7 @@ class MovieController extends Controller
 
     public function show(Request $request, $idOrSlug)
     {
+        $lookupByTmdb = $request->string('lookup')->lower()->value() === 'tmdb';
 
         $movie = Movie::with([
             'genres',
@@ -124,18 +125,19 @@ class MovieController extends Controller
                 $q->orderBy('pivot_order');
             }
         ])
-            ->where(function ($query) use ($idOrSlug) {
+            ->where(function ($query) use ($idOrSlug, $lookupByTmdb) {
                 if (is_numeric($idOrSlug)) {
-                    // URLs públicas podem usar o ID interno ou o ID do TMDB.
-                    // Damos prioridade ao TMDB para que /filme/{tmdb_id} resolva
-                    // corretamente mesmo se o mesmo número existir como ID local.
-                    $query->where('tmdb_id', $idOrSlug)
-                        ->orWhere('id', $idOrSlug);
+                    // O site público envia lookup=tmdb: números na URL são IDs
+                    // do TMDB, nunca IDs internos do banco.
+                    if ($lookupByTmdb) {
+                        $query->where('tmdb_id', $idOrSlug);
+                    } else {
+                        $query->where('id', $idOrSlug);
+                    }
                 } else {
                     $query->where('slug', $idOrSlug);
                 }
             })
-            ->when(is_numeric($idOrSlug), fn ($query) => $query->orderByRaw('CASE WHEN tmdb_id = ? THEN 0 ELSE 1 END', [$idOrSlug]))
             ->firstOrFail();
 
 

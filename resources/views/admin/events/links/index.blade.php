@@ -20,12 +20,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 bg-green-900/20 border border-green-600 text-green-400 px-4 py-3 rounded text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden shadow-2xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">

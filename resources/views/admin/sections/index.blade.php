@@ -48,13 +48,6 @@
         @endforeach
     </div>
 
-    @if (session('success'))
-        <div class="mb-6 bg-green-900/30 border border-green-600/50 text-green-100 px-4 py-3 rounded-xl text-sm flex items-center gap-3">
-            <i class="fa-solid fa-check-circle text-green-400"></i>
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- DICA DE GESTÃO MANUAL --}}
     <div class="mb-8 bg-purple-900/20 border border-purple-500/30 rounded-2xl p-5 flex items-start gap-4">
         <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">

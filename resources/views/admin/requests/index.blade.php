@@ -10,12 +10,6 @@
             <p class="mt-2 text-sm text-neutral-400">Usuários solicitam filmes e séries pelo App. Importe diretamente daqui.</p>
         </div>
     </div>
-
-    @if (session('success'))
-        <div class="mt-4 bg-green-900 border border-green-600 text-green-100 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
-        </div>
-    @endif
     @if (session('error'))
         <div class="mt-4 bg-red-900 border border-red-600 text-red-100 px-4 py-3 rounded relative" role="alert">
             <span class="block sm:inline">{{ session('error') }}</span>

@@ -36,12 +36,6 @@
         </form>
     </div>
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-900 border border-green-600 text-green-100 px-4 py-2 rounded text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         @forelse ($avatars as $avatar)
             <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden group relative">

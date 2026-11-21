@@ -8,7 +8,6 @@
         <div><h2 class="text-2xl font-bold">Shorts</h2><p class="text-sm text-neutral-500">Feed vertical com fontes diretas e players oficiais incorporados.</p></div>
         <a href="{{ route('admin.shorts.create') }}" class="bg-netflix px-5 py-3 rounded-xl font-bold"><i class="fa-solid fa-plus mr-2"></i>Novo Short</a>
     </div>
-    @if(session('success'))<div class="mb-5 p-4 rounded-xl border border-green-600/40 text-green-400 bg-green-950/30">{{ session('success') }}</div>@endif
     <form class="mb-5 flex gap-2" method="GET"><input name="search" value="{{ request('search') }}" placeholder="Buscar título" class="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-2 w-full md:max-w-sm"><button class="border border-neutral-700 px-4 rounded-xl">Buscar</button></form>
     <div class="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-x-auto">
         <table class="w-full text-sm"><thead class="text-neutral-400 text-xs bg-neutral-800/50"><tr><th class="p-4 text-left">SHORT</th><th class="p-4 text-left">FONTE</th><th class="p-4 text-left">STATUS</th><th class="p-4 text-right">AÇÕES</th></tr></thead><tbody class="divide-y divide-neutral-800">

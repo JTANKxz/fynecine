@@ -10,12 +10,6 @@
     </a>
 </div>
 
-@if(session('success'))
-    <div class="bg-green-900/30 border border-green-700 text-green-400 p-3 rounded mb-4">
-        {{ session('success') }}
-    </div>
-@endif
-
 @if($teams->isEmpty())
     <div class="bg-neutral-900 rounded-lg p-12 text-center">
         <i class="fa-solid fa-shield-halved text-4xl text-neutral-600 mb-4"></i>

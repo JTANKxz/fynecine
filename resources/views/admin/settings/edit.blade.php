@@ -9,12 +9,6 @@
         <p class="text-sm text-neutral-500">Ajuste chaves de API, modos de segurança e comportamento do app.</p>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 bg-green-900/20 border border-green-600 text-green-400 px-4 py-3 rounded text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" class="w-full space-y-8">
         @csrf
         @method('PUT')

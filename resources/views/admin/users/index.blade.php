@@ -29,12 +29,6 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-900/30 border border-green-600 text-green-400 px-4 py-3 rounded relative text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     {{-- Tabela de usuários --}}
     <div class="bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800">
         <div class="overflow-x-auto">

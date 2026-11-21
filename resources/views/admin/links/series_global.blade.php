@@ -17,12 +17,6 @@
         </form>
     </div>
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-900 border border-green-600 text-green-100 px-4 py-2 rounded text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="space-y-6">
         @forelse ($series as $serie)
             <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-4">

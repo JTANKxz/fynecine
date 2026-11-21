@@ -63,13 +63,6 @@
         </form>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-5 py-4 rounded-xl text-sm flex items-center gap-3">
-            <i class="fa-solid fa-circle-check"></i>
-            {{ session('success') }}
-        </div>
-    @endif
-
     @if(session('error'))
         <div class="mb-6 bg-red-900/20 border border-red-600 text-red-400 px-5 py-4 rounded-xl text-sm flex items-center gap-3">
             <i class="fa-solid fa-circle-exclamation"></i>

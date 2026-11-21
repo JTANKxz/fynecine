@@ -9,10 +9,6 @@
         </div>
         <a href="{{ route('admin.channels.index') }}" class="rounded bg-neutral-800 px-4 py-2 text-sm">Voltar</a>
     </div>
-
-    @if(session('success'))
-        <div class="rounded border border-green-700 bg-green-900/30 p-3 text-sm text-green-200">{{ session('success') }}</div>
-    @endif
     @if(session('error'))
         <div class="rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">{{ session('error') }}</div>
     @endif

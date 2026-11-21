@@ -18,12 +18,6 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-900/30 border border-green-600 text-green-400 px-4 py-3 rounded relative text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="grid gap-4">
         @forelse ($tickets as $ticket)
             <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5 hover:border-neutral-700 transition group">

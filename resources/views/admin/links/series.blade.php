@@ -17,12 +17,6 @@
         </form>
     </div>
 
-    @if (session('success'))
-        <div class="mb-4 bg-green-900 border border-green-600 text-green-100 px-4 py-2 rounded text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach ($series as $serie)
             <div class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden group hover:border-netflix transition">

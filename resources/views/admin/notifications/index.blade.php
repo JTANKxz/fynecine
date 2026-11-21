@@ -31,12 +31,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 bg-green-900/20 border border-green-600 text-green-400 px-4 py-3 rounded text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-
     @if(session('error'))
         <div class="mb-6 bg-red-900/20 border border-red-600 text-red-400 px-4 py-3 rounded text-sm">
             <i class="fa-solid fa-circle-exclamation mr-2"></i> {{ session('error') }}

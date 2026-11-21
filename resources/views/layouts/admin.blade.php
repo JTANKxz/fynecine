@@ -447,6 +447,15 @@
                 </a>
             </div>
 
+            {{-- Backups do banco --}}
+            @if(Auth::user()->isAdmin())
+            <div>
+                <a href="{{ route('admin.backups.index') }}"
+                   class="block p-3 rounded flex items-center gap-2 {{ request()->routeIs('admin.backups.*') ? 'bg-netflix text-white' : 'hover:bg-neutral-800' }}">
+                    <i class="fa-solid fa-database w-5"></i> Backups do banco
+                </a>
+            </div>
+            @endif
         </nav>
     </aside>
 

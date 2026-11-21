@@ -56,6 +56,10 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 Route::middleware(['admin', 'auth'])->prefix('dashzin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dash');
 
+    // Backups do banco (somente administrador)
+    Route::get('/backups', [\App\Http\Controllers\Admin\DatabaseBackupController::class, 'index'])->name('backups.index');
+    Route::get('/backups/download/{type}', [\App\Http\Controllers\Admin\DatabaseBackupController::class, 'download'])->where('type', 'full|movies|series|seasons|episodes|users')->name('backups.download');
+
     Route::get('/tmdb', [TMDBController::class, 'index'])->name('tmdb');
     Route::get('/tmdb/search', [TMDBController::class, 'search']);
     Route::get('/tmdb/radar', [TMDBController::class, 'radar'])->name('tmdb.radar');
